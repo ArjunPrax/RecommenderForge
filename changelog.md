@@ -18,7 +18,7 @@ Future work follows `AGENTS.md`. The PDF's conflicting required-benchmark statem
 
 ### Validation
 
-Validated local structure with `git diff --check`. Created `ArjunPrax/TiktokTechjamTrack2` as a private GitHub repository and verified its private-only settings. Bootstrap commit and push follow this entry.
+Validated local structure with `git diff --check`. Created `ArjunPrax/TiktokTechjamTrack2` as a private GitHub repository and verified its private-only settings. Bootstrap commit `5d61ceb` was pushed to `main`.
 
 ### Files
 

@@ -42,7 +42,7 @@ Use `BACKLOG`, `READY`, `IN_PROGRESS`, `BLOCKED`, `REVIEW`, or `DONE`. Never rec
 ### T2-001 - Establish repository and collaboration bootstrap
 
 Owner: Human team
-Status: REVIEW
+Status: DONE
 Priority: High
 Depends on: None
 
@@ -50,10 +50,10 @@ Goal: Create/push private bootstrap repository and Track 2-only context.
 
 Relevant requirements: REQ-009, REQ-011, REQ-014
 
-Definition of done: Structure validated; private remote created; bootstrap committed/pushed; user delegates teammate access; PDF conflict recorded.
+Definition of done: Structure validated; private remote created; bootstrap committed/pushed; PDF conflict recorded. Teammate access remains a user-managed follow-up.
 
 Validation: Inspect structure, remote privacy, commit, push.
 
 Files/components: Root docs, `docs/`, `.github/`.
 
-Notes: Local scaffold and private remote are prepared. Commit/push verification remains.
+Notes: Bootstrap is committed and pushed. Do not begin Phase 1 until explicitly directed by the human.
