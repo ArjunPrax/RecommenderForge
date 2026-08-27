@@ -157,6 +157,9 @@ def run_autonomous_history(
     parent_hash = parent["checkpoint_manifest"].get("checkpoint_sha256")
     if not parent_hash:
         raise ValueError("history research parent is missing a checkpoint hash")
+    parent_prediction_path = Path(parent["checkpoint_manifest"]["checkpoint_path"]).with_suffix(".validation.npy")
+    if not parent_prediction_path.is_file():
+        raise ValueError("history research parent validation predictions are unavailable for ordering audit")
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     benchmark = starter_kuairand_pure_spec(starter_kit_dir)
@@ -196,7 +199,12 @@ def run_autonomous_history(
                     "hypothesis": "Frozen train-only user history crosses improve BPR validation ranking.",
                     "expected_mechanism": "the history bucket interacts with video, author, tab, and duration fields rather than acting as a user-constant score.",
                     "evidence_ids": ["KB-004"],
-                    "configuration": {"objective": "bpr", "history_cross": True, "seeds": [0, 1, 2, 3, 4]},
+                    "configuration": {
+                        "objective": "bpr",
+                        "history_cross": True,
+                        "seeds": [0, 1, 2, 3, 4],
+                        "parent_validation_prediction_path": str(parent_prediction_path),
+                    },
                     "controlled_variables": ["BPR loss", "FM optimizer", "train/validation split", "seed set"],
                 }
             ],

@@ -13,6 +13,7 @@ from typing import Iterable
 from .contracts import CheckpointManifest, ExperimentSpec
 from .controller import ExecutionResult
 from .kuairand import KuaiRandPureAdapter
+from .ordering import within_user_ordering_change
 from .ranking_fm import RankingFMConfig, run_ranking_fm
 
 
@@ -87,6 +88,16 @@ def execute_ranking_candidate(
         validation_prediction_sha256=str(best["validation_prediction_sha256"]),
         validation_metrics={metric: float(best[metric]) for metric in metric_names},
     )
+    ordering_audit: dict[str, int] | None = None
+    parent_prediction_path = candidate.configuration.get("parent_validation_prediction_path")
+    if parent_prediction_path is not None:
+        parent_scores = np.load(Path(str(parent_prediction_path)))
+        candidate_scores = np.load(Path(str(best["checkpoint_path"])).with_suffix(".validation.npy"))
+        ordering_audit = within_user_ordering_change(
+            [row.user_id for row in adapter.development_rows("valid")], parent_scores, candidate_scores
+        )
+        if ordering_audit["changed_users"] == 0:
+            raise RuntimeError("candidate feature did not alter any within-user validation ordering")
     (output_dir / "measurements.json").write_text(json.dumps(measurements, indent=2, sort_keys=True), encoding="utf-8")
     revision, diff_sha = _git_identity(Path(repository_root))
     return ExecutionResult(
@@ -96,6 +107,7 @@ def execute_ranking_candidate(
             "best_seed": int(float(best["seed"])),
             "best_seed_primary": float(best["primary"]),
             "selection_rule": "multi-seed mean ranks candidates; manifest freezes the best validation seed.",
+            "ordering_change_audit": ordering_audit,
         },
         checkpoint_manifest=manifest,
         resource_usage={
