@@ -1,8 +1,8 @@
 # Project Plan
 
-Current Phase: **Phase 0 - Bootstrap**
+Current Phase: **Phase 1 - Implementation**
 
-These are workflow phases, not technical decisions. Do not create Phase 1+ technical tasks until the human advances the project.
+The human advanced the project from Phase 0 on 2026-08-27. This plan implements the agreed autonomous research-agent architecture. Organizer metric/label ambiguity remains a tracked blocker for final benchmark designation, not for the platform foundation.
 
 1. Phase 0 - Repository and collaboration bootstrap
 2. Phase 1 - Problem analysis and research
@@ -56,4 +56,79 @@ Validation: Inspect structure, remote privacy, commit, push.
 
 Files/components: Root docs, `docs/`, `.github/`.
 
-Notes: Bootstrap is committed and pushed. Do not begin Phase 1 until explicitly directed by the human.
+Notes: Bootstrap is committed and pushed. The human advanced the project on 2026-08-27.
+
+## Phase 1
+
+### T2-002 - Platform foundation and benchmark integrity
+
+Owner: Codex
+Status: DONE
+Priority: Critical
+Depends on: T2-001
+
+Goal: Establish versioned benchmark contracts, hidden-test protection, an append-only ledger, checkpoint identity, deterministic recovery/convergence, and the qualification-run kernel.
+
+Relevant requirements: REQ-001, REQ-003, REQ-005, REQ-006, REQ-009, REQ-013, REQ-017, REQ-018, REQ-019
+
+Definition of done: A deterministic qualification workflow can create isolated candidate records, fail closed on test scoring, persist a checkpoint manifest, recover a controlled failure, calculate convergence, and export a report.
+
+Validation: Unit tests for contracts, test-access guard, evaluator delegation, ledger, convergence, recovery, checkpoint identity, and report export.
+
+Files/components: `src/tiktok_ml_agent/`, `tests/`, root/documentation contracts.
+
+### T2-003 - Baseline reproduction and PyTorch parity
+
+Owner: Claude
+Status: DONE
+Priority: Critical
+Depends on: T2-002 model/benchmark interfaces and local data
+
+Goal: Reproduce organizer references and establish a faithful pointwise PyTorch control before ranking-loss experiments.
+
+Relevant requirements: REQ-002, REQ-003, REQ-008, REQ-018
+
+Definition of done: Actual five-seed NumPy results are recorded; PyTorch fixed-weight parity passes; five-seed mean is within 0.001 of NumPy with no consistently directional defect.
+
+Validation: Reproduction commands, fixed fixtures, five-seed log, sign/difference checks.
+
+### T2-004 - Autonomous qualification run
+
+Owner: Codex
+Status: DONE
+Priority: Critical
+Depends on: T2-002
+
+Goal: Prove a complete non-final research loop with evidence retrieval, sibling candidates, recovery, convergence rehearsal, frozen checkpoint, validated output, and generated report.
+
+Relevant requirements: REQ-001, REQ-005, REQ-006, REQ-009, REQ-012, REQ-013, REQ-019
+
+Definition of done: One command completes the qualification flow and generates judge-facing evidence without hidden-test scoring.
+
+Validation: Deterministic fixture, injected failure, resource/intervention records, report and checkpoint-manifest assertions.
+
+### T2-005 - Autonomous ranking-objective research
+
+Owner: Claude
+Status: IN_PROGRESS
+Priority: High
+Depends on: T2-003, T2-004
+
+Goal: Run BPR and exact listwise objectives as sibling experiments through the autonomous system.
+
+Relevant requirements: REQ-004, REQ-005, REQ-009
+
+Definition of done: Measured multi-seed results and mechanism-aware reflections are recorded.
+
+### T2-006 - KuaiRand-1K and 27K adaptation
+
+Owner: Codex + Claude
+Status: BLOCKED
+Priority: High
+Depends on: organizer artifact contract, T2-004, T2-005
+
+Goal: Stream the bonus datasets without compromising evidence, safety, or recovery.
+
+Relevant requirements: REQ-004, REQ-008, REQ-012, REQ-013
+
+Definition of done: Official artifacts available; baseline, scalable training, recovery, and output validation complete.

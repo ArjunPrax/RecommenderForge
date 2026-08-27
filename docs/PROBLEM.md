@@ -1,6 +1,6 @@
 # Track 2 Problem
 
-Source: official **Tiktok Techjam Prob Statements** PDF supplied by the user, pages 1-9. This describes the problem, not a solution.
+Source: official **Tiktok Techjam Prob Statements** PDF supplied by the user, updated 2026-08-26, pages 1-12. This describes the problem, not a solution.
 
 ## Official Problem Statement
 
@@ -43,6 +43,12 @@ Technical Execution 35%; Innovation & Problem Insight 20%; Impact & Relevance 20
 
 The technical score uses the converged result, not the peak. Per metric, hidden-test delta is agent score minus official baseline; dataset score is mean metric delta. Autonomy is measured primarily by manual interventions. Feasibility includes LLM tokens and GPU-hours.
 
+## Current Benchmarks
+
+- KuaiRand-Pure is required and determines the primary score.
+- KuaiRand-1K and KuaiRand-27K are organizer bonus benchmarks; the team treats both as internal must-attempt targets once official artifacts exist.
+- AliCCP is absent from the updated 12-page PDF and is out of scope unless organizers explicitly reintroduce it.
+
 ## Open Questions / Ambiguities
 
-**Organizer-source conflict - requires clarification.** Pages 3, 7, and 8 say **AliCCP** is required and KuaiRand is bonus. Pages 4-6 describe a KuaiRand-Pure Starter Kit and state KuaiRand-Pure is required and determines 100% of primary score. The PDF also has incompatible metric/baseline detail between these passages. No benchmark is selected in Phase 0.
+**Organizer-source conflict - requires clarification.** The starter kit pins `long_view`, GAUC, and nDCG@5. PDF pages 4, 6, 7, and 8 instead describe `click`, nDCG@10, and Recall@50. The PDF says the Starter Kit pins the exact label/metrics, but its narrative contradicts that claim. The team will reproduce the starter kit as a provisional executable profile while blocking a final technical selection until organizers confirm whether `evaluate.py` is final.

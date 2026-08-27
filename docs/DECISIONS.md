@@ -54,6 +54,134 @@ REQ-014 must be clarified before affected planning.
 - Requirements: REQ-014
 - Tasks: T2-001
 
+## D006 - Advance to Phase 1 implementation
+
+Date: 2026-08-27
+Status: Accepted
+
+### Context
+
+The human explicitly authorized full implementation after reviewing the plan.
+
+### Decision
+
+Advance the project from bootstrap to implementation while retaining unresolved organizer ambiguity as a versioned benchmark-contract blocker.
+
+### Why
+
+The platform foundation, safety controls, baseline reproduction, and qualification workflow are useful under either possible KuaiRand metric profile.
+
+### Consequences
+
+Phase 1 tasks and code may proceed. Final metric-specific model selection remains blocked by REQ-014.
+
+### Related
+
+- Requirements: REQ-001, REQ-014
+- Tasks: T2-002
+
+## D007 - Provisional organizer evaluator delegation
+
+Date: 2026-08-27
+Status: Accepted
+
+### Context
+
+The updated PDF conflicts over KuaiRand target and metrics. The supplied starter kit includes runnable `evaluate.py` and baseline references.
+
+### Decision
+
+Use the starter evaluator as the provisional executable contract, recording its path and SHA-256 hash. The adapter delegates to it instead of reimplementing official metrics.
+
+### Why
+
+It is the only complete runnable organizer artifact, while preserving an auditable route to replace it if organizers issue a correction.
+
+### Consequences
+
+All results carry an evaluator hash and cannot be compared across changed evaluator versions.
+
+### Related
+
+- Requirements: REQ-008, REQ-014, REQ-015
+- Tasks: T2-002, T2-003
+
+## D008 - Fail closed on hidden-test access
+
+Date: 2026-08-27
+Status: Accepted
+
+### Decision
+
+Candidate-facing APIs reject test-label access and development test scoring. Only submission-row features/identifiers may be read for output generation.
+
+### Why
+
+The starter kit physically contains local test labels, while the organizer rules prohibit their use.
+
+### Consequences
+
+Every denied attempt is ledgered. The starter kit's local test-score route is not exposed through the agent.
+
+### Related
+
+- Requirements: REQ-003, REQ-017
+- Tasks: T2-002
+
+## D009 - Immutable checkpoint-backed outputs
+
+Date: 2026-08-27
+Status: Accepted
+
+### Decision
+
+Freeze a manifest that binds code, data, evaluator, configuration, metrics, prediction hash, and checkpoint hash. Submission output loads that checkpoint; it never retrains.
+
+### Why
+
+The measured validation result must describe the submitted model.
+
+### Related
+
+- Requirements: REQ-012, REQ-018
+- Tasks: T2-002, T2-004
+
+## D010 - Stable experiment IDs and explicit run classes
+
+Date: 2026-08-27
+Status: Accepted
+
+### Decision
+
+Assign stable EXP-001 through EXP-011 in `docs/EXPERIMENTS.md`. Each run is `qualification`, `research`, or `designated_final`; results are never renumbered or conflated.
+
+### Why
+
+It prevents identifier recycling and separates rehearsal resource/intervention accounting from the designated final run.
+
+### Related
+
+- Requirements: REQ-009, REQ-013, REQ-019
+- Tasks: T2-002, T2-004
+
+## D011 - Bounded runtime memory and operator taxonomy
+
+Date: 2026-08-27
+Status: Accepted
+
+### Decision
+
+Keep an append-only ledger, retrieve structured evidence cards at runtime, and periodically create bounded working-memory snapshots. Each experiment has one primary operator family; `novel` remains available with justification.
+
+### Why
+
+This controls token growth, makes research choices traceable, and prevents malformed unrestricted changes without reducing the evidence base to a human-authored script.
+
+### Related
+
+- Requirements: REQ-001, REQ-005, REQ-013, REQ-019
+- Tasks: T2-002, T2-004
+
 ## D004 - Retain experimental evidence
 
 Date: 2026-08-26

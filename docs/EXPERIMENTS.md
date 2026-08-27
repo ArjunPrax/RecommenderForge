@@ -1,11 +1,28 @@
 # Experiment Registry
 
-Plan experiments here; measured outcomes belong in `results_log.md`. Do not invent experiments during Phase 0.
+Plan experiments here; measured outcomes belong in `results_log.md`. IDs are stable and must never be reassigned.
+
+| ID | Title | Status |
+|---|---|---|
+| EXP-001 | Organizer baseline reproduction | Planned |
+| EXP-002 | NumPy-to-PyTorch pointwise parity | Planned |
+| EXP-003 | Autonomous qualification run | Planned |
+| EXP-004 | Ranking objectives: BPR and exact listwise | Measured; see R003 and R004 |
+| EXP-005 | Candidate-specific history and temporal crosses | Planned |
+| EXP-006 | Multi-feedback learning | Planned |
+| EXP-007 | Duration/watch-time corrections | Planned |
+| EXP-008 | Exposure and temporal robustness | Planned |
+| EXP-009 | Ensembles | Planned |
+| EXP-010 | KuaiRand-1K scale validation | Blocked on organizer artifacts |
+| EXP-011 | KuaiRand-27K scale validation | Blocked on organizer artifacts |
 
 ## EXP-XXX - Experiment title
 
 Status:
 Owner:
+Run class: qualification / research / designated_final
+Operator family:
+Parent experiment / checkpoint:
 
 ### Question
 

@@ -1,6 +1,6 @@
 # Demo
 
-Status: Not planned. The supplied PDF specifies submission evidence but no timed/live demo flow.
+Status: Planned. The final event includes Presentation & Communication scoring.
 
 ## Officially captured evidence
 
@@ -11,40 +11,50 @@ Status: Not planned. The supplied PDF specifies submission evidence but no timed
 
 ## Demo objective
 
-Not yet defined.
+Show a complete autonomous qualification/research run: benchmark contract, runtime hypothesis selection, isolated candidate execution, recovery event, evidence ledger, convergence, and exact checkpoint-backed output.
 
 ## Three-minute flow
 
-Not yet defined.
+1. State the benchmark and no-hidden-test policy.
+2. Show the planner's retrieved evidence and candidate batch.
+3. Show one candidate result and the mechanism-aware reflection.
+4. Show a recovery record and intervention count.
+5. Show the frozen checkpoint manifest, report, and valid output.
 
 ## Normal case
 
-Not yet defined.
+The agent reaches a converged result without manual mid-run code changes and produces an evidence report.
 
 ## Failure/degraded/edge case
 
-Not yet defined.
+Use recorded qualification artifacts and deterministic fixtures if live data/training is unavailable.
 
 ## What judges should observe
 
-Not yet defined.
+The agent's research reasoning is traceable, its test access is blocked, and the submitted artifact is the measured model.
 
 ## Commands
 
-Not yet defined.
+`python -m tiktok_ml_agent qualification --output-dir artifacts/qualification`
+
+For the first real, validation-only objective batch:
+
+`python -m tiktok_ml_agent autonomous-ranking --output-dir artifacts/autonomous-ranking`
+
+The second command deliberately does not accept a test-score option.
 
 ## Expected output
 
-Not yet defined.
+Not yet demonstrated.
 
 ## Recovery plan
 
-Not yet defined.
+Stop the affected candidate, preserve artifacts, resume from the immutable parent, and show the ledger recovery event.
 
 ## Backup demo
 
-Not yet defined.
+Use a pre-generated report, ledger export, and checkpoint manifest.
 
 ## Architecture visual
 
-Not yet defined.
+Controller -> isolated candidates -> evaluator -> ledger/memory -> reflection/convergence -> checkpoint-backed output.

@@ -1,49 +1,64 @@
 # Architecture
 
-Status: **NOT YET SELECTED**
-
-Architecture planning has intentionally not begun. Repository bootstrap must complete before the team evaluates solution architectures.
+Status: **Accepted for Phase 1 implementation**
 
 ## System overview
 
-Not yet selected.
+The project is an autonomous research control plane around organizer-supplied recommender benchmarks. It plans a bounded candidate batch from immutable parents, executes candidates in isolated worktrees, delegates validation to a versioned organizer evaluator, stores immutable evidence, reflects on the outcome, and selects the next parent or converges.
 
 ## Components
 
-Not yet selected.
+- **Benchmark contract and adapter:** data partitions, evaluator path/hash, submission schema, hidden-test policy.
+- **Research knowledge base:** structured evidence cards for papers, organizer guidance, and measured findings.
+- **Memory manager:** bounded planner context distilled from, but never replacing, the append-only ledger.
+- **Planner:** produces 1–3 ranked `ExperimentSpec` siblings with evidence and one primary operator family.
+- **Executor:** creates an isolated candidate worktree and records process/resource state.
+- **Validator:** static checks, test-access policy, checkpoint checks, and organizer evaluator delegation.
+- **Ledger:** SQLite/JSON evidence with run class, hypothesis, diff/config/data/evaluator identity, metrics, reflection, failures, and resources.
+- **Controller:** deterministic candidate selection, recovery, convergence, checkpoint freezing, and report export.
 
 ## Data flow
 
-Not yet selected.
+```text
+BenchmarkSpec + KnowledgeBase + MemorySnapshot
+                  -> Planner -> CandidateBatch
+                  -> isolated candidate execution
+                  -> validator + organizer evaluator
+                  -> RunRecord + artifacts
+                  -> reflection + memory consolidation
+                  -> promote / recover / converge / checkpoint-backed output
+```
 
 ## Interfaces
 
-Not yet selected.
+- `BenchmarkSpec`: dataset/splits/label/evaluator hash/baseline/convergence/schema/policy.
+- `ExperimentSpec`: stable ID, run class, parent, hypothesis, source evidence, operator, config, controls, budgets.
+- `RunRecord`: append-only measured outcome and lifecycle state.
+- `CheckpointManifest`: content hashes binding the measured checkpoint to code/data/evaluator/config/predictions.
+- `EvidenceCard` and `MemorySnapshot`: retrievable research evidence and bounded planner state.
 
 ## Execution environment
 
-Not yet selected.
-
-## Performance-sensitive path
-
-Not yet selected.
+Python is managed through a project-local `uv` environment after compatibility verification. The NumPy baseline remains runnable without PyTorch. PyTorch is admitted only after fixed-weight and five-seed pointwise parity.
 
 ## Trust/security boundaries
 
-Not yet selected.
+- Candidate code cannot retrieve test labels or locally score test data.
+- The adapter delegates to the organizer evaluator, whose hash is recorded.
+- Every accepted prediction is traceable to an immutable checkpoint manifest.
+- Data, generated artifacts, caches, submissions, and secrets are git-ignored.
 
 ## Observability
 
-Not yet selected.
+Run records include timings, CPU/MPS/CUDA use, peak memory, LLM tokens, attempt count, failure/recovery history, interventions, and event timestamps. Generated reports aggregate qualification, research, and designated-final runs separately.
 
 ## Evaluation path
 
-Not yet selected.
-
-## Architecture diagram
-
-Not yet selected.
+Use the organizer evaluator for any official validation score. Inner development is available for model-internal training controls but is not a candidate-rejection proxy unless correlation has been demonstrated. Final claims use the declared multi-seed protocol.
 
 ## Known tradeoffs
 
-Not yet selected.
+- The starter evaluator is provisional due to the organizer conflict.
+- Bounded operator taxonomy improves safety and comparability, but `novel` preserves exploration.
+- Working-memory summaries reduce token growth; the original ledger remains retrievable.
+- Full-fidelity Pure evaluation is preferred over unvalidated small-data pruning.
