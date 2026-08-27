@@ -16,7 +16,7 @@ Plan experiments here; measured outcomes belong in `results_log.md`. IDs are sta
 | EXP-010 | KuaiRand-1K scale validation | Baseline demonstrated on official artifact; R012 |
 | EXP-011 | KuaiRand-27K scale validation | Official artifact download in progress; bounded-memory validation route implemented and tested on 1K |
 | EXP-012 | Compact DeepFM BPR backbone | Measured; R011 rejects the first configuration |
-| EXP-013 | Three-negatives-per-positive BPR sampling | Implemented; five-seed measurement in progress |
+| EXP-013 | Three-negatives-per-positive BPR sampling | Measured; R014 rejects the first configuration |
 
 ## EXP-XXX - Experiment title
 

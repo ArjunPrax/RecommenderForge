@@ -2,6 +2,31 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R014 - Three-negatives-per-positive BPR sampling result
+
+Date: 2026-08-28
+Experiment: EXP-013
+Implementation / commit: `9f5a88b`
+Environment: CPython 3.13.11, NumPy 2.5.2, PyTorch 2.13.0, CPU.
+
+### Change Tested
+
+Retained the BPR loss, FM fields, optimizer, data split, and five seeds but sampled three strictly same-user negatives for every positive rather than one.
+
+### Metrics
+
+| Metric | Mean | Population std | Delta vs BPR |
+|---|---:|---:|---:|
+| GAUC | 0.669069 | 0.000999 | -0.000465 |
+| nDCG@5 | 0.536571 | 0.000418 | +0.000006 |
+| primary | 0.602820 | 0.000693 | -0.000262 |
+
+The run used 120.61 CPU seconds, zero GPU-hours, zero LLM tokens, and zero manual interventions. Its best seed altered 41,313 eligible within-user pairwise relations for 8,992 of 18,460 users relative to the BPR parent.
+
+### Interpretation
+
+The denser sampler did not translate to a useful mean ranking improvement and increased variance. Reject it as a parent; retain the full checkpoint, event ledger, and measured failure as a sampling-family result.
+
 ## R013 - Train-only watch-completion BPR result
 
 Date: 2026-08-28

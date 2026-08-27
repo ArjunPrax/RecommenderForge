@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Denser BPR negative-sampling result
+
+### Measured
+
+EXP-013 reached mean validation primary `0.602820`, `-0.000262` versus BPR. The changed ordering audit and full resource record are retained in R014; the configuration is rejected as a parent.
+
 ## 2026-08-28 - Denser BPR negative-sampling candidate
 
 ### Changed
