@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - DeepFM backbone measured
+
+### Measured
+
+EXP-012 reached mean validation primary `0.603115`, essentially flat versus BPR and below R010. The 64-unit DeepFM configuration is retained as a negative result; its higher variance is recorded in R011.
+
 ## 2026-08-28 - DeepFM backbone lane
 
 ### Changed

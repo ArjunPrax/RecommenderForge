@@ -2,6 +2,28 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R011 - Compact DeepFM BPR backbone result
+
+Date: 2026-08-28
+Experiment: EXP-012
+Implementation / commit: `efa568e`
+
+### Change Tested
+
+Replaced the FM scoring backbone with a compact DeepFM-style model: the original FM interactions plus a 64-unit nonlinear tower over the same field embeddings. BPR, categorical fields, data split, early stopping, and seeds remained controlled.
+
+### Metrics
+
+| Metric | Mean | Population std | Delta vs BPR | Delta vs R010 |
+|---|---:|---:|---:|---:|
+| GAUC | 0.669561 | 0.001082 | +0.000027 | -0.001283 |
+| nDCG@5 | 0.536668 | 0.000460 | +0.000040 | -0.000520 |
+| primary | 0.603115 | 0.000736 | +0.000033 | -0.000902 |
+
+### Interpretation
+
+The nonlinear tower does not deliver a useful mean gain at this scale and substantially increases seed variance. Reject this 64-unit DeepFM configuration as a parent. Its retained artifact remains available only for future frozen-ensemble analysis, not as a selected component.
+
 ## R010 - Three-component frozen rank ensemble improvement
 
 Date: 2026-08-28
