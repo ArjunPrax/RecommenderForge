@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - KuaiRand-1K official bonus baseline
+
+### Changed and measured
+
+Downloaded KuaiRand-1K from the official Zenodo source with published-MD5 verification. Implemented and ran streaming preflight plus a train-only smoothed item-popularity baseline on the full 1K train/validation time ranges. R012 records primary `0.543898` and a 16.54-second run. Test labels were never exposed.
+
 ## 2026-08-28 - DeepFM backbone measured
 
 ### Measured

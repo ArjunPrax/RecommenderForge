@@ -123,7 +123,7 @@ Definition of done: Measured multi-seed results and mechanism-aware reflections 
 ### T2-006 - KuaiRand-1K and 27K adaptation
 
 Owner: Codex + Claude
-Status: BLOCKED
+Status: IN_PROGRESS
 Priority: High
 Depends on: organizer artifact contract, T2-004, T2-005
 
@@ -132,3 +132,5 @@ Goal: Stream the bonus datasets without compromising evidence, safety, or recove
 Relevant requirements: REQ-004, REQ-008, REQ-012, REQ-013
 
 Definition of done: Official artifacts available; baseline, scalable training, recovery, and output validation complete.
+
+Notes: KuaiRand-1K official archive is checksum-verified and its streaming baseline is measured (R012). KuaiRand-27K remains pending due its 46GB size; do not represent the task as complete until both artifacts meet the definition of done.

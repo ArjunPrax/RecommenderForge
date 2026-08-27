@@ -2,6 +2,37 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R012 - KuaiRand-1K streaming popularity bonus baseline
+
+Date: 2026-08-28
+Experiment: EXP-010
+Implementation / commit: `305b057`
+
+### Purpose
+
+Validate that the agent can train and evaluate a real bonus-scale artifact without loading its test labels or relying on the Pure in-memory path.
+
+### Dataset Integrity
+
+The official `KuaiRand-1K.tar.gz` archive was downloaded from Zenodo and verified against MD5 `6b0b9c8222d67fcd4c676218edca3f1f`. Streaming preflight found 5,055,984 train, 2,524,980 validation, and 4,132,081 test rows. Test rows were exposed as features/identifiers only.
+
+### Change Tested
+
+One-pass smoothed item long-view popularity, trained on 2,119,510 unique training items and evaluated with the provisional organizer evaluator on the 1K validation time range.
+
+### Metrics
+
+| Metric | Value |
+|---|---:|
+| GAUC | 0.542570 |
+| nDCG@5 | 0.545226 |
+| primary | 0.543898 |
+| wall seconds | 16.54 |
+
+### Interpretation
+
+This is a scalable integrity and baseline result, not a comparison against an organizer-provided 1K reference. The metric profile remains provisional under REQ-014, but the data adapter, streaming train/evaluate path, and feature-only test boundary are now demonstrated on the official bonus artifact.
+
 ## R011 - Compact DeepFM BPR backbone result
 
 Date: 2026-08-28
