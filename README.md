@@ -15,7 +15,10 @@ Read [AGENTS.md](AGENTS.md), then the context listed there. The repository is th
 ## Repository map
 
 - `docs/` - problem, requirements, decisions, plan, collaboration, experiments, demo, references
-- `src/`, `tests/`, `experiments/`, `scripts/`, `artifacts/` - intentionally empty placeholders
+- `src/tiktok_ml_agent/` - benchmark contracts, safe adapters, research controller, model candidates, reporting, submission
+- `tests/` - deterministic integrity, metric, isolation, model, and recovery tests
+- `scripts/` - checksum-verified official KuaiRand downloader
+- `artifacts/` - ignored ledgers, checkpoints, reports, outputs, and scale preflights
 - `changelog.md` - newest-first handoff log
 - `results_log.md` - reproducible measured outcomes
 - `.github/` - lightweight PR and issue templates
@@ -25,6 +28,17 @@ Read [AGENTS.md](AGENTS.md), then the context listed there. The repository is th
 The agent reproduces the organizer KuaiRand-Pure baseline, proposes bounded research candidates, executes each candidate in an isolated worktree, evaluates only permitted validation data, recovers from failures, records complete evidence, and freezes the exact validation-best checkpoint for submission.
 
 The official PDF currently conflicts over the target/metrics. The supplied starter-kit evaluator is the provisional executable contract; see [docs/PROBLEM.md](docs/PROBLEM.md) and [docs/DECISIONS.md](docs/DECISIONS.md).
+
+## Safe reproduction commands
+
+```bash
+.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python -m tiktok_ml_agent qualification
+.venv/bin/python -m tiktok_ml_agent baseline-valid
+.venv/bin/python -m tiktok_ml_agent autonomous-ranking
+```
+
+All development commands are validation-only. `submission` reconstructs a measured frozen checkpoint and validates row alignment; it does not score local test labels.
 
 ## Start here
 
