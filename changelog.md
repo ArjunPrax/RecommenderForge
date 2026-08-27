@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Watch-completion auxiliary result
+
+### Measured
+
+EXP-007 reached mean validation primary `0.603023`, a `-0.000059` regression from BPR. The candidate changed 44,299 within-user pairwise relations across 9,088 users, so it was a genuine ranking change but not an improvement. R013 preserves the negative result and its zero-GPU, zero-token, zero-intervention evidence.
+
 ## 2026-08-28 - Train-only watch-completion candidate
 
 ### Changed

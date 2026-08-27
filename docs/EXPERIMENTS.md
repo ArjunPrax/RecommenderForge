@@ -10,7 +10,7 @@ Plan experiments here; measured outcomes belong in `results_log.md`. IDs are sta
 | EXP-004 | Ranking objectives: BPR and exact listwise | Measured manually; autonomous rerun pending. Child candidates: EXP-004A (BPR), EXP-004B (exact listwise). See R003 and R004. |
 | EXP-005 | Candidate-specific history and temporal crosses | Measured; see R005 (recovered run) and R006 |
 | EXP-006 | Multi-feedback learning | Measured; R007 rejects the first shared-FM auxiliary configuration |
-| EXP-007 | Train-only watch-completion auxiliary objective | Implemented; five-seed measurement in progress |
+| EXP-007 | Train-only watch-completion auxiliary objective | Measured; R013 rejects the first configuration |
 | EXP-008 | Exposure and temporal robustness | Measured; see R009 |
 | EXP-009 | Ensembles | Measured; R008 two-component, R010 three-component child EXP-009A is current validation leader |
 | EXP-010 | KuaiRand-1K scale validation | Baseline demonstrated on official artifact; R012 |

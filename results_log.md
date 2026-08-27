@@ -2,6 +2,31 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R013 - Train-only watch-completion BPR result
+
+Date: 2026-08-28
+Experiment: EXP-007
+Implementation / commit: `1e48fbd`
+Environment: CPython 3.13.11, NumPy 2.5.2, PyTorch 2.13.0, CPU.
+
+### Change Tested
+
+Added one auxiliary completion head to BPR FM. Its target was `clip(play_time_ms / duration_ms, 0, 1)` from training rows only. Validation and test row objects cannot request `play_time_ms`; the evaluated score stayed the primary long-view BPR logit.
+
+### Metrics
+
+| Metric | Mean | Population std | Delta vs BPR |
+|---|---:|---:|---:|
+| GAUC | 0.669489 | 0.000607 | -0.000045 |
+| nDCG@5 | 0.536557 | 0.000418 | -0.000008 |
+| primary | 0.603023 | 0.000491 | -0.000059 |
+
+The autonomous run used 105.44 CPU seconds, zero GPU-hours, zero LLM tokens, and zero manual interventions. The best watch-time seed changed 44,299 eligible within-user pairwise relations for 9,088 of 18,460 users relative to the frozen BPR parent, so the candidate was not user-constant or inert.
+
+### Interpretation
+
+This first completion-auxiliary configuration is a small regression and is rejected as a parent. Its complete ledger, recovered audit event, checkpoint manifests, and prediction files are retained. It did not access validation or test watch-time outcomes.
+
 ## R012 - KuaiRand-1K streaming popularity bonus baseline
 
 Date: 2026-08-28

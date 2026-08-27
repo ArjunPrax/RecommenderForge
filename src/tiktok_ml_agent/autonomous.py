@@ -327,6 +327,7 @@ def run_autonomous_watchtime(
     parent_hash = parent["checkpoint_manifest"].get("checkpoint_sha256")
     if not parent_hash:
         raise ValueError("watch-time parent is missing a checkpoint hash")
+    parent_prediction_path = str(Path(parent["checkpoint_manifest"]["checkpoint_path"]).with_suffix(".validation.npy"))
     output_dir = Path(output_dir); output_dir.mkdir(parents=True, exist_ok=True)
     benchmark = starter_kuairand_pure_spec(starter_kit_dir); ledger = ExperimentLedger(output_dir / "ledger.sqlite")
     knowledge = KnowledgeBase([EvidenceCard(
@@ -352,7 +353,7 @@ def run_autonomous_watchtime(
             "hypothesis": "Train-only watch-completion supervision improves BPR validation primary.",
             "expected_mechanism": "a shared representation receives denser preference gradients while the evaluated BPR head remains unchanged.",
             "evidence_ids": ["KB-010"],
-            "configuration": {"objective": "bpr", "auxiliary_task": "watch_completion", "auxiliary_weight": 0.10, "seeds": [0, 1, 2, 3, 4]},
+            "configuration": {"objective": "bpr", "auxiliary_task": "watch_completion", "auxiliary_weight": 0.10, "seeds": [0, 1, 2, 3, 4], "parent_validation_prediction_path": parent_prediction_path},
             "controlled_variables": ["BPR loss", "FM fields", "train/validation split", "seed set"],
         }],
     })
