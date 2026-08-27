@@ -6,6 +6,8 @@ The project will address the official Track 2 challenge: an autonomous ML resear
 
 Official KuaiRand variants can be downloaded with checksum verification, for example: `python scripts/download_kuairand.py 1k`. Data stays untracked.
 
+For the large official artifact, the scale baseline is deliberately bounded-memory: `python -m tiktok_ml_agent scale-popularity --variant 27k --data-dir kuairand-starter-kit/KuaiRand-27K/data`. It keeps test labels unavailable and evaluates validation in user-consistent shards.
+
 ## Start here
 
 Read [AGENTS.md](AGENTS.md), then the context listed there. The repository is the durable project memory.

@@ -9,6 +9,7 @@ The project is an autonomous research control plane around organizer-supplied re
 ## Components
 
 - **Benchmark contract and adapter:** data partitions, evaluator path/hash, submission schema, hidden-test policy.
+- **Scale adapter:** streams official 1K/27K logs, uses bounded item statistics and user-consistent validation shards, and never exposes bonus-test labels.
 - **Research knowledge base:** structured evidence cards for papers, organizer guidance, and measured findings.
 - **Memory manager:** bounded planner context distilled from, but never replacing, the append-only ledger.
 - **Planner:** produces 1–3 ranked `ExperimentSpec` siblings with evidence and one primary operator family.

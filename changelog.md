@@ -2,6 +2,16 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Bounded KuaiRand-27K baseline route
+
+### Changed
+
+Replaced the scale baseline's assumption that all items and validation predictions fit in memory. KuaiRand-27K now defaults to a fixed 24-bit stable-hash popularity table and user-consistent validation shards. Every shard delegates metric calculation to the supplied evaluator; the cross-shard aggregation is explicitly matched to its documented GAUC and nDCG weighting.
+
+### Validation
+
+Added unit coverage for deterministic bounded hashing and shard aggregation. The full 1K baseline reproduced its previous metrics exactly through the sharded route: primary `0.543898`, GAUC `0.542570`, nDCG@5 `0.545226` (18.88 seconds, 32 shards). Full test suite: 36 passing. The 27K archive download is in progress; no 27K score is claimed yet.
+
 ## 2026-08-28 - KuaiRand-1K official bonus baseline
 
 ### Changed and measured
