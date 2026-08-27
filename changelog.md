@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Campaign-level convergence accounting
+
+### Changed
+
+Added a persistent campaign convergence model that evaluates epsilon/N across complete candidate batches, records the significant-improvement anchor separately from the best measured run, and exports a machine-readable campaign status.
+
 ## 2026-08-28 - Three-component ensemble measured
 
 ### Measured

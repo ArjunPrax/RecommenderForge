@@ -16,6 +16,7 @@ The project is an autonomous research control plane around organizer-supplied re
 - **Validator:** static checks, test-access policy, checkpoint checks, and organizer evaluator delegation.
 - **Ledger:** SQLite/JSON evidence with run class, hypothesis, diff/config/data/evaluator identity, metrics, reflection, failures, and resources.
 - **Controller:** deterministic candidate selection, recovery, convergence, checkpoint freezing, and report export.
+- **Campaign convergence:** evaluates epsilon/N over complete candidate batches across the campaign, rather than incorrectly treating siblings as sequential iterations.
 
 ## Data flow
 

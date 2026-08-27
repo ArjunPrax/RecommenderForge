@@ -259,6 +259,19 @@ Use `EXP-009A` as the append-only child of EXP-009 for the BPR/history/temporal 
 
 The candidate has distinct component manifests and a distinct declared weight grid, so it requires an independent immutable experiment identity.
 
+## D016 - Convergence counts batches, not sibling candidates
+
+Date: 2026-08-28
+Status: Accepted
+
+### Decision
+
+Apply the provisional epsilon/N convergence rule to the selected result of each complete candidate batch. Sibling candidates share a parent and are alternatives within one iteration, so they must not consume multiple stagnation counts.
+
+### Why
+
+This preserves the intended atomicity of an autonomous proposal/execute/select loop and makes the stopping audit reproducible.
+
 ## D004 - Retain experimental evidence
 
 Date: 2026-08-26
