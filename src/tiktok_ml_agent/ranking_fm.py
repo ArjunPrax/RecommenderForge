@@ -21,6 +21,7 @@ from .baseline_runner import StarterFMConfig, _encode_train_validation
 from .history import prior_long_view_buckets
 from .kuairand import KuaiRandPureAdapter
 from .torch_fm import TorchFM
+from .temporal import temporal_primary_windows
 
 
 @dataclass(frozen=True, slots=True)
@@ -162,6 +163,13 @@ def run_ranking_fm(
     validation_scores = model.predict(x_valid_tensor).cpu().numpy()
     metrics = adapter.evaluator.score_development(
         "valid", users_valid, [int(row.label) for row in valid], validation_scores
+    )
+    metrics.update(
+        temporal_primary_windows(
+            valid,
+            validation_scores,
+            lambda users, labels, values: adapter.evaluator.score_development("valid", users, labels, values),
+        )
     )
     if checkpoint_path is not None:
         checkpoint = Path(checkpoint_path)

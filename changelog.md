@@ -2,6 +2,20 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Multi-feedback candidate evidence
+
+### Changed
+
+Added train-only access to click/like/follow labels, a shared-FM multi-task BPR candidate, and an autonomous five-seed runner from the immutable BPR parent.
+
+### Measured
+
+EXP-006 mean validation primary was `0.602298`, `-0.000783` relative to BPR. The first shared-FM auxiliary configuration is rejected; see R007. The negative result is preserved rather than tuned away.
+
+### Validation
+
+The multi-task head-gradient and train-only auxiliary-access tests pass. The run wrote an immutable checkpoint manifest and did not access test labels or scores.
+
 ## 2026-08-28 - Autonomous ranking and history evidence
 
 ### Changed

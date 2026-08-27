@@ -83,6 +83,11 @@ def execute_ranking_candidate(
     metric_names = ("GAUC", "nDCG@5", "primary")
     metrics = {metric: mean(float(result[metric]) for result in measurements) for metric in metric_names}
     metrics.update({f"{metric}_std": pstdev(float(result[metric]) for result in measurements) for metric in metric_names})
+    temporal_stability = {
+        key: mean(float(result[key]) for result in measurements)
+        for key in ("valid_early_primary", "valid_late_primary", "valid_temporal_gap")
+        if key in measurements[0]
+    }
     best = max(measurements, key=lambda result: float(result["primary"]))
     manifest = CheckpointManifest(
         checkpoint_path=str(best["checkpoint_path"]),
@@ -114,6 +119,7 @@ def execute_ranking_candidate(
             "best_seed_primary": float(best["primary"]),
             "selection_rule": "multi-seed mean ranks candidates; manifest freezes the best validation seed.",
             "ordering_change_audit": ordering_audit,
+            "temporal_validation_stability": temporal_stability,
         },
         checkpoint_manifest=manifest,
         resource_usage={

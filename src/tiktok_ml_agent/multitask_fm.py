@@ -15,6 +15,7 @@ from .baseline_runner import StarterFMConfig, _encode_train_validation
 from .kuairand import KuaiRandPureAdapter
 from .ranking_fm import _group_indices, _sample_bpr_pairs
 from .torch_fm import TorchFM
+from .temporal import temporal_primary_windows
 
 
 class MultiTaskFM(TorchFM):
@@ -107,6 +108,13 @@ def run_multitask_bpr(
     model.load_state_dict(best_state)
     validation_scores = model.task_logits(valid_tensor, 0).detach().numpy()
     metrics = adapter.evaluator.score_development("valid", users_valid, [int(row.label) for row in valid], validation_scores)
+    metrics.update(
+        temporal_primary_windows(
+            valid,
+            validation_scores,
+            lambda users, labels, values: adapter.evaluator.score_development("valid", users, labels, values),
+        )
+    )
     if checkpoint_path is not None:
         checkpoint = Path(checkpoint_path)
         checkpoint.parent.mkdir(parents=True, exist_ok=True)

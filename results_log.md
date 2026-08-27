@@ -2,6 +2,47 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R007 - Multi-feedback BPR regression
+
+Date: 2026-08-28
+Experiment: EXP-006
+Implementation / commit: `92658323a126dee65d6b31bbdbe2e1f1bc12b83a`
+Environment: CPython 3.13.11, NumPy 2.5.2, PyTorch 2.13.0, CPU.
+
+### Question
+
+Do train-only click, like, and follow auxiliary tasks improve a shared FM representation for the primary long-view BPR ranker?
+
+### Baseline
+
+EXP-004A BPR five-seed mean primary `0.603082`.
+
+### Change Tested
+
+Added three task-specific bias heads above one shared FM. The primary head retained BPR on long-view; click, like, and follow used auxiliary BCE from training rows only, with auxiliary weight `0.15`. Validation exposes no auxiliary outcome labels.
+
+### Metrics
+
+| Metric | Mean | Population std | Delta vs BPR |
+|---|---:|---:|---:|
+| GAUC | 0.668488 | 0.000725 | -0.001046 |
+| nDCG@5 | 0.536108 | 0.000497 | -0.000521 |
+| primary | 0.602298 | 0.000571 | -0.000783 |
+
+The autonomous five-seed run consumed `118.22` CPU seconds, no GPU-hours, no LLM tokens, and no manual interventions.
+
+### Correctness Validation
+
+Unit tests confirm auxiliary-head gradients update independently. The safe loader blocks auxiliary outcomes outside the training split. The run is checkpoint-backed and validation-only.
+
+### Interpretation
+
+This first multi-task weighting is a regression. The result does not reject multi-task learning universally, but it rejects this architecture/weight as a parent.
+
+### Decision / Next Step
+
+Do not tune against one seed. Any future multi-task retry must change one named mechanism (task weighting, gradient balancing, or a richer head) and run the same multi-seed protocol.
+
 ## R006 - Checkpoint-parented history-cross BPR result
 
 Date: 2026-08-28
