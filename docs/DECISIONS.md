@@ -246,6 +246,19 @@ This makes a possible complementary-rank gain reproducible and prevents silently
 - Requirements: REQ-003, REQ-009, REQ-018
 - Experiments: EXP-009
 
+## D015 - EXP-009 child for three-component ensemble
+
+Date: 2026-08-28
+Status: Accepted
+
+### Decision
+
+Use `EXP-009A` as the append-only child of EXP-009 for the BPR/history/temporal three-component candidate. EXP-009 retains its two-component result.
+
+### Why
+
+The candidate has distinct component manifests and a distinct declared weight grid, so it requires an independent immutable experiment identity.
+
 ## D004 - Retain experimental evidence
 
 Date: 2026-08-26

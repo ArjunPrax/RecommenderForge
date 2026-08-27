@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Three-component ensemble measured
+
+### Measured
+
+EXP-009A selected BPR/history/temporal weights `0.375/0.375/0.25` with mean validation primary `0.604017`, +`0.002444` over R001 and +`0.000251` over the two-component R008 blend. A schema-valid output was generated from the composite manifest without test scoring.
+
 ## 2026-08-28 - Temporal cross measured
 
 ### Measured

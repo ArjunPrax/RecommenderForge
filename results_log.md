@@ -2,6 +2,34 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R010 - Three-component frozen rank ensemble improvement
+
+Date: 2026-08-28
+Experiment: EXP-009A (child of EXP-009)
+Implementation / commit: `f63f617`
+
+### Change Tested
+
+Added the frozen inference-known temporal BPR predictor to the R008 BPR/history rank ensemble. Four predeclared three-weight vectors were evaluated across the same five seed-aligned validation predictions. The selected vector was `0.375` BPR, `0.375` history, and `0.25` temporal.
+
+### Metrics
+
+| Metric | Mean | Population std | Delta vs R001 baseline | Delta vs R008 |
+|---|---:|---:|---:|---:|
+| GAUC | 0.670845 | 0.000685 | +0.003444 | +0.000432 |
+| nDCG@5 | 0.537188 | 0.000240 | +0.001445 | +0.000070 |
+| primary | 0.604017 | 0.000441 | +0.002444 | +0.000251 |
+
+The other declared grid means ranged from `0.603866` to `0.603954`.
+
+### Correctness Validation
+
+All three components are frozen checkpoint manifests. The composite manifest includes component weights, full grid, best validation prediction hash, data and evaluator hashes, and it generated a schema-valid 170,588-row output without test scoring.
+
+### Interpretation
+
+R010 is the current validation leader. Its improvement over R008 is smaller than epsilon, so it does not reset a global epsilon/N convergence counter by itself; it should nevertheless remain the scored candidate rather than being discarded.
+
 ## R009 - Inference-known weekday-cross BPR result
 
 Date: 2026-08-28
