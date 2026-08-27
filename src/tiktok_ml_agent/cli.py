@@ -14,6 +14,7 @@ from .torch_fm import run_safe_torch_fm
 from .ranking_fm import RankingFMConfig, run_ranking_fm
 from .autonomous import run_autonomous_backbone, run_autonomous_ensemble, run_autonomous_history, run_autonomous_multitask, run_autonomous_ranking, run_autonomous_temporal, run_autonomous_three_ensemble
 from .submission import generate_submission
+from .scale import ScaleArtifactAdapter, write_preflight
 
 
 def main() -> None:
@@ -90,6 +91,10 @@ def main() -> None:
     submission.add_argument("--starter-kit", type=Path, default=Path("kuairand-starter-kit"))
     submission.add_argument("--data-dir", type=Path, default=Path("kuairand-starter-kit/KuaiRand-Pure/data"))
     submission.add_argument("--output", type=Path, required=True)
+    preflight = commands.add_parser("scale-preflight", help="stream and validate a KuaiRand-1K/27K bonus artifact")
+    preflight.add_argument("--variant", choices=("1k", "27k"), required=True)
+    preflight.add_argument("--data-dir", type=Path, required=True)
+    preflight.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "qualification":
         print(json.dumps(run_qualification(args.output_dir), indent=2, sort_keys=True))
@@ -145,6 +150,8 @@ def main() -> None:
         print(json.dumps(run_autonomous_backbone(repository_root=args.repository_root, starter_kit_dir=args.starter_kit, data_dir=args.data_dir, parent_ledger_path=args.parent_ledger, output_dir=args.output_dir), indent=2, sort_keys=True))
     elif args.command == "submission":
         print(generate_submission(ledger_path=args.ledger, run_id=args.run_id, starter_kit_dir=args.starter_kit, data_dir=args.data_dir, output_path=args.output))
+    elif args.command == "scale-preflight":
+        print(write_preflight(ScaleArtifactAdapter(args.variant, args.data_dir), args.output))
 
 
 if __name__ == "__main__":
