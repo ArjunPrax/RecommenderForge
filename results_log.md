@@ -80,6 +80,8 @@ The run used `87.89` CPU seconds, `0` GPU-hours, and `0` LLM tokens because this
 
 Automated tests establish strict-prior training history and train-only frozen validation history. The runtime ordering audit found `24,282` changed pairwise relations across `6,758` of `18,460` eligible validation users, so the field affects within-user ranking. No hidden-test scoring occurred.
 
+The frozen best-seed checkpoint generated `170,588` aligned test rows plus header through `tiktok_ml_agent submission`; the adapter checked header, row IDs, user/video alignment, and finite scores without scoring test labels.
+
 ### Interpretation
 
 The history cross is mechanism-valid and positive but its mean gain is materially smaller than the provisional `epsilon=0.002`. Retain it as a component candidate; do not declare it a promoted final parent or a converged improvement.

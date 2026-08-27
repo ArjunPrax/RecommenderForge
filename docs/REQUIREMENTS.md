@@ -15,13 +15,13 @@ Source: updated official PDF pages 3-12 and the organizer Starter Kit. Conflicti
 | REQ-009 | p. 5 | Log each iteration's hypothesis, code diff, metrics, and errors/recovery events. | Mandatory | Complete per-iteration log. | Partially demonstrated for R005/R006 and autonomous objective runs |
 | REQ-010 | p. 7 | Submit Devpost description including tools, APIs, libraries, datasets/assets. | Mandatory | Submitted Devpost content. | Not started |
 | REQ-011 | p. 7 | Submit a public repository and README with overview, setup, reproduction, limitations, contributions. | Mandatory | Public final repository and README. | Not started |
-| REQ-012 | pp. 7-8 | Submit final output/checkpoint in Starter Kit schema and validation-best results/delta table. | Mandatory | Validated output and results table. | Not started |
+| REQ-012 | pp. 7-8 | Submit final output/checkpoint in Starter Kit schema and validation-best results/delta table. | Mandatory | Validated output and results table. | Partially demonstrated: checkpoint-backed, schema-valid EXP-005 output generated; no final designated submission |
 | REQ-013 | p. 8 | Report total LLM input/output tokens and GPU-hours to convergence. | Mandatory | Resource-use records. | Not started |
 | REQ-014 | pp. 4-8 | PDF conflicts: Starter Kit uses `long_view` / GAUC / nDCG@5; narrative uses `click` / nDCG@10 / Recall@50. | Clarification required | Organizer response and versioned benchmark contract. | Blocked |
 | REQ-015 | p. 5 | Provisional Starter Kit submission schema is `row_id,user_id,video_id,score`; rows must validate for alignment and finite scores. | Conditional | Adapter validation against organizer check semantics. | Not evaluated |
 | REQ-016 | p. 5 | Provisional Starter Kit convergence uses epsilon=0.002 and N=3. | Conditional | Versioned iteration history. | Not evaluated |
 | REQ-017 | p. 5 | Development must not use hidden test despite locally available labels. | Mandatory | Fail-closed adapter, audit events, and tests. | Implemented and unit-tested; final-run audit pending |
-| REQ-018 | pp. 5, 8 | Final output must be generated from the validation-best checkpoint at convergence. | Mandatory | Checkpoint manifest and reproducible predictions. | Not started |
+| REQ-018 | pp. 5, 8 | Final output must be generated from the validation-best checkpoint at convergence. | Mandatory | Checkpoint manifest and reproducible predictions. | Partially demonstrated: EXP-005 output loads its frozen validation-best seed; final convergence pending |
 | REQ-019 | pp. 5, 7, 9 | Agent must retain per-iteration reasoning and resource/intervention evidence. | Mandatory | Append-only run ledger and generated report. | Qualification fixture implemented and tested; real-run evidence pending |
 
 The PDF permits open-source libraries/frameworks, papers, public solutions, and pretrained weights except as limited by REQ-007. It mandates no technical stack.

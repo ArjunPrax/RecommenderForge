@@ -10,6 +10,7 @@ from __future__ import annotations
 import importlib
 import sys
 from dataclasses import dataclass
+from dataclasses import replace
 from pathlib import Path
 from time import perf_counter
 from typing import Any
@@ -75,6 +76,24 @@ def _encode_train_validation(
     x_train, y_train, _ = encode(train, extra_train)
     x_valid, y_valid, users_valid = encode(valid, extra_valid)
     return x_train, y_train, x_valid, y_valid, users_valid, int(sum(field_dims))
+
+
+def encode_train_inference(
+    train: list[KuaiRandRow], inference: list[KuaiRandRow], *, extra_train: list[str] | None = None,
+    extra_inference: list[str] | None = None,
+) -> tuple[np.ndarray, int]:
+    """Fit vocabulary on labeled train rows and encode feature-only inference rows.
+
+    The underlying encoder needs a label array for its development contract, so
+    inference rows receive a fabricated zero solely for matrix allocation. The
+    fabricated values are neither read from test data nor used by the returned
+    feature matrix.
+    """
+    masked = [replace(row, label=0) for row in inference]
+    _, _, encoded, _, _, dimension = _encode_train_validation(
+        train, masked, extra_train=extra_train, extra_valid=extra_inference
+    )
+    return encoded, dimension
 
 
 def _organizer_fm_class(starter_kit_dir: str | Path) -> type[Any]:

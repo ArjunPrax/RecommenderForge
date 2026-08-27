@@ -2,6 +2,16 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Checkpoint-backed output path
+
+### Changed
+
+Added output generation from a ledger-selected immutable checkpoint. It reconstructs feature vocabularies from train rows, accepts test rows only as feature/identifier records, verifies the checkpoint/evaluator, and validates the resulting Starter Kit schema without invoking any score path.
+
+### Validation
+
+Generated `170,588` EXP-005 test rows plus header from the frozen best-seed checkpoint. Alignment and finite-score checks passed. No model was retrained and no test labels were read or scored.
+
 ## 2026-08-28 - Multi-feedback candidate evidence
 
 ### Changed

@@ -13,6 +13,7 @@ from .baseline_runner import run_safe_numpy_fm
 from .torch_fm import run_safe_torch_fm
 from .ranking_fm import RankingFMConfig, run_ranking_fm
 from .autonomous import run_autonomous_history, run_autonomous_multitask, run_autonomous_ranking
+from .submission import generate_submission
 
 
 def main() -> None:
@@ -56,6 +57,12 @@ def main() -> None:
     autonomous_multitask.add_argument("--data-dir", type=Path, default=Path("kuairand-starter-kit/KuaiRand-Pure/data"))
     autonomous_multitask.add_argument("--parent-ledger", type=Path, default=Path("artifacts/autonomous-ranking-verified/ledger.sqlite"))
     autonomous_multitask.add_argument("--output-dir", type=Path, default=Path("artifacts/autonomous-multitask"))
+    submission = commands.add_parser("submission", help="generate a CSV from one frozen checkpoint manifest")
+    submission.add_argument("--ledger", type=Path, required=True)
+    submission.add_argument("--run-id", required=True)
+    submission.add_argument("--starter-kit", type=Path, default=Path("kuairand-starter-kit"))
+    submission.add_argument("--data-dir", type=Path, default=Path("kuairand-starter-kit/KuaiRand-Pure/data"))
+    submission.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "qualification":
         print(json.dumps(run_qualification(args.output_dir), indent=2, sort_keys=True))
@@ -101,6 +108,8 @@ def main() -> None:
         )
     elif args.command == "autonomous-multitask":
         print(json.dumps(run_autonomous_multitask(repository_root=args.repository_root, starter_kit_dir=args.starter_kit, data_dir=args.data_dir, parent_ledger_path=args.parent_ledger, output_dir=args.output_dir), indent=2, sort_keys=True))
+    elif args.command == "submission":
+        print(generate_submission(ledger_path=args.ledger, run_id=args.run_id, starter_kit_dir=args.starter_kit, data_dir=args.data_dir, output_path=args.output))
 
 
 if __name__ == "__main__":
