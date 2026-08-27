@@ -61,7 +61,7 @@ def run_autonomous_ranking(
     knowledge = _ranking_knowledge()
     context = PlannerContext(
         goal="Compare first-round same-user ranking objectives against the reproduced pointwise FM control.",
-        experiment_ids=("EXP-004", "EXP-005"),
+        experiment_ids=("EXP-004A", "EXP-004B"),
         run_class=RunClass.RESEARCH,
         parent_run_id=None,
         parent_checkpoint_sha256=None,
@@ -78,7 +78,7 @@ def run_autonomous_ranking(
             ),
             "candidates": [
                 {
-                    "experiment_id": "EXP-004",
+                    "experiment_id": "EXP-004A",
                     "operator_family": "loss_objective",
                     "hypothesis": "BPR improves validation ranking over pointwise FM.",
                     "expected_mechanism": "same-user positive impressions receive larger scores than sampled negatives.",
@@ -87,7 +87,7 @@ def run_autonomous_ranking(
                     "controlled_variables": ["FM fields", "optimizer", "train/validation split", "seed set"],
                 },
                 {
-                    "experiment_id": "EXP-005",
+                    "experiment_id": "EXP-004B",
                     "operator_family": "loss_objective",
                     "hypothesis": "A complete same-user listwise objective improves validation ranking over pointwise FM.",
                     "expected_mechanism": "each logged user impression list concentrates score on positive items.",

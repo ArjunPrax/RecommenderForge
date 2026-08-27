@@ -24,7 +24,7 @@ class PlannerTests(unittest.TestCase):
         )
         self.context = PlannerContext(
             goal="test ranking objective",
-            experiment_ids=("EXP-004", "EXP-005"),
+            experiment_ids=("EXP-004A", "EXP-004B"),
             run_class=RunClass.RESEARCH,
             parent_run_id="parent",
             parent_checkpoint_sha256="abc",
@@ -40,7 +40,7 @@ class PlannerTests(unittest.TestCase):
                 "rationale": "Compare two ranking objectives with identical controls.",
                 "candidates": [
                     {
-                        "experiment_id": "EXP-004",
+                        "experiment_id": "EXP-004A",
                         "operator_family": "loss_objective",
                         "hypothesis": "BPR improves within-user ordering.",
                         "expected_mechanism": "positive impressions outrank negatives.",
@@ -63,7 +63,7 @@ class PlannerTests(unittest.TestCase):
                 "rationale": "bad",
                 "candidates": [
                     {
-                        "experiment_id": "EXP-004",
+                        "experiment_id": "EXP-004A",
                         "operator_family": "backbone",
                         "hypothesis": "bad",
                         "expected_mechanism": "bad",

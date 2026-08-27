@@ -182,6 +182,29 @@ This controls token growth, makes research choices traceable, and prevents malfo
 - Requirements: REQ-001, REQ-005, REQ-013, REQ-019
 - Tasks: T2-002, T2-004
 
+## D012 - Stable child identifiers for sibling objective candidates
+
+Date: 2026-08-28
+Status: Accepted
+
+### Context
+
+EXP-004 is the fixed parent research family for ranking objectives, but BPR and exact listwise loss are distinct sibling changes that must each retain their own ledger evidence.
+
+### Decision
+
+Use append-only child IDs `EXP-004A` (BPR) and `EXP-004B` (exact listwise) underneath EXP-004. This expands the registered family; it does not reassign EXP-005, which remains reserved for history/temporal crosses.
+
+### Why
+
+The ledger needs a unique immutable experiment identifier per sibling, while the plan needs to retain the original family taxonomy.
+
+### Related
+
+- Requirements: REQ-009, REQ-019
+- Tasks: T2-005
+- Experiments: EXP-004, EXP-004A, EXP-004B
+
 ## D004 - Retain experimental evidence
 
 Date: 2026-08-26
