@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Single-pass scale preflight
+
+### Changed
+
+The 1K/27K preflight now counts and fingerprints all time splits in one stream instead of rescanning every log per split. Normal official date-named files are routed directly to the relevant split, reducing 27K baseline I/O while retaining a fallback for unexpected names. Test `long_view` is still not indexed or materialized.
+
 ## 2026-08-28 - Denser BPR negative-sampling result
 
 ### Measured
