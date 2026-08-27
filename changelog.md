@@ -2,6 +2,16 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Controller-integrated isolated candidate executor
+
+### Changed
+
+The controller now accepts run-aware executors. Added a worktree command executor that creates a detached worktree from the immutable parent revision, validates the candidate patch boundary, runs only a host-owned command factory, captures structured result JSON, records the code/diff identity, and removes the worktree after execution.
+
+### Validation
+
+Unit coverage confirms the controller dispatches the run-aware execution route and that the host command result is bound to an isolated candidate lifecycle. No candidate controls the executable command.
+
 ## 2026-08-28 - Checkpoint-backed output path
 
 ### Changed

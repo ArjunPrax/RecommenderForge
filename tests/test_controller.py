@@ -39,3 +39,20 @@ class ControllerTests(unittest.TestCase):
             self.assertFalse(controller.observe_for_convergence(records))
             self.assertEqual(len(ledger.events_for(records[1].run_id)), 2)
             ledger.close()
+
+    def test_run_aware_executor_receives_ledger_run_id(self) -> None:
+        class Executor:
+            seen: tuple[str, str] | None = None
+
+            def execute(self, run_id, candidate):
+                self.seen = (run_id, candidate.experiment_id)
+                return ExecutionResult(metrics={"primary": 0.6})
+
+        with tempfile.TemporaryDirectory() as directory:
+            ledger = ExperimentLedger(Path(directory) / "ledger.sqlite")
+            controller = ResearchController(BenchmarkSpec("fixture", "v1", "label", ("primary",)), ledger)
+            candidate = ExperimentSpec("EXP-003", RunClass.QUALIFICATION, OperatorFamily.HYPERPARAMETER, "runs", "records its id")
+            executor = Executor()
+            record = controller.execute_batch(CandidateBatch("batch", None, None, (candidate,)), executor)[0]
+            self.assertEqual(executor.seen, (record.run_id, "EXP-003"))
+            ledger.close()

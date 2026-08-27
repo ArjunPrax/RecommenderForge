@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from hashlib import sha256
 from time import perf_counter
-from typing import Callable, Iterable
+from typing import Callable, Iterable, Protocol
 from uuid import uuid4
 
 from .contracts import (
@@ -87,6 +87,12 @@ class RecoveryPolicy:
 Executor = Callable[[ExperimentSpec], ExecutionResult]
 
 
+class RunAwareExecutor(Protocol):
+    """Executor variant that needs the ledger run ID for isolated artifacts."""
+
+    def execute(self, run_id: str, candidate: ExperimentSpec) -> ExecutionResult: ...
+
+
 class ResearchController:
     def __init__(self, benchmark: BenchmarkSpec, ledger: ExperimentLedger) -> None:
         self.benchmark = benchmark
@@ -116,7 +122,10 @@ class ResearchController:
             )
             started = perf_counter()
             try:
-                result = executor(candidate)
+                if hasattr(executor, "execute"):
+                    result = executor.execute(run_id, candidate)  # type: ignore[union-attr]
+                else:
+                    result = executor(candidate)
                 record.status = RunStatus.SUCCEEDED
                 record.metrics = result.metrics
                 record.diagnosis = result.diagnosis

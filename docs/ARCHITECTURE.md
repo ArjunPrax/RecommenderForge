@@ -12,7 +12,7 @@ The project is an autonomous research control plane around organizer-supplied re
 - **Research knowledge base:** structured evidence cards for papers, organizer guidance, and measured findings.
 - **Memory manager:** bounded planner context distilled from, but never replacing, the append-only ledger.
 - **Planner:** produces 1–3 ranked `ExperimentSpec` siblings with evidence and one primary operator family.
-- **Executor:** creates an isolated candidate worktree and records process/resource state.
+- **Executor:** invokes a host-owned command factory in a disposable candidate worktree; candidate patches are path-scoped and must emit structured result JSON.
 - **Validator:** static checks, test-access policy, checkpoint checks, and organizer evaluator delegation.
 - **Ledger:** SQLite/JSON evidence with run class, hypothesis, diff/config/data/evaluator identity, metrics, reflection, failures, and resources.
 - **Controller:** deterministic candidate selection, recovery, convergence, checkpoint freezing, and report export.
@@ -44,6 +44,7 @@ Python is managed through a project-local `uv` environment after compatibility v
 ## Trust/security boundaries
 
 - Candidate code cannot retrieve test labels or locally score test data.
+- Candidates cannot select shell commands; only a host-owned command factory executes after static diff validation.
 - The adapter delegates to the organizer evaluator, whose hash is recorded.
 - Every accepted prediction is traceable to an immutable checkpoint manifest.
 - Data, generated artifacts, caches, submissions, and secrets are git-ignored.
