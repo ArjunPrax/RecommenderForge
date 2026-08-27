@@ -83,7 +83,11 @@ class TorchFM(nn.Module):
                 second_hat = second / (1 - beta2**step)
                 parameter.addcdiv_(first_hat, second_hat.sqrt().add_(epsilon), value=-self.lr)
             self.b.add_(self.b.grad, alpha=-self.lr)
+            self._step_extra_parameters()
         return float(loss.detach().cpu())
+
+    def _step_extra_parameters(self) -> None:
+        """Hook for controlled extensions with explicitly declared extra heads."""
 
     @torch.no_grad()
     def predict(self, x: Tensor, batch_size: int = 200_000) -> Tensor:

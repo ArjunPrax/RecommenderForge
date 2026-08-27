@@ -12,7 +12,7 @@ from .reporting import write_report
 from .baseline_runner import run_safe_numpy_fm
 from .torch_fm import run_safe_torch_fm
 from .ranking_fm import RankingFMConfig, run_ranking_fm
-from .autonomous import run_autonomous_history, run_autonomous_ranking
+from .autonomous import run_autonomous_history, run_autonomous_multitask, run_autonomous_ranking
 
 
 def main() -> None:
@@ -50,6 +50,12 @@ def main() -> None:
     autonomous_history.add_argument("--data-dir", type=Path, default=Path("kuairand-starter-kit/KuaiRand-Pure/data"))
     autonomous_history.add_argument("--parent-ledger", type=Path, default=Path("artifacts/autonomous-ranking-verified/ledger.sqlite"))
     autonomous_history.add_argument("--output-dir", type=Path, default=Path("artifacts/autonomous-history"))
+    autonomous_multitask = commands.add_parser("autonomous-multitask", help="run the checkpoint-parented multi-feedback candidate")
+    autonomous_multitask.add_argument("--repository-root", type=Path, default=Path("."))
+    autonomous_multitask.add_argument("--starter-kit", type=Path, default=Path("kuairand-starter-kit"))
+    autonomous_multitask.add_argument("--data-dir", type=Path, default=Path("kuairand-starter-kit/KuaiRand-Pure/data"))
+    autonomous_multitask.add_argument("--parent-ledger", type=Path, default=Path("artifacts/autonomous-ranking-verified/ledger.sqlite"))
+    autonomous_multitask.add_argument("--output-dir", type=Path, default=Path("artifacts/autonomous-multitask"))
     args = parser.parse_args()
     if args.command == "qualification":
         print(json.dumps(run_qualification(args.output_dir), indent=2, sort_keys=True))
@@ -93,6 +99,8 @@ def main() -> None:
                 sort_keys=True,
             )
         )
+    elif args.command == "autonomous-multitask":
+        print(json.dumps(run_autonomous_multitask(repository_root=args.repository_root, starter_kit_dir=args.starter_kit, data_dir=args.data_dir, parent_ledger_path=args.parent_ledger, output_dir=args.output_dir), indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":

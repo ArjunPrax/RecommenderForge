@@ -35,6 +35,7 @@ class KuaiRandRow:
     tab: str
     duration_ms: float
     label: int | None
+    auxiliary_labels: tuple[int, int, int] | None = None
 
 
 def starter_kuairand_pure_spec(starter_kit_dir: str | Path) -> BenchmarkSpec:
@@ -71,9 +72,13 @@ class KuaiRandPureData:
             self.data_dir / "log_standard_4_22_to_5_08_pure.csv",
         )
 
-    def rows(self, split: SplitName, include_labels: bool = True) -> list[KuaiRandRow]:
+    def rows(
+        self, split: SplitName, include_labels: bool = True, include_auxiliary_labels: bool = False
+    ) -> list[KuaiRandRow]:
         if split == "test" and include_labels:
             raise TestAccessError("KuaiRand test labels are prohibited in candidate-facing data access")
+        if split != "train" and include_auxiliary_labels:
+            raise TestAccessError("auxiliary outcome labels are available only for the training split")
         if split not in SPLIT_DATES:
             raise ValueError(f"unknown split: {split}")
         lower, upper = SPLIT_DATES[split]
@@ -90,6 +95,9 @@ class KuaiRandPureData:
                     raise ValueError(f"{path} is missing required columns: {sorted(missing)}")
                 if include_labels and "long_view" not in positions:
                     raise ValueError(f"{path} is missing the development label column")
+                auxiliary_columns = ("is_click", "is_like", "is_follow")
+                if include_auxiliary_labels and any(column not in positions for column in auxiliary_columns):
+                    raise ValueError(f"{path} is missing required auxiliary labels")
                 for values in reader:
                     # Select only fields that candidate-facing code is entitled to use. In
                     # particular, test rows never create a Python value for `long_view`.
@@ -98,6 +106,11 @@ class KuaiRandPureData:
                         continue
                     video_id = values[positions["video_id"]]
                     label = int(values[positions["long_view"]] != "0") if include_labels else None
+                    auxiliary_labels = (
+                        tuple(int(values[positions[column]] != "0") for column in auxiliary_columns)
+                        if include_auxiliary_labels
+                        else None
+                    )
                     output.append(
                         KuaiRandRow(
                             date=date,
@@ -108,6 +121,7 @@ class KuaiRandPureData:
                             tab=values[positions["tab"]],
                             duration_ms=float(values[positions["duration_ms"]]),
                             label=label,
+                            auxiliary_labels=auxiliary_labels,
                         )
                     )
         return output
@@ -131,9 +145,11 @@ class KuaiRandPureAdapter:
         self.data = KuaiRandPureData(data_dir)
         self.evaluator = BenchmarkAdapter.from_organizer_file(self.spec)
 
-    def development_rows(self, split: Literal["train", "valid"]) -> list[KuaiRandRow]:
+    def development_rows(
+        self, split: Literal["train", "valid"], *, include_auxiliary_labels: bool = False
+    ) -> list[KuaiRandRow]:
         self.spec.assert_development_split(split)
-        return self.data.rows(split, include_labels=True)
+        return self.data.rows(split, include_labels=True, include_auxiliary_labels=include_auxiliary_labels)
 
     def submission_rows(self) -> list[KuaiRandRow]:
         return self.data.rows("test", include_labels=False)

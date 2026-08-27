@@ -230,3 +230,78 @@ def run_autonomous_history(
     response = {"ledger": str(output_dir / "ledger.sqlite"), "report": str(report), "memory_snapshot": snapshot["snapshot_id"], "converged": converged, "runs": [record.run_id for record in records]}
     ledger.close()
     return response
+
+
+def run_autonomous_multitask(
+    *,
+    repository_root: str | Path,
+    starter_kit_dir: str | Path,
+    data_dir: str | Path,
+    parent_ledger_path: str | Path,
+    output_dir: str | Path,
+) -> dict[str, object]:
+    """Run train-only multi-feedback BPR from a frozen BPR parent."""
+    parent_ledger = ExperimentLedger(parent_ledger_path)
+    try:
+        parent = next((run for run in parent_ledger.list_runs() if run["experiment_id"] == "EXP-004A" and run["status"] == "succeeded"), None)
+    finally:
+        parent_ledger.close()
+    if parent is None or not parent.get("checkpoint_manifest"):
+        raise ValueError("multi-task research requires a succeeded EXP-004A parent manifest")
+    parent_hash = parent["checkpoint_manifest"].get("checkpoint_sha256")
+    if not parent_hash:
+        raise ValueError("multi-task parent is missing a checkpoint hash")
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    benchmark = starter_kuairand_pure_spec(starter_kit_dir)
+    ledger = ExperimentLedger(output_dir / "ledger.sqlite")
+    knowledge = KnowledgeBase(
+        [
+            EvidenceCard(
+                evidence_id="KB-005",
+                title="Shared representation across observed feedback",
+                source="Interpretation - multi-task learning candidate using organizer-provided train-only click, like, and follow outcomes",
+                claim="Auxiliary feedback losses may regularize a shared representation used by the primary long-view ranking task.",
+                assumptions=("auxiliary outcomes are read only from the training split",),
+                operator_families=(OperatorFamily.MULTI_TASK,),
+                applicability="Controlled extension of BPR FM.",
+                risks=("auxiliary objectives can distract from the primary ranking metric",),
+            )
+        ]
+    )
+    context = PlannerContext(
+        goal="Test whether train-only click, like, and follow supervision improves the primary BPR long-view ranking.",
+        experiment_ids=("EXP-006",),
+        run_class=RunClass.RESEARCH,
+        parent_run_id=parent["run_id"],
+        parent_checkpoint_sha256=str(parent_hash),
+        allowed_operator_families=(OperatorFamily.MULTI_TASK,),
+        allowed_paths=(),
+        token_budget=0,
+        compute_budget_seconds=1800,
+    )
+    planner = FixedPlanner(
+        {
+            "rationale": "Keep BPR and the FM backbone fixed; add train-only auxiliary feedback BCE through task-specific heads.",
+            "candidates": [{
+                "experiment_id": "EXP-006",
+                "operator_family": "multi_task",
+                "hypothesis": "Shared train-only click/like/follow supervision improves BPR primary validation score.",
+                "expected_mechanism": "auxiliary gradients regularize the shared FM interactions while the long-view BPR head remains the evaluated scorer.",
+                "evidence_ids": ["KB-005"],
+                "configuration": {"objective": "bpr", "auxiliary_weight": 0.15, "seeds": [0, 1, 2, 3, 4]},
+                "controlled_variables": ["BPR loss", "FM fields", "train/validation split", "seed set"],
+            }],
+        }
+    )
+    plan = planner.plan(context, knowledge)
+    controller = ResearchController(benchmark, ledger)
+    records = controller.execute_batch(plan.batch, lambda candidate: execute_ranking_candidate(candidate, repository_root=repository_root, starter_kit_dir=starter_kit_dir, data_dir=data_dir, artifact_root=output_dir / "artifacts"))
+    for record in records:
+        ledger.append_event(record.run_id, "planner_decision", {"rationale": plan.rationale, "provider": "fixed_offline_policy"})
+    converged = controller.observe_for_convergence(records)
+    snapshot = MemoryManager(ledger).consolidate()
+    report = write_report(ledger, output_dir / "report.md")
+    response = {"ledger": str(output_dir / "ledger.sqlite"), "report": str(report), "memory_snapshot": snapshot["snapshot_id"], "converged": converged, "runs": [record.run_id for record in records]}
+    ledger.close()
+    return response

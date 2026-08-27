@@ -12,9 +12,10 @@ from typing import Iterable
 
 import numpy as np
 
-from .contracts import CheckpointManifest, ExperimentSpec
+from .contracts import CheckpointManifest, ExperimentSpec, OperatorFamily
 from .controller import ExecutionResult
 from .kuairand import KuaiRandPureAdapter
+from .multitask_fm import MultiTaskConfig, run_multitask_bpr
 from .ordering import within_user_ordering_change
 from .ranking_fm import RankingFMConfig, run_ranking_fm
 
@@ -53,29 +54,32 @@ def execute_ranking_candidate(
     raw_seeds = candidate.configuration.get("seeds", [0, 1, 2, 3, 4])
     if not isinstance(raw_seeds, list) or not raw_seeds or any(not isinstance(seed, int) for seed in raw_seeds):
         raise ValueError("candidate seeds must be a non-empty list of integers")
-    config = RankingFMConfig(
-        objective=str(objective),
-        k=int(candidate.configuration.get("k", 16)),
-        lr=float(candidate.configuration.get("lr", 0.001)),
-        epochs=int(candidate.configuration.get("epochs", 40)),
-        patience=int(candidate.configuration.get("patience", 4)),
-        history_cross=bool(candidate.configuration.get("history_cross", False)),
-    )
+    common_config = {
+        "k": int(candidate.configuration.get("k", 16)),
+        "lr": float(candidate.configuration.get("lr", 0.001)),
+        "epochs": int(candidate.configuration.get("epochs", 40)),
+        "patience": int(candidate.configuration.get("patience", 4)),
+    }
+    config = RankingFMConfig(objective=str(objective), history_cross=bool(candidate.configuration.get("history_cross", False)), **common_config)
     adapter = KuaiRandPureAdapter(starter_kit_dir, data_dir)
     output_dir = Path(artifact_root) / candidate.experiment_id.lower() / f"{objective}-{_config_hash(candidate.configuration)[:12]}"
     output_dir.mkdir(parents=True, exist_ok=True)
     started = perf_counter()
     measurements: list[dict[str, float | str]] = []
     for seed in raw_seeds:
-        measurements.append(
-            run_ranking_fm(
-                starter_kit_dir,
-                data_dir,
-                seed,
-                config,
-                checkpoint_path=output_dir / f"seed-{seed}.pt",
+        checkpoint_path = output_dir / f"seed-{seed}.pt"
+        if candidate.operator_family is OperatorFamily.MULTI_TASK:
+            measurements.append(
+                run_multitask_bpr(
+                    starter_kit_dir,
+                    data_dir,
+                    seed,
+                    MultiTaskConfig(auxiliary_weight=float(candidate.configuration.get("auxiliary_weight", 0.15)), **common_config),
+                    checkpoint_path=checkpoint_path,
+                )
             )
-        )
+        else:
+            measurements.append(run_ranking_fm(starter_kit_dir, data_dir, seed, config, checkpoint_path=checkpoint_path))
     metric_names = ("GAUC", "nDCG@5", "primary")
     metrics = {metric: mean(float(result[metric]) for result in measurements) for metric in metric_names}
     metrics.update({f"{metric}_std": pstdev(float(result[metric]) for result in measurements) for metric in metric_names})
