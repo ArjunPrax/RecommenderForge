@@ -15,6 +15,7 @@ from .ranking_fm import RankingFMConfig, run_ranking_fm
 from .autonomous import run_autonomous_backbone, run_autonomous_ensemble, run_autonomous_history, run_autonomous_multitask, run_autonomous_ranking, run_autonomous_temporal, run_autonomous_three_ensemble
 from .submission import generate_submission
 from .scale import ScaleArtifactAdapter, write_preflight
+from .scale_baseline import run_streaming_popularity
 
 
 def main() -> None:
@@ -95,6 +96,10 @@ def main() -> None:
     preflight.add_argument("--variant", choices=("1k", "27k"), required=True)
     preflight.add_argument("--data-dir", type=Path, required=True)
     preflight.add_argument("--output", type=Path, required=True)
+    scale_baseline = commands.add_parser("scale-popularity", help="run streaming popularity baseline on KuaiRand-1K/27K validation")
+    scale_baseline.add_argument("--variant", choices=("1k", "27k"), required=True)
+    scale_baseline.add_argument("--data-dir", type=Path, required=True)
+    scale_baseline.add_argument("--evaluator", type=Path, default=Path("kuairand-starter-kit/evaluate.py"))
     args = parser.parse_args()
     if args.command == "qualification":
         print(json.dumps(run_qualification(args.output_dir), indent=2, sort_keys=True))
@@ -152,6 +157,8 @@ def main() -> None:
         print(generate_submission(ledger_path=args.ledger, run_id=args.run_id, starter_kit_dir=args.starter_kit, data_dir=args.data_dir, output_path=args.output))
     elif args.command == "scale-preflight":
         print(write_preflight(ScaleArtifactAdapter(args.variant, args.data_dir), args.output))
+    elif args.command == "scale-popularity":
+        print(json.dumps(run_streaming_popularity(variant=args.variant, data_dir=args.data_dir, evaluator_path=args.evaluator), indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":
