@@ -87,7 +87,14 @@ class ScaleArtifactAdapter:
                     row["long_view"] = values[positions["long_view"]] if split != "test" else None
                     counts[split] += 1
                     digest.update(repr(tuple(row.items())).encode())
-        return {"variant": self.variant, "data_dir": str(self.data_dir), "log_files": [str(path) for path in self._log_files()], "split_counts": counts, "feature_only_test_fingerprint": digest.hexdigest()}
+        return {
+            "variant": self.variant,
+            "data_dir": str(self.data_dir),
+            "log_files": [str(path) for path in self._log_files()],
+            "split_counts": counts,
+            "feature_only_test_fingerprint": digest.hexdigest(),
+            "fingerprint_algorithm": "one-pass-source-order-v2",
+        }
 
 
 def write_preflight(adapter: ScaleArtifactAdapter, path: str | Path) -> Path:
