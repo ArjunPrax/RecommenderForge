@@ -10,6 +10,8 @@ from statistics import mean, pstdev
 from time import perf_counter
 from typing import Iterable
 
+import numpy as np
+
 from .contracts import CheckpointManifest, ExperimentSpec
 from .controller import ExecutionResult
 from .kuairand import KuaiRandPureAdapter
