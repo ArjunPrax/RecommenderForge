@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Temporal cross measured
+
+### Measured
+
+EXP-008's inference-known weekday cross reached mean validation primary `0.603506`: better than standalone BPR but below R008's frozen ensemble. Early/late validation stability is now recorded in the run diagnosis.
+
 ## 2026-08-28 - Frozen rank ensemble measured
 
 ### Measured

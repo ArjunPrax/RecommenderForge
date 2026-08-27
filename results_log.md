@@ -2,6 +2,30 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R009 - Inference-known weekday-cross BPR result
+
+Date: 2026-08-28
+Experiment: EXP-008
+Implementation / commit: `9235cd9`
+
+### Change Tested
+
+Added one weekday categorical field derived only from each impression's known calendar date. It crosses with candidate fields inside BPR FM and uses no post-exposure or validation outcome.
+
+### Metrics
+
+| Metric | Mean | Population std | Delta vs BPR | Delta vs R008 ensemble |
+|---|---:|---:|---:|---:|
+| GAUC | 0.670019 | 0.000365 | +0.000484 | -0.000393 |
+| nDCG@5 | 0.536993 | 0.000208 | +0.000364 | -0.000125 |
+| primary | 0.603506 | 0.000270 | +0.000424 | -0.000259 |
+
+The validation early/late primary means were `0.590071` and `0.561413` respectively (gap `0.028658`). This is a drift diagnostic, not a second validation metric or selection gate.
+
+### Interpretation
+
+The temporal feature improves standalone BPR but does not exceed the frozen ensemble. Keep its prediction artifact available for a later declared ensemble comparison; do not promote it as the current parent.
+
 ## R008 - Frozen BPR/history rank ensemble improvement
 
 Date: 2026-08-28
