@@ -4,6 +4,8 @@ Autonomous ML research agent for TikTok TechJam 2026 Track 2. The project is in 
 
 The project will address the official Track 2 challenge: an autonomous ML research agent for recommender systems. Exact organizer wording, requirements, and unresolved source conflicts are in [docs/PROBLEM.md](docs/PROBLEM.md) and [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md).
 
+Official KuaiRand variants can be downloaded with checksum verification, for example: `python scripts/download_kuairand.py 1k`. Data stays untracked.
+
 ## Start here
 
 Read [AGENTS.md](AGENTS.md), then the context listed there. The repository is the durable project memory.
