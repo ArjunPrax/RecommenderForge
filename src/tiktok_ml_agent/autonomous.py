@@ -12,6 +12,7 @@ from .memory import KnowledgeBase, MemoryManager
 from .planner import FixedPlanner, PlannerContext
 from .reporting import write_report
 from .research_runner import execute_ranking_candidate
+from .ensemble_runner import execute_rank_ensemble
 
 
 def _ranking_knowledge() -> KnowledgeBase:
@@ -305,3 +306,38 @@ def run_autonomous_multitask(
     response = {"ledger": str(output_dir / "ledger.sqlite"), "report": str(report), "memory_snapshot": snapshot["snapshot_id"], "converged": converged, "runs": [record.run_id for record in records]}
     ledger.close()
     return response
+
+
+def run_autonomous_ensemble(
+    *, repository_root: str | Path, starter_kit_dir: str | Path, data_dir: str | Path,
+    bpr_ledger_path: str | Path, history_ledger_path: str | Path, output_dir: str | Path,
+) -> dict[str, object]:
+    """Compare declared rank blends built only from frozen component artifacts."""
+    bpr_ledger = ExperimentLedger(bpr_ledger_path)
+    history_ledger = ExperimentLedger(history_ledger_path)
+    try:
+        bpr = next((run for run in bpr_ledger.list_runs() if run["experiment_id"] == "EXP-004A" and run["status"] == "succeeded"), None)
+        history = next((run for run in history_ledger.list_runs() if run["experiment_id"] == "EXP-005" and run["status"] == "succeeded"), None)
+    finally:
+        bpr_ledger.close(); history_ledger.close()
+    if not bpr or not history or not bpr.get("checkpoint_manifest") or not history.get("checkpoint_manifest"):
+        raise ValueError("ensemble requires succeeded checkpoint-backed EXP-004A and EXP-005 components")
+    output_dir = Path(output_dir); output_dir.mkdir(parents=True, exist_ok=True)
+    benchmark = starter_kuairand_pure_spec(starter_kit_dir)
+    ledger = ExperimentLedger(output_dir / "ledger.sqlite")
+    knowledge = KnowledgeBase([EvidenceCard(
+        evidence_id="KB-006", title="Rank ensemble of complementary objectives", source="Interpretation - component blend over frozen validation predictions",
+        claim="Rank-space blending can combine independently trained objectives while preserving each component's within-user ordering contribution.",
+        assumptions=("component checkpoints and predictions are immutable",), operator_families=(OperatorFamily.ENSEMBLE,),
+        applicability="BPR plus strict-history BPR blend.", risks=("weight selection consumes validation feedback and must be logged",),
+    )])
+    context = PlannerContext(goal="Evaluate a declared five-seed rank blend of frozen BPR and history-cross components.", experiment_ids=("EXP-009",), run_class=RunClass.RESEARCH, parent_run_id=bpr["run_id"], parent_checkpoint_sha256=bpr["checkpoint_manifest"]["checkpoint_sha256"], allowed_operator_families=(OperatorFamily.ENSEMBLE,), allowed_paths=(), token_budget=0, compute_budget_seconds=600)
+    planner = FixedPlanner({"rationale": "Blend frozen component ranks; do not retrain components or use test labels.", "candidates": [{"experiment_id": "EXP-009", "operator_family": "ensemble", "hypothesis": "A rank blend of BPR and history-cross BPR improves validation primary relative to either component.", "expected_mechanism": "components make different within-user ordering errors that rank blending can reduce.", "evidence_ids": ["KB-006"], "configuration": {"bpr_ledger": str(bpr_ledger_path), "history_ledger": str(history_ledger_path), "bpr_weights": [0.25, 0.5, 0.75], "seeds": [0, 1, 2, 3, 4]}, "controlled_variables": ["frozen component checkpoints", "validation rows", "seed set"]}]})
+    plan = planner.plan(context, knowledge)
+    controller = ResearchController(benchmark, ledger)
+    records = controller.execute_batch(plan.batch, lambda candidate: execute_rank_ensemble(candidate, repository_root=repository_root, starter_kit_dir=starter_kit_dir, data_dir=data_dir, artifact_root=output_dir / "artifacts"))
+    for record in records:
+        ledger.append_event(record.run_id, "planner_decision", {"rationale": plan.rationale, "provider": "fixed_offline_policy"})
+    snapshot = MemoryManager(ledger).consolidate(); report = write_report(ledger, output_dir / "report.md")
+    response = {"ledger": str(output_dir / "ledger.sqlite"), "report": str(report), "memory_snapshot": snapshot["snapshot_id"], "converged": controller.observe_for_convergence(records), "runs": [record.run_id for record in records]}
+    ledger.close(); return response

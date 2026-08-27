@@ -228,6 +228,24 @@ This preserves a meaningful candidate-specific mechanism while making the tempor
 - Tasks: T2-005
 - Experiments: EXP-005
 
+## D014 - Frozen-component rank ensembles only
+
+Date: 2026-08-28
+Status: Accepted
+
+### Decision
+
+An ensemble candidate must consume immutable component checkpoints and saved validation predictions. Its blend grid, component manifests, selected weight, and five-seed results are ledgered; component models are never retrained as part of blending.
+
+### Why
+
+This makes a possible complementary-rank gain reproducible and prevents silently reusing test scoring or replacing a validated component.
+
+### Related
+
+- Requirements: REQ-003, REQ-009, REQ-018
+- Experiments: EXP-009
+
 ## D004 - Retain experimental evidence
 
 Date: 2026-08-26

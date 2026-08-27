@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Frozen-component ensemble lane
+
+### Changed
+
+Added EXP-009 rank-space blending over the immutable BPR and history-cross validation predictions. The runner evaluates a predeclared five-seed weight grid, freezes the selected component manifest composition, and never retrains a component.
+
 ## 2026-08-28 - Controller-integrated isolated candidate executor
 
 ### Changed
