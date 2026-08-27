@@ -15,6 +15,15 @@ class RankingObjectiveTests(unittest.TestCase):
         positives, negatives = _sample_bpr_pairs(groups, labels, np.random.default_rng(1))
         self.assertTrue(all((pos < 2) == (neg < 2) for pos, neg in zip(positives, negatives)))
 
+    def test_bpr_can_draw_multiple_negatives_per_positive(self) -> None:
+        groups = [np.asarray([0, 1, 2]), np.asarray([3, 4])]
+        labels = np.asarray([1, 0, 0, 1, 0])
+        positives, negatives = _sample_bpr_pairs(
+            groups, labels, np.random.default_rng(0), negatives_per_positive=3
+        )
+        self.assertEqual(len(positives), 6)
+        self.assertEqual(len(negatives), 6)
+
     def test_group_batches_keep_complete_groups(self) -> None:
         groups = [np.asarray([0, 1]), np.asarray([2, 3, 4]), np.asarray([5])]
         batches = _group_batches(groups, 3)

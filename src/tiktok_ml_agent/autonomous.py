@@ -366,6 +366,55 @@ def run_autonomous_watchtime(
     ledger.close(); return response
 
 
+def run_autonomous_negative_sampling(
+    *,
+    repository_root: str | Path,
+    starter_kit_dir: str | Path,
+    data_dir: str | Path,
+    parent_ledger_path: str | Path,
+    output_dir: str | Path,
+) -> dict[str, object]:
+    """Compare a predeclared denser same-user BPR negative sampler."""
+    source = ExperimentLedger(parent_ledger_path)
+    try:
+        parent = next((run for run in source.list_runs() if run["experiment_id"] == "EXP-004A" and run["status"] == "succeeded"), None)
+    finally:
+        source.close()
+    if not parent or not parent.get("checkpoint_manifest"):
+        raise ValueError("negative-sampling research requires a succeeded EXP-004A parent")
+    parent_manifest = parent["checkpoint_manifest"]
+    parent_prediction_path = str(Path(parent_manifest["checkpoint_path"]).with_suffix(".validation.npy"))
+    output_dir = Path(output_dir); output_dir.mkdir(parents=True, exist_ok=True)
+    benchmark = starter_kuairand_pure_spec(starter_kit_dir); ledger = ExperimentLedger(output_dir / "ledger.sqlite")
+    knowledge = KnowledgeBase([EvidenceCard(
+        evidence_id="KB-011", title="Multiple within-user BPR negatives",
+        source="Rendle et al. (2009), BPR: Bayesian Personalized Ranking from Implicit Feedback",
+        claim="Drawing more sampled negatives per observed preference can cover a wider set of same-user non-positive impressions.",
+        assumptions=("negatives remain within the same user group",),
+        operator_families=(OperatorFamily.SAMPLING,), applicability="Controlled BPR sampler comparison.",
+        risks=("more repeated negatives can increase compute without new information",),
+    )])
+    context = PlannerContext(
+        goal="Test a denser within-user BPR negative sampler against the frozen BPR parent.", experiment_ids=("EXP-013",),
+        run_class=RunClass.RESEARCH, parent_run_id=parent["run_id"], parent_checkpoint_sha256=parent_manifest["checkpoint_sha256"],
+        allowed_operator_families=(OperatorFamily.SAMPLING,), allowed_paths=(), token_budget=0, compute_budget_seconds=3600,
+    )
+    planner = FixedPlanner({"rationale": "Keep the loss, features, splits, and seeds fixed; draw three same-user negatives per positive.", "candidates": [{
+        "experiment_id": "EXP-013", "operator_family": "sampling", "hypothesis": "Three same-user BPR negatives per positive improve validation ranking.",
+        "expected_mechanism": "a positive is compared with more of its user's exposed non-positive videos each epoch.",
+        "evidence_ids": ["KB-011"],
+        "configuration": {"objective": "bpr", "negatives_per_positive": 3, "seeds": [0, 1, 2, 3, 4], "parent_validation_prediction_path": parent_prediction_path},
+        "controlled_variables": ["BPR loss", "FM fields", "train/validation split", "seed set"],
+    }]})
+    plan = planner.plan(context, knowledge); controller = ResearchController(benchmark, ledger)
+    records = controller.execute_batch(plan.batch, lambda candidate: execute_ranking_candidate(candidate, repository_root=repository_root, starter_kit_dir=starter_kit_dir, data_dir=data_dir, artifact_root=output_dir / "artifacts"))
+    for record in records:
+        ledger.append_event(record.run_id, "planner_decision", {"rationale": plan.rationale, "provider": "fixed_offline_policy"})
+    snapshot = MemoryManager(ledger).consolidate(); report = write_report(ledger, output_dir / "report.md")
+    response = {"ledger": str(output_dir / "ledger.sqlite"), "report": str(report), "memory_snapshot": snapshot["snapshot_id"], "converged": controller.observe_for_convergence(records), "runs": [record.run_id for record in records]}
+    ledger.close(); return response
+
+
 def run_autonomous_ensemble(
     *, repository_root: str | Path, starter_kit_dir: str | Path, data_dir: str | Path,
     bpr_ledger_path: str | Path, history_ledger_path: str | Path, output_dir: str | Path,

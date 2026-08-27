@@ -31,10 +31,13 @@ class RankingFMConfig(StarterFMConfig):
     group_batch_rows: int = 8192
     history_cross: bool = False
     temporal_day_cross: bool = False
+    negatives_per_positive: int = 1
 
     def __post_init__(self) -> None:
         if self.objective not in {"bpr", "listwise"}:
             raise ValueError("objective must be bpr or listwise")
+        if self.negatives_per_positive < 1:
+            raise ValueError("negatives_per_positive must be at least one")
 
 
 def _group_indices(users: list[str]) -> list[np.ndarray]:
@@ -44,7 +47,11 @@ def _group_indices(users: list[str]) -> list[np.ndarray]:
     return [np.asarray(indices, dtype=np.int64) for indices in groups.values()]
 
 
-def _sample_bpr_pairs(groups: list[np.ndarray], labels: np.ndarray, rng: np.random.Generator) -> tuple[np.ndarray, np.ndarray]:
+def _sample_bpr_pairs(
+    groups: list[np.ndarray], labels: np.ndarray, rng: np.random.Generator, *, negatives_per_positive: int = 1,
+) -> tuple[np.ndarray, np.ndarray]:
+    if negatives_per_positive < 1:
+        raise ValueError("negatives_per_positive must be at least one")
     positives: list[np.ndarray] = []
     negatives: list[np.ndarray] = []
     for group in groups:
@@ -52,8 +59,8 @@ def _sample_bpr_pairs(groups: list[np.ndarray], labels: np.ndarray, rng: np.rand
         pos = group[group_labels == 1]
         neg = group[group_labels == 0]
         if len(pos) and len(neg):
-            positives.append(pos)
-            negatives.append(rng.choice(neg, size=len(pos), replace=True))
+            positives.append(np.repeat(pos, negatives_per_positive))
+            negatives.append(rng.choice(neg, size=len(pos) * negatives_per_positive, replace=True))
     if not positives:
         raise ValueError("BPR requires at least one user with positive and negative impressions")
     return np.concatenate(positives), np.concatenate(negatives)
@@ -133,7 +140,9 @@ def run_ranking_fm(
     started = perf_counter()
     for _epoch in range(1, config.epochs + 1):
         if config.objective == "bpr":
-            positives, negatives = _sample_bpr_pairs(groups, y_train, rng)
+            positives, negatives = _sample_bpr_pairs(
+                groups, y_train, rng, negatives_per_positive=config.negatives_per_positive,
+            )
             order = rng.permutation(len(positives))
             for start in range(0, len(order), config.pair_batch_size):
                 selected = order[start : start + config.pair_batch_size]
@@ -192,6 +201,7 @@ def run_ranking_fm(
                 "objective": config.objective,
                 "history_cross": config.history_cross,
                 "temporal_day_cross": config.temporal_day_cross,
+                "negatives_per_positive": config.negatives_per_positive,
                 "configuration": {
                     "k": config.k,
                     "lr": config.lr,

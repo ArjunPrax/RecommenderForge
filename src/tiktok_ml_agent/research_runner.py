@@ -64,7 +64,9 @@ def execute_ranking_candidate(
     }
     config = RankingFMConfig(
         objective=str(objective), history_cross=bool(candidate.configuration.get("history_cross", False)),
-        temporal_day_cross=bool(candidate.configuration.get("temporal_day_cross", False)), **common_config,
+        temporal_day_cross=bool(candidate.configuration.get("temporal_day_cross", False)),
+        negatives_per_positive=int(candidate.configuration.get("negatives_per_positive", 1)),
+        **common_config,
     )
     adapter = KuaiRandPureAdapter(starter_kit_dir, data_dir)
     output_dir = Path(artifact_root) / candidate.experiment_id.lower() / f"{objective}-{_config_hash(candidate.configuration)[:12]}"

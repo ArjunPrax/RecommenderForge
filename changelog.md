@@ -2,6 +2,16 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Denser BPR negative-sampling candidate
+
+### Changed
+
+Implemented EXP-013 as a controlled sampling experiment: retain BPR, fields, splits, and seeds but draw three strictly same-user negatives per positive instead of one. The candidate has a frozen BPR parent, automatic within-user ordering audit, normal ledger evidence, and a five-seed protocol.
+
+### Validation
+
+Unit coverage verifies triple-negative sampling cardinality and the full suite passes before measurement. No performance result is claimed until the autonomous run completes.
+
 ## 2026-08-28 - Watch-completion auxiliary result
 
 ### Measured
