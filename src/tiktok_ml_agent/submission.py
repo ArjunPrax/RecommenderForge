@@ -80,15 +80,23 @@ def generate_submission(
     checkpoint = _verify_manifest(manifest, adapter)
     if checkpoint.suffix == ".json":
         ensemble = json.loads(checkpoint.read_text(encoding="utf-8"))
-        if ensemble.get("type") != "global_percentile_rank_blend" or len(ensemble.get("components", [])) != 2:
+        if ensemble.get("type") != "global_percentile_rank_blend" or len(ensemble.get("components", [])) < 2:
             raise ValueError("unsupported ensemble checkpoint format")
-        bpr_manifest, history_manifest = (CheckpointManifest(**item) for item in ensemble["components"])
-        test, bpr_scores = _component_scores(bpr_manifest, adapter)
-        history_test, history_scores = _component_scores(history_manifest, adapter)
-        if [(row.user_id, row.video_id) for row in test] != [(row.user_id, row.video_id) for row in history_test]:
-            raise ValueError("ensemble component test row order differs")
-        weight = float(ensemble["bpr_weight"])
-        scores = weight * _percentile_ranks(bpr_scores) + (1 - weight) * _percentile_ranks(history_scores)
+        component_manifests = [CheckpointManifest(**item) for item in ensemble["components"]]
+        if "component_weights" in ensemble:
+            weights = [float(weight) for weight in ensemble["component_weights"]]
+        else:
+            weights = [float(ensemble["bpr_weight"]), float(ensemble["history_weight"])]
+        if len(component_manifests) != len(weights) or not np.isclose(sum(weights), 1.0):
+            raise ValueError("ensemble component weights are invalid")
+        test, first_scores = _component_scores(component_manifests[0], adapter)
+        scores = weights[0] * _percentile_ranks(first_scores)
+        expected_rows = [(row.user_id, row.video_id) for row in test]
+        for weight, component_manifest in zip(weights[1:], component_manifests[1:]):
+            component_test, component_scores = _component_scores(component_manifest, adapter)
+            if expected_rows != [(row.user_id, row.video_id) for row in component_test]:
+                raise ValueError("ensemble component test row order differs")
+            scores += weight * _percentile_ranks(component_scores)
     else:
         test, scores = _component_scores(manifest, adapter)
     records = [(index, row.user_id, row.video_id, float(score)) for index, (row, score) in enumerate(zip(test, scores))]

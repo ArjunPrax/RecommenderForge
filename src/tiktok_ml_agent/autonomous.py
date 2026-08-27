@@ -12,7 +12,7 @@ from .memory import KnowledgeBase, MemoryManager
 from .planner import FixedPlanner, PlannerContext
 from .reporting import write_report
 from .research_runner import execute_ranking_candidate
-from .ensemble_runner import execute_rank_ensemble
+from .ensemble_runner import execute_rank_ensemble, execute_three_rank_ensemble
 
 
 def _ranking_knowledge() -> KnowledgeBase:
@@ -362,6 +362,34 @@ def run_autonomous_temporal(
     planner = FixedPlanner({"rationale": "Keep the BPR model fixed and add one calendar field known at impression time.", "candidates": [{"experiment_id": "EXP-008", "operator_family": "temporal_history", "hypothesis": "An inference-known weekday cross improves temporal robustness of BPR.", "expected_mechanism": "weekday interacts with candidate fields to model repeatable time-dependent preferences.", "evidence_ids": ["KB-007"], "configuration": {"objective": "bpr", "temporal_day_cross": True, "seeds": [0, 1, 2, 3, 4]}, "controlled_variables": ["BPR loss", "FM optimizer", "seed set", "train/validation split"]}]})
     plan = planner.plan(context, knowledge); controller = ResearchController(benchmark, ledger)
     records = controller.execute_batch(plan.batch, lambda candidate: execute_ranking_candidate(candidate, repository_root=repository_root, starter_kit_dir=starter_kit_dir, data_dir=data_dir, artifact_root=output_dir / "artifacts"))
+    for record in records: ledger.append_event(record.run_id, "planner_decision", {"rationale": plan.rationale, "provider": "fixed_offline_policy"})
+    snapshot = MemoryManager(ledger).consolidate(); report = write_report(ledger, output_dir / "report.md")
+    response = {"ledger": str(output_dir / "ledger.sqlite"), "report": str(report), "memory_snapshot": snapshot["snapshot_id"], "converged": controller.observe_for_convergence(records), "runs": [record.run_id for record in records]}
+    ledger.close(); return response
+
+
+def run_autonomous_three_ensemble(
+    *, repository_root: str | Path, starter_kit_dir: str | Path, data_dir: str | Path,
+    bpr_ledger_path: str | Path, history_ledger_path: str | Path, temporal_ledger_path: str | Path, output_dir: str | Path,
+) -> dict[str, object]:
+    """Evaluate a declared three-way rank blend from frozen component manifests."""
+    paths = ((bpr_ledger_path, "EXP-004A"), (history_ledger_path, "EXP-005"), (temporal_ledger_path, "EXP-008"))
+    parents = []
+    for path, experiment_id in paths:
+        source = ExperimentLedger(path)
+        try: record = next((run for run in source.list_runs() if run["experiment_id"] == experiment_id and run["status"] == "succeeded"), None)
+        finally: source.close()
+        if not record or not record.get("checkpoint_manifest"): raise ValueError(f"three-way ensemble requires {experiment_id} manifest")
+        parents.append(record)
+    output_dir = Path(output_dir); output_dir.mkdir(parents=True, exist_ok=True)
+    benchmark = starter_kuairand_pure_spec(starter_kit_dir); ledger = ExperimentLedger(output_dir / "ledger.sqlite")
+    knowledge = KnowledgeBase([EvidenceCard(evidence_id="KB-008", title="Three-source rank ensemble", source="Interpretation - frozen BPR, history, and temporal prediction blend", claim="A third temporal component may correct errors that remain after a BPR/history blend.", assumptions=("all components are immutable and prediction-aligned",), operator_families=(OperatorFamily.ENSEMBLE,), applicability="Frozen ensemble extension.", risks=("larger validation grid increases selection bias",))])
+    context = PlannerContext(goal="Evaluate a small declared three-way rank ensemble grid from frozen components.", experiment_ids=("EXP-009A",), run_class=RunClass.RESEARCH, parent_run_id=parents[0]["run_id"], parent_checkpoint_sha256=parents[0]["checkpoint_manifest"]["checkpoint_sha256"], allowed_operator_families=(OperatorFamily.ENSEMBLE,), allowed_paths=(), token_budget=0, compute_budget_seconds=600)
+    components = [{"ledger": str(path), "experiment_id": experiment_id} for path, experiment_id in paths]
+    grid = [[0.375, 0.375, 0.25], [0.25, 0.5, 0.25], [0.25, 0.375, 0.375], [0.5, 0.25, 0.25]]
+    planner = FixedPlanner({"rationale": "Blend only frozen predictions using a compact declared three-way grid; no component retraining.", "candidates": [{"experiment_id": "EXP-009A", "operator_family": "ensemble", "hypothesis": "A three-way rank blend improves primary validation score beyond the current two-way ensemble.", "expected_mechanism": "the temporal component contributes non-overlapping within-user ordering signal.", "evidence_ids": ["KB-008"], "configuration": {"components": components, "weight_grid": grid, "seeds": [0, 1, 2, 3, 4]}, "controlled_variables": ["frozen components", "validation rows", "seed set"]}]})
+    plan = planner.plan(context, knowledge); controller = ResearchController(benchmark, ledger)
+    records = controller.execute_batch(plan.batch, lambda candidate: execute_three_rank_ensemble(candidate, repository_root=repository_root, starter_kit_dir=starter_kit_dir, data_dir=data_dir, artifact_root=output_dir / "artifacts"))
     for record in records: ledger.append_event(record.run_id, "planner_decision", {"rationale": plan.rationale, "provider": "fixed_offline_policy"})
     snapshot = MemoryManager(ledger).consolidate(); report = write_report(ledger, output_dir / "report.md")
     response = {"ledger": str(output_dir / "ledger.sqlite"), "report": str(report), "memory_snapshot": snapshot["snapshot_id"], "converged": controller.observe_for_convergence(records), "runs": [record.run_id for record in records]}

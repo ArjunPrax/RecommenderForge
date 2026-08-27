@@ -106,3 +106,52 @@ def execute_rank_ensemble(
         diagnosis={"summary": "Rank ensemble evaluated from frozen component prediction artifacts.", "selected_bpr_weight": float(selected_weight), "weight_primary_means": ensemble["all_weight_primary_means"], "component_runs": [bpr_record["run_id"], history_record["run_id"]]},
         resource_usage={"cpu_seconds": 0.0, "gpu_seconds": 0.0, "llm_input_tokens": 0.0, "llm_output_tokens": 0.0},
     )
+
+
+def execute_three_rank_ensemble(
+    candidate: ExperimentSpec, *, repository_root: str | Path, starter_kit_dir: str | Path, data_dir: str | Path,
+    artifact_root: str | Path,
+) -> ExecutionResult:
+    """Evaluate a declared three-component rank blend, retaining every grid value."""
+    raw_components = candidate.configuration.get("components")
+    raw_weights = candidate.configuration.get("weight_grid")
+    seeds = candidate.configuration.get("seeds", [0, 1, 2, 3, 4])
+    if not isinstance(raw_components, list) or len(raw_components) != 3 or not isinstance(raw_weights, list):
+        raise ValueError("three-way ensemble requires three components and a declared weight grid")
+    if any(not isinstance(seed, int) for seed in seeds):
+        raise ValueError("ensemble seeds must be integers")
+    components: list[tuple[dict[str, Any], dict[str, Any]]] = []
+    for item in raw_components:
+        if not isinstance(item, dict):
+            raise ValueError("ensemble component specification must be an object")
+        components.append(_component_manifest(item["ledger"], item["experiment_id"]))
+    grids: list[tuple[float, float, float]] = []
+    for item in raw_weights:
+        if not isinstance(item, list) or len(item) != 3 or not all(isinstance(value, (int, float)) and value >= 0 for value in item):
+            raise ValueError("each ensemble weight vector must contain three non-negative numbers")
+        vector = tuple(float(value) for value in item)
+        if not np.isclose(sum(vector), 1.0):
+            raise ValueError("ensemble weights must sum to one")
+        grids.append(vector)
+    prediction_paths = [_prediction_paths(manifest, seeds) for _, manifest in components]
+    adapter = KuaiRandPureAdapter(starter_kit_dir, data_dir); valid = adapter.development_rows("valid")
+    users, labels = [row.user_id for row in valid], [int(row.label) for row in valid]
+    evaluations: dict[tuple[float, float, float], list[dict[str, float]]] = {vector: [] for vector in grids}
+    for vector in grids:
+        for index in range(len(seeds)):
+            scores = sum(weight * _percentile_ranks(np.load(paths[index])) for weight, paths in zip(vector, prediction_paths))
+            evaluations[vector].append(adapter.evaluator.score_development("valid", users, labels, scores))
+    selected_vector = max(grids, key=lambda vector: mean(result["primary"] for result in evaluations[vector]))
+    selected = evaluations[selected_vector]
+    metrics = {metric: mean(result[metric] for result in selected) for metric in ("GAUC", "nDCG@5", "primary")}
+    metrics.update({f"{metric}_std": pstdev(result[metric] for result in selected) for metric in ("GAUC", "nDCG@5", "primary")})
+    best_seed_index = max(range(len(selected)), key=lambda index: selected[index]["primary"])
+    best_prediction = sum(weight * _percentile_ranks(np.load(paths[best_seed_index])) for weight, paths in zip(selected_vector, prediction_paths))
+    output = Path(artifact_root) / candidate.experiment_id.lower(); output.mkdir(parents=True, exist_ok=True)
+    prediction_path = output / "validation.npy"; np.save(prediction_path, best_prediction)
+    ensemble_path = output / "ensemble.json"
+    ensemble = {"type": "global_percentile_rank_blend", "component_weights": list(selected_vector), "best_seed": seeds[best_seed_index], "components": [manifest for _, manifest in components], "weight_grid": [list(vector) for vector in grids], "all_weight_primary_means": {str(vector): mean(result["primary"] for result in evaluations[vector]) for vector in grids}}
+    ensemble_path.write_text(json.dumps(ensemble, sort_keys=True, indent=2), encoding="utf-8")
+    revision, diff = _git_identity(Path(repository_root))
+    manifest = CheckpointManifest(checkpoint_path=str(ensemble_path), checkpoint_sha256=hash_file(ensemble_path), code_revision=revision, data_fingerprint=adapter.data.data_fingerprint(), evaluator_sha256=adapter.spec.evaluator_sha256, configuration_sha256=sha256(json.dumps(dict(candidate.configuration), sort_keys=True).encode()).hexdigest(), validation_prediction_sha256=hash_file(prediction_path), validation_metrics={key: float(value) for key, value in metrics.items() if not key.endswith("_std")})
+    return ExecutionResult(metrics=metrics, checkpoint_manifest=manifest, code_revision=revision, diff_sha256=diff, data_fingerprint=manifest.data_fingerprint, evaluator_sha256=manifest.evaluator_sha256, seeds=tuple(seeds), diagnosis={"summary": "Three-component frozen rank ensemble evaluated over declared five-seed grid.", "selected_weights": list(selected_vector), "weight_primary_means": ensemble["all_weight_primary_means"], "component_runs": [record["run_id"] for record, _ in components]}, resource_usage={"cpu_seconds": 0.0, "gpu_seconds": 0.0, "llm_input_tokens": 0.0, "llm_output_tokens": 0.0})
