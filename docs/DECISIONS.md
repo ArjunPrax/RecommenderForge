@@ -285,6 +285,28 @@ Add EXP-012 as a bounded DeepFM-style BPR backbone trial: FM terms plus a 64-uni
 
 It tests a distinct higher-order interaction mechanism without changing the benchmark adapter, data policy, loss, or seed protocol.
 
+## D018 - Explicit cross-ledger campaign evidence
+
+Date: 2026-08-28
+Status: Accepted
+
+### Context
+
+Research batches are stored in isolated ledgers so their artifacts cannot overwrite one another. A final convergence claim must not silently discover arbitrary historical runs or count sibling candidates as sequential iterations.
+
+### Decision
+
+Materialize campaign status only from a declarative JSON file that names every source ledger and eligible run. Enforce a common benchmark/evaluator identity, one use of each run, one selected result per batch, and no continuation after epsilon/N convergence. Aggregate resource totals from the referenced immutable run records.
+
+### Why
+
+This makes the convergence and resource claim reviewable while preserving isolated experiment ledgers.
+
+### Related
+
+- Requirements: REQ-005, REQ-009, REQ-013, REQ-016, REQ-019
+- Tasks: T2-005
+
 ## D004 - Retain experimental evidence
 
 Date: 2026-08-26

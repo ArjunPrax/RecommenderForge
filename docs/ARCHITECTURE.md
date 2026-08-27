@@ -39,6 +39,7 @@ BenchmarkSpec + KnowledgeBase + MemorySnapshot
 - `RunRecord`: append-only measured outcome and lifecycle state.
 - `CheckpointManifest`: content hashes binding the measured checkpoint to code/data/evaluator/config/predictions.
 - `EvidenceCard` and `MemorySnapshot`: retrievable research evidence and bounded planner state.
+- `campaign-status`: materializes an auditable convergence/resource report from explicit cross-ledger run references; it refuses mixed evaluators and post-convergence continuation.
 
 ## Execution environment
 

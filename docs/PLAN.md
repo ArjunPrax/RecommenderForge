@@ -79,7 +79,7 @@ Files/components: `src/tiktok_ml_agent/`, `tests/`, root/documentation contracts
 
 ### T2-003 - Baseline reproduction and PyTorch parity
 
-Owner: Claude
+Owner: Codex
 Status: DONE
 Priority: Critical
 Depends on: T2-002 model/benchmark interfaces and local data
@@ -114,11 +114,11 @@ Status: IN_PROGRESS
 Priority: High
 Depends on: T2-003, T2-004
 
-Goal: Run BPR and exact listwise objectives as sibling experiments through the autonomous system.
+Goal: Run, audit, and converge ranking research as explicit candidate batches through the autonomous system.
 
 Relevant requirements: REQ-004, REQ-005, REQ-009
 
-Definition of done: Measured multi-seed results and mechanism-aware reflections are recorded.
+Definition of done: Measured multi-seed results, mechanism-aware reflections, and an explicit campaign-level convergence/resource report are recorded.
 
 ### T2-006 - KuaiRand-1K and 27K adaptation
 

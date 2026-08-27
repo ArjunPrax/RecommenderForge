@@ -16,6 +16,7 @@ from .autonomous import run_autonomous_backbone, run_autonomous_ensemble, run_au
 from .submission import generate_submission
 from .scale import ScaleArtifactAdapter, write_preflight
 from .scale_baseline import run_streaming_popularity
+from .campaign import write_campaign_report
 
 
 def main() -> None:
@@ -26,6 +27,9 @@ def main() -> None:
     report = commands.add_parser("report", help="render a report from an existing ledger")
     report.add_argument("--ledger", type=Path, required=True)
     report.add_argument("--output", type=Path, required=True)
+    campaign = commands.add_parser("campaign-status", help="materialize convergence evidence from declared ledger runs")
+    campaign.add_argument("--campaign", type=Path, required=True, help="JSON campaign configuration with explicit ledger/run references")
+    campaign.add_argument("--output", type=Path, required=True)
     baseline = commands.add_parser("baseline-valid", help="run one organizer FM seed on train/validation only")
     baseline.add_argument("--starter-kit", type=Path, default=Path("kuairand-starter-kit"))
     baseline.add_argument("--data-dir", type=Path, default=Path("kuairand-starter-kit/KuaiRand-Pure/data"))
@@ -124,6 +128,8 @@ def main() -> None:
             print(write_report(ledger, args.output))
         finally:
             ledger.close()
+    elif args.command == "campaign-status":
+        print(write_campaign_report(args.campaign, args.output))
     elif args.command == "baseline-valid":
         print(json.dumps(run_safe_numpy_fm(args.starter_kit, args.data_dir, args.seed), indent=2, sort_keys=True))
     elif args.command == "torch-baseline-valid":

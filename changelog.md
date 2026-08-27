@@ -2,6 +2,16 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Explicit campaign convergence evidence
+
+### Changed
+
+Added a campaign-status command that materializes epsilon/N convergence, selected batch results, evaluator identity, and resource totals from an explicit cross-ledger JSON manifest. It rejects duplicate references, failed/non-research records, mixed evaluator hashes, and any declared continuation after convergence.
+
+### Validation
+
+Two new campaign-evidence tests cover valid convergence/resource aggregation and mixed-evaluator rejection. The full suite has 40 passing tests. Historical research ledgers are intentionally not yet presented as a converged final campaign because their parent lineage predates this stronger campaign contract.
+
 ## 2026-08-28 - Single-pass scale preflight
 
 ### Changed
