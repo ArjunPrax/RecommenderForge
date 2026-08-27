@@ -2,6 +2,16 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Train-only watch-completion candidate
+
+### Changed
+
+Implemented EXP-007: a BPR FM with one clipped play-time/duration completion auxiliary head. `play_time_ms` can now be loaded only for training rows; validation and test requests fail closed. The evaluated prediction remains the primary BPR long-view score. The route creates normal frozen checkpoint/manifests and supports output reconstruction.
+
+### Validation
+
+The new head-gradient test and validation/test access-control test pass. Full suite: 37 passing. Five-seed experiment measurement is pending; no performance claim is made.
+
 ## 2026-08-28 - Bounded KuaiRand-27K baseline route
 
 ### Changed

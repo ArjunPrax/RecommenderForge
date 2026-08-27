@@ -16,6 +16,7 @@ from .contracts import CheckpointManifest, ExperimentSpec, OperatorFamily
 from .controller import ExecutionResult
 from .kuairand import KuaiRandPureAdapter
 from .multitask_fm import MultiTaskConfig, run_multitask_bpr
+from .watchtime_fm import WatchTimeConfig, run_watchtime_bpr
 from .deepfm import DeepFMConfig, run_deepfm_bpr
 from .ordering import within_user_ordering_change
 from .ranking_fm import RankingFMConfig, run_ranking_fm
@@ -73,15 +74,26 @@ def execute_ranking_candidate(
     for seed in raw_seeds:
         checkpoint_path = output_dir / f"seed-{seed}.pt"
         if candidate.operator_family is OperatorFamily.MULTI_TASK:
-            measurements.append(
-                run_multitask_bpr(
-                    starter_kit_dir,
-                    data_dir,
-                    seed,
-                    MultiTaskConfig(auxiliary_weight=float(candidate.configuration.get("auxiliary_weight", 0.15)), **common_config),
-                    checkpoint_path=checkpoint_path,
+            if candidate.configuration.get("auxiliary_task") == "watch_completion":
+                measurements.append(
+                    run_watchtime_bpr(
+                        starter_kit_dir,
+                        data_dir,
+                        seed,
+                        WatchTimeConfig(auxiliary_weight=float(candidate.configuration.get("auxiliary_weight", 0.10)), **common_config),
+                        checkpoint_path=checkpoint_path,
+                    )
                 )
-            )
+            else:
+                measurements.append(
+                    run_multitask_bpr(
+                        starter_kit_dir,
+                        data_dir,
+                        seed,
+                        MultiTaskConfig(auxiliary_weight=float(candidate.configuration.get("auxiliary_weight", 0.15)), **common_config),
+                        checkpoint_path=checkpoint_path,
+                    )
+                )
         elif candidate.operator_family is OperatorFamily.BACKBONE:
             measurements.append(
                 run_deepfm_bpr(

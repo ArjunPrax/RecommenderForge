@@ -30,6 +30,8 @@ class KuaiRandSafeLoaderTests(unittest.TestCase):
                 loader.rows("test", include_labels=True)
             with self.assertRaises(TestAccessError):
                 loader.rows("valid", include_auxiliary_labels=True)
+            with self.assertRaises(TestAccessError):
+                loader.rows("valid", include_watch_targets=True)
             rows = loader.rows("test", include_labels=False)
             self.assertEqual(len(rows), 1)
             self.assertIsNone(rows[0].label)

@@ -36,6 +36,7 @@ class KuaiRandRow:
     duration_ms: float
     label: int | None
     auxiliary_labels: tuple[int, int, int] | None = None
+    watch_time_ms: float | None = None
 
 
 def starter_kuairand_pure_spec(starter_kit_dir: str | Path) -> BenchmarkSpec:
@@ -73,12 +74,18 @@ class KuaiRandPureData:
         )
 
     def rows(
-        self, split: SplitName, include_labels: bool = True, include_auxiliary_labels: bool = False
+        self,
+        split: SplitName,
+        include_labels: bool = True,
+        include_auxiliary_labels: bool = False,
+        include_watch_targets: bool = False,
     ) -> list[KuaiRandRow]:
         if split == "test" and include_labels:
             raise TestAccessError("KuaiRand test labels are prohibited in candidate-facing data access")
         if split != "train" and include_auxiliary_labels:
             raise TestAccessError("auxiliary outcome labels are available only for the training split")
+        if split != "train" and include_watch_targets:
+            raise TestAccessError("watch-time outcomes are available only for the training split")
         if split not in SPLIT_DATES:
             raise ValueError(f"unknown split: {split}")
         lower, upper = SPLIT_DATES[split]
@@ -98,6 +105,8 @@ class KuaiRandPureData:
                 auxiliary_columns = ("is_click", "is_like", "is_follow")
                 if include_auxiliary_labels and any(column not in positions for column in auxiliary_columns):
                     raise ValueError(f"{path} is missing required auxiliary labels")
+                if include_watch_targets and "play_time_ms" not in positions:
+                    raise ValueError(f"{path} is missing required play_time_ms training outcome")
                 for values in reader:
                     # Select only fields that candidate-facing code is entitled to use. In
                     # particular, test rows never create a Python value for `long_view`.
@@ -111,6 +120,7 @@ class KuaiRandPureData:
                         if include_auxiliary_labels
                         else None
                     )
+                    watch_time_ms = float(values[positions["play_time_ms"]]) if include_watch_targets else None
                     output.append(
                         KuaiRandRow(
                             date=date,
@@ -122,6 +132,7 @@ class KuaiRandPureData:
                             duration_ms=float(values[positions["duration_ms"]]),
                             label=label,
                             auxiliary_labels=auxiliary_labels,
+                            watch_time_ms=watch_time_ms,
                         )
                     )
         return output
@@ -146,10 +157,19 @@ class KuaiRandPureAdapter:
         self.evaluator = BenchmarkAdapter.from_organizer_file(self.spec)
 
     def development_rows(
-        self, split: Literal["train", "valid"], *, include_auxiliary_labels: bool = False
+        self,
+        split: Literal["train", "valid"],
+        *,
+        include_auxiliary_labels: bool = False,
+        include_watch_targets: bool = False,
     ) -> list[KuaiRandRow]:
         self.spec.assert_development_split(split)
-        return self.data.rows(split, include_labels=True, include_auxiliary_labels=include_auxiliary_labels)
+        return self.data.rows(
+            split,
+            include_labels=True,
+            include_auxiliary_labels=include_auxiliary_labels,
+            include_watch_targets=include_watch_targets,
+        )
 
     def submission_rows(self) -> list[KuaiRandRow]:
         return self.data.rows("test", include_labels=False)

@@ -308,6 +308,63 @@ def run_autonomous_multitask(
     return response
 
 
+def run_autonomous_watchtime(
+    *,
+    repository_root: str | Path,
+    starter_kit_dir: str | Path,
+    data_dir: str | Path,
+    parent_ledger_path: str | Path,
+    output_dir: str | Path,
+) -> dict[str, object]:
+    """Test train-only watch-completion supervision from the frozen BPR parent."""
+    parent_ledger = ExperimentLedger(parent_ledger_path)
+    try:
+        parent = next((run for run in parent_ledger.list_runs() if run["experiment_id"] == "EXP-004A" and run["status"] == "succeeded"), None)
+    finally:
+        parent_ledger.close()
+    if parent is None or not parent.get("checkpoint_manifest"):
+        raise ValueError("watch-time research requires a succeeded EXP-004A parent manifest")
+    parent_hash = parent["checkpoint_manifest"].get("checkpoint_sha256")
+    if not parent_hash:
+        raise ValueError("watch-time parent is missing a checkpoint hash")
+    output_dir = Path(output_dir); output_dir.mkdir(parents=True, exist_ok=True)
+    benchmark = starter_kuairand_pure_spec(starter_kit_dir); ledger = ExperimentLedger(output_dir / "ledger.sqlite")
+    knowledge = KnowledgeBase([EvidenceCard(
+        evidence_id="KB-010",
+        title="Watch-completion auxiliary supervision",
+        source="Interpretation - organizer-provided train-only play_time_ms normalized by duration_ms",
+        claim="A bounded watch-completion loss may teach the shared FM preference signal not captured by binary long_view alone.",
+        assumptions=("play_time_ms is requested only from training rows", "completion is clipped to [0, 1]"),
+        operator_families=(OperatorFamily.MULTI_TASK,),
+        applicability="Controlled BPR auxiliary-objective candidate.",
+        risks=("post-exposure outcomes must never be read from validation or test", "the auxiliary may distract from ranking"),
+    )])
+    context = PlannerContext(
+        goal="Test whether train-only normalized watch completion improves long-view BPR ranking.",
+        experiment_ids=("EXP-007",), run_class=RunClass.RESEARCH,
+        parent_run_id=parent["run_id"], parent_checkpoint_sha256=str(parent_hash),
+        allowed_operator_families=(OperatorFamily.MULTI_TASK,), allowed_paths=(), token_budget=0, compute_budget_seconds=1800,
+    )
+    planner = FixedPlanner({
+        "rationale": "Keep BPR and the FM fields fixed; add one train-only, clipped watch-completion BCE head.",
+        "candidates": [{
+            "experiment_id": "EXP-007", "operator_family": "multi_task",
+            "hypothesis": "Train-only watch-completion supervision improves BPR validation primary.",
+            "expected_mechanism": "a shared representation receives denser preference gradients while the evaluated BPR head remains unchanged.",
+            "evidence_ids": ["KB-010"],
+            "configuration": {"objective": "bpr", "auxiliary_task": "watch_completion", "auxiliary_weight": 0.10, "seeds": [0, 1, 2, 3, 4]},
+            "controlled_variables": ["BPR loss", "FM fields", "train/validation split", "seed set"],
+        }],
+    })
+    plan = planner.plan(context, knowledge); controller = ResearchController(benchmark, ledger)
+    records = controller.execute_batch(plan.batch, lambda candidate: execute_ranking_candidate(candidate, repository_root=repository_root, starter_kit_dir=starter_kit_dir, data_dir=data_dir, artifact_root=output_dir / "artifacts"))
+    for record in records:
+        ledger.append_event(record.run_id, "planner_decision", {"rationale": plan.rationale, "provider": "fixed_offline_policy"})
+    snapshot = MemoryManager(ledger).consolidate(); report = write_report(ledger, output_dir / "report.md")
+    response = {"ledger": str(output_dir / "ledger.sqlite"), "report": str(report), "memory_snapshot": snapshot["snapshot_id"], "converged": controller.observe_for_convergence(records), "runs": [record.run_id for record in records]}
+    ledger.close(); return response
+
+
 def run_autonomous_ensemble(
     *, repository_root: str | Path, starter_kit_dir: str | Path, data_dir: str | Path,
     bpr_ledger_path: str | Path, history_ledger_path: str | Path, output_dir: str | Path,

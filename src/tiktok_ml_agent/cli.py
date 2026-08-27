@@ -12,7 +12,7 @@ from .reporting import write_report
 from .baseline_runner import run_safe_numpy_fm
 from .torch_fm import run_safe_torch_fm
 from .ranking_fm import RankingFMConfig, run_ranking_fm
-from .autonomous import run_autonomous_backbone, run_autonomous_ensemble, run_autonomous_history, run_autonomous_multitask, run_autonomous_ranking, run_autonomous_temporal, run_autonomous_three_ensemble
+from .autonomous import run_autonomous_backbone, run_autonomous_ensemble, run_autonomous_history, run_autonomous_multitask, run_autonomous_ranking, run_autonomous_temporal, run_autonomous_three_ensemble, run_autonomous_watchtime
 from .submission import generate_submission
 from .scale import ScaleArtifactAdapter, write_preflight
 from .scale_baseline import run_streaming_popularity
@@ -59,6 +59,12 @@ def main() -> None:
     autonomous_multitask.add_argument("--data-dir", type=Path, default=Path("kuairand-starter-kit/KuaiRand-Pure/data"))
     autonomous_multitask.add_argument("--parent-ledger", type=Path, default=Path("artifacts/autonomous-ranking-verified/ledger.sqlite"))
     autonomous_multitask.add_argument("--output-dir", type=Path, default=Path("artifacts/autonomous-multitask"))
+    autonomous_watchtime = commands.add_parser("autonomous-watchtime", help="run the train-only watch-completion BPR candidate")
+    autonomous_watchtime.add_argument("--repository-root", type=Path, default=Path("."))
+    autonomous_watchtime.add_argument("--starter-kit", type=Path, default=Path("kuairand-starter-kit"))
+    autonomous_watchtime.add_argument("--data-dir", type=Path, default=Path("kuairand-starter-kit/KuaiRand-Pure/data"))
+    autonomous_watchtime.add_argument("--parent-ledger", type=Path, default=Path("artifacts/autonomous-ranking-verified/ledger.sqlite"))
+    autonomous_watchtime.add_argument("--output-dir", type=Path, default=Path("artifacts/autonomous-watchtime"))
     autonomous_ensemble = commands.add_parser("autonomous-ensemble", help="evaluate a frozen-component rank ensemble")
     autonomous_ensemble.add_argument("--repository-root", type=Path, default=Path("."))
     autonomous_ensemble.add_argument("--starter-kit", type=Path, default=Path("kuairand-starter-kit"))
@@ -148,6 +154,8 @@ def main() -> None:
         )
     elif args.command == "autonomous-multitask":
         print(json.dumps(run_autonomous_multitask(repository_root=args.repository_root, starter_kit_dir=args.starter_kit, data_dir=args.data_dir, parent_ledger_path=args.parent_ledger, output_dir=args.output_dir), indent=2, sort_keys=True))
+    elif args.command == "autonomous-watchtime":
+        print(json.dumps(run_autonomous_watchtime(repository_root=args.repository_root, starter_kit_dir=args.starter_kit, data_dir=args.data_dir, parent_ledger_path=args.parent_ledger, output_dir=args.output_dir), indent=2, sort_keys=True))
     elif args.command == "autonomous-ensemble":
         print(json.dumps(run_autonomous_ensemble(repository_root=args.repository_root, starter_kit_dir=args.starter_kit, data_dir=args.data_dir, bpr_ledger_path=args.bpr_ledger, history_ledger_path=args.history_ledger, output_dir=args.output_dir), indent=2, sort_keys=True))
     elif args.command == "autonomous-temporal":

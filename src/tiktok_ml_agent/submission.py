@@ -19,6 +19,7 @@ from .multitask_fm import MultiTaskFM
 from .torch_fm import TorchFM
 from .ensemble_runner import _percentile_ranks
 from .deepfm import DeepFM
+from .watchtime_fm import WatchTimeFM
 
 
 def _manifest_from_ledger(path: str | Path, run_id: str) -> CheckpointManifest:
@@ -62,6 +63,9 @@ def _component_scores(manifest: CheckpointManifest, adapter: KuaiRandPureAdapter
     if state.get("model_type") == "deepfm":
         config = state["configuration"]
         model = DeepFM(dimension, field_count=int(config["field_count"]), k=int(config["k"]), hidden=int(config["hidden"]))
+        predict = model.logits
+    elif state.get("model_type") == "watchtime":
+        model = WatchTimeFM(dimension, k=state_dict["V"].shape[1])
         predict = model.logits
     elif "task_bias" in state_dict:
         model = MultiTaskFM(dimension, task_count=len(state_dict["task_bias"]), k=state_dict["V"].shape[1])
