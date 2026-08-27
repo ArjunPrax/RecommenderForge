@@ -12,7 +12,7 @@ Plan experiments here; measured outcomes belong in `results_log.md`. IDs are sta
 | EXP-006 | Multi-feedback learning | Measured; R007 rejects the first shared-FM auxiliary configuration |
 | EXP-007 | Duration/watch-time corrections | Planned |
 | EXP-008 | Exposure and temporal robustness | Planned |
-| EXP-009 | Ensembles | Implemented; frozen-component five-seed rank blend pending |
+| EXP-009 | Ensembles | Measured; R008 is the current validation leader |
 | EXP-010 | KuaiRand-1K scale validation | Blocked on organizer artifacts |
 | EXP-011 | KuaiRand-27K scale validation | Blocked on organizer artifacts |
 

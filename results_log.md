@@ -2,6 +2,43 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R008 - Frozen BPR/history rank ensemble improvement
+
+Date: 2026-08-28
+Experiment: EXP-009
+Implementation / commit: `597c936d23e066d3cc7d890b19dfc8c9222210e4`
+Environment: CPython 3.13.11, NumPy 2.5.2, PyTorch 2.13.0, CPU.
+
+### Question
+
+Can a rank-space blend of the frozen BPR and leakage-safe history-cross components improve validation primary without retraining either model?
+
+### Change Tested
+
+For each seed, percentile-ranked BPR and history scores were blended. The declared BPR-weight grid was `{0.25, 0.50, 0.75}` and the five-seed mean selected `0.25` BPR / `0.75` history. Component checkpoint manifests and validation predictions were preserved.
+
+### Metrics
+
+| Metric | Mean | Population std | Delta vs R001 baseline |
+|---|---:|---:|---:|
+| GAUC | 0.670412 | 0.000547 | +0.003012 |
+| nDCG@5 | 0.537118 | 0.000243 | +0.001374 |
+| primary | 0.603765 | 0.000332 | +0.002193 |
+
+The other declared blend means were `0.603699` at BPR weight `0.50` and `0.603569` at `0.75`.
+
+### Correctness Validation
+
+No component was retrained. The ensemble manifest binds both source manifests, the selected weight, validation-prediction hash, code, data, and evaluator hashes. It generated a schema-valid, 170,588-row test output from the component checkpoints without test scoring.
+
+### Interpretation
+
+This is the first candidate exceeding the provisional `epsilon=0.002` improvement threshold over R001. It is a validation-only result and not a converged final claim; the weight grid consumed validation feedback and must remain visible in the report.
+
+### Decision / Next Step
+
+Use the frozen ensemble as the current research parent and judge later candidates against it using the global convergence ledger.
+
 ## R007 - Multi-feedback BPR regression
 
 Date: 2026-08-28

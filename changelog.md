@@ -2,6 +2,16 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Frozen rank ensemble measured
+
+### Measured
+
+EXP-009 selected a 0.25 BPR / 0.75 history percentile-rank blend across a predeclared five-seed grid. Its mean validation primary is `0.603765`, +`0.002193` over the reproduced NumPy FM. A schema-valid 170,588-row output was generated from the composite manifest without test scoring.
+
+### Caveat
+
+This is not a converged or hidden-test result. Weight selection uses validation feedback and its full grid is retained in the ensemble manifest and R008.
+
 ## 2026-08-28 - Frozen-component ensemble lane
 
 ### Changed
