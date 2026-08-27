@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - DeepFM backbone lane
+
+### Changed
+
+Added a compact DeepFM-style BPR implementation (shared field embeddings, FM terms, nonlinear tower), its checkpoint/output support, and an autonomous five-seed EXP-012 route. The architecture uses the existing safe adapter and does not access test labels.
+
 ## 2026-08-28 - Campaign-level convergence accounting
 
 ### Changed

@@ -16,6 +16,7 @@ from .contracts import CheckpointManifest, ExperimentSpec, OperatorFamily
 from .controller import ExecutionResult
 from .kuairand import KuaiRandPureAdapter
 from .multitask_fm import MultiTaskConfig, run_multitask_bpr
+from .deepfm import DeepFMConfig, run_deepfm_bpr
 from .ordering import within_user_ordering_change
 from .ranking_fm import RankingFMConfig, run_ranking_fm
 
@@ -78,6 +79,14 @@ def execute_ranking_candidate(
                     data_dir,
                     seed,
                     MultiTaskConfig(auxiliary_weight=float(candidate.configuration.get("auxiliary_weight", 0.15)), **common_config),
+                    checkpoint_path=checkpoint_path,
+                )
+            )
+        elif candidate.operator_family is OperatorFamily.BACKBONE:
+            measurements.append(
+                run_deepfm_bpr(
+                    starter_kit_dir, data_dir, seed,
+                    DeepFMConfig(hidden=int(candidate.configuration.get("hidden", 64)), **common_config),
                     checkpoint_path=checkpoint_path,
                 )
             )

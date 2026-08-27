@@ -12,7 +12,7 @@ from .reporting import write_report
 from .baseline_runner import run_safe_numpy_fm
 from .torch_fm import run_safe_torch_fm
 from .ranking_fm import RankingFMConfig, run_ranking_fm
-from .autonomous import run_autonomous_ensemble, run_autonomous_history, run_autonomous_multitask, run_autonomous_ranking, run_autonomous_temporal, run_autonomous_three_ensemble
+from .autonomous import run_autonomous_backbone, run_autonomous_ensemble, run_autonomous_history, run_autonomous_multitask, run_autonomous_ranking, run_autonomous_temporal, run_autonomous_three_ensemble
 from .submission import generate_submission
 
 
@@ -78,6 +78,12 @@ def main() -> None:
     autonomous_three_ensemble.add_argument("--history-ledger", type=Path, default=Path("artifacts/autonomous-history-verified/ledger.sqlite"))
     autonomous_three_ensemble.add_argument("--temporal-ledger", type=Path, default=Path("artifacts/autonomous-temporal/ledger.sqlite"))
     autonomous_three_ensemble.add_argument("--output-dir", type=Path, default=Path("artifacts/autonomous-three-ensemble"))
+    autonomous_backbone = commands.add_parser("autonomous-backbone", help="run the compact DeepFM BPR backbone candidate")
+    autonomous_backbone.add_argument("--repository-root", type=Path, default=Path("."))
+    autonomous_backbone.add_argument("--starter-kit", type=Path, default=Path("kuairand-starter-kit"))
+    autonomous_backbone.add_argument("--data-dir", type=Path, default=Path("kuairand-starter-kit/KuaiRand-Pure/data"))
+    autonomous_backbone.add_argument("--parent-ledger", type=Path, default=Path("artifacts/autonomous-ranking-verified/ledger.sqlite"))
+    autonomous_backbone.add_argument("--output-dir", type=Path, default=Path("artifacts/autonomous-backbone"))
     submission = commands.add_parser("submission", help="generate a CSV from one frozen checkpoint manifest")
     submission.add_argument("--ledger", type=Path, required=True)
     submission.add_argument("--run-id", required=True)
@@ -135,6 +141,8 @@ def main() -> None:
         print(json.dumps(run_autonomous_temporal(repository_root=args.repository_root, starter_kit_dir=args.starter_kit, data_dir=args.data_dir, parent_ledger_path=args.parent_ledger, output_dir=args.output_dir), indent=2, sort_keys=True))
     elif args.command == "autonomous-three-ensemble":
         print(json.dumps(run_autonomous_three_ensemble(repository_root=args.repository_root, starter_kit_dir=args.starter_kit, data_dir=args.data_dir, bpr_ledger_path=args.bpr_ledger, history_ledger_path=args.history_ledger, temporal_ledger_path=args.temporal_ledger, output_dir=args.output_dir), indent=2, sort_keys=True))
+    elif args.command == "autonomous-backbone":
+        print(json.dumps(run_autonomous_backbone(repository_root=args.repository_root, starter_kit_dir=args.starter_kit, data_dir=args.data_dir, parent_ledger_path=args.parent_ledger, output_dir=args.output_dir), indent=2, sort_keys=True))
     elif args.command == "submission":
         print(generate_submission(ledger_path=args.ledger, run_id=args.run_id, starter_kit_dir=args.starter_kit, data_dir=args.data_dir, output_path=args.output))
 

@@ -272,6 +272,19 @@ Apply the provisional epsilon/N convergence rule to the selected result of each 
 
 This preserves the intended atomicity of an autonomous proposal/execute/select loop and makes the stopping audit reproducible.
 
+## D017 - Compact DeepFM architecture lane
+
+Date: 2026-08-28
+Status: Accepted
+
+### Decision
+
+Add EXP-012 as a bounded DeepFM-style BPR backbone trial: FM terms plus a 64-unit nonlinear tower over the same categorical field embeddings.
+
+### Why
+
+It tests a distinct higher-order interaction mechanism without changing the benchmark adapter, data policy, loss, or seed protocol.
+
 ## D004 - Retain experimental evidence
 
 Date: 2026-08-26

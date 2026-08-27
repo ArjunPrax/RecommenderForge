@@ -15,6 +15,7 @@ Plan experiments here; measured outcomes belong in `results_log.md`. IDs are sta
 | EXP-009 | Ensembles | Measured; R008 two-component, R010 three-component child EXP-009A is current validation leader |
 | EXP-010 | KuaiRand-1K scale validation | Blocked on organizer artifacts |
 | EXP-011 | KuaiRand-27K scale validation | Blocked on organizer artifacts |
+| EXP-012 | Compact DeepFM BPR backbone | Implemented; five-seed run pending |
 
 ## EXP-XXX - Experiment title
 

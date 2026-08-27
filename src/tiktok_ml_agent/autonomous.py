@@ -394,3 +394,25 @@ def run_autonomous_three_ensemble(
     snapshot = MemoryManager(ledger).consolidate(); report = write_report(ledger, output_dir / "report.md")
     response = {"ledger": str(output_dir / "ledger.sqlite"), "report": str(report), "memory_snapshot": snapshot["snapshot_id"], "converged": controller.observe_for_convergence(records), "runs": [record.run_id for record in records]}
     ledger.close(); return response
+
+
+def run_autonomous_backbone(
+    *, repository_root: str | Path, starter_kit_dir: str | Path, data_dir: str | Path,
+    parent_ledger_path: str | Path, output_dir: str | Path,
+) -> dict[str, object]:
+    """Evaluate a compact nonlinear DeepFM BPR backbone from the BPR parent."""
+    source = ExperimentLedger(parent_ledger_path)
+    try: parent = next((run for run in source.list_runs() if run["experiment_id"] == "EXP-004A" and run["status"] == "succeeded"), None)
+    finally: source.close()
+    if not parent or not parent.get("checkpoint_manifest"): raise ValueError("backbone research requires a succeeded EXP-004A parent")
+    output_dir = Path(output_dir); output_dir.mkdir(parents=True, exist_ok=True)
+    benchmark = starter_kuairand_pure_spec(starter_kit_dir); ledger = ExperimentLedger(output_dir / "ledger.sqlite")
+    knowledge = KnowledgeBase([EvidenceCard(evidence_id="KB-009", title="DeepFM nonlinear interactions", source="Guo et al. (2017), DeepFM", claim="A neural tower over field embeddings can model higher-order feature interactions alongside FM terms.", assumptions=("small architecture is trainable under the project compute budget",), operator_families=(OperatorFamily.BACKBONE,), applicability="Controlled BPR backbone replacement.", risks=("more capacity can overfit short temporal validation",))])
+    context = PlannerContext(goal="Test whether a compact DeepFM tower improves BPR ranking beyond factorization-machine interactions.", experiment_ids=("EXP-012",), run_class=RunClass.RESEARCH, parent_run_id=parent["run_id"], parent_checkpoint_sha256=parent["checkpoint_manifest"]["checkpoint_sha256"], allowed_operator_families=(OperatorFamily.BACKBONE,), allowed_paths=(), token_budget=0, compute_budget_seconds=3600)
+    planner = FixedPlanner({"rationale": "Replace only the FM backbone with a compact nonlinear tower while retaining BPR, fields, splits, and seeds.", "candidates": [{"experiment_id": "EXP-012", "operator_family": "backbone", "hypothesis": "DeepFM's nonlinear tower improves BPR validation primary.", "expected_mechanism": "higher-order interactions complement pairwise FM terms.", "evidence_ids": ["KB-009"], "configuration": {"objective": "bpr", "hidden": 64, "seeds": [0, 1, 2, 3, 4]}, "controlled_variables": ["BPR loss", "fields", "train/validation split", "seed set"]}]})
+    plan = planner.plan(context, knowledge); controller = ResearchController(benchmark, ledger)
+    records = controller.execute_batch(plan.batch, lambda candidate: execute_ranking_candidate(candidate, repository_root=repository_root, starter_kit_dir=starter_kit_dir, data_dir=data_dir, artifact_root=output_dir / "artifacts"))
+    for record in records: ledger.append_event(record.run_id, "planner_decision", {"rationale": plan.rationale, "provider": "fixed_offline_policy"})
+    snapshot = MemoryManager(ledger).consolidate(); report = write_report(ledger, output_dir / "report.md")
+    response = {"ledger": str(output_dir / "ledger.sqlite"), "report": str(report), "memory_snapshot": snapshot["snapshot_id"], "converged": controller.observe_for_convergence(records), "runs": [record.run_id for record in records]}
+    ledger.close(); return response
