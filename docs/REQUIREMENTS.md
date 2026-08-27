@@ -4,15 +4,15 @@ Source: updated official PDF pages 3-12 and the organizer Starter Kit. Conflicti
 
 | ID | Source | Requirement | Mandatory / Optional | How we will eventually prove compliance | Status |
 |---|---|---|---|---|---|
-| REQ-001 | p. 3 | Design and implement an autonomous ML research agent for recommender systems. | Mandatory | End-to-end run, code, logs, submission. | Not started |
+| REQ-001 | p. 3 | Design and implement an autonomous ML research agent for recommender systems. | Mandatory | End-to-end run, code, logs, submission. | Partially demonstrated: qualification and bounded validation-only research loops; final convergence/submission pending |
 | REQ-002 | p. 3 | Reproduce organizer official baseline and confirm reported validation score. | Mandatory | Reproducible baseline run and metrics. | Reproduced on validation; see R001 |
 | REQ-003 | p. 3 | Iterate using training split and public validation feedback only; never access hidden test during development. | Mandatory | Data-access controls and run logs. | Not evaluated |
 | REQ-004 | p. 3 | Repeatedly improve relative to official baseline; final hidden-test score uses final designated submission. | Mandatory target | Iteration logs and organizer evaluation. | Not evaluated |
-| REQ-005 | p. 3 | Improve autonomously across full stack with minimal human intervention. | Mandatory | Intervention summary and logs. | Not evaluated |
-| REQ-006 | p. 3, 9 | Recover/retry/route around errors, timeouts, unexpected inputs; long runs must not crash, stall, or diverge. | Mandatory | Recovery evidence in run logs. | Not evaluated |
+| REQ-005 | p. 3 | Improve autonomously across full stack with minimal human intervention. | Mandatory | Intervention summary and logs. | Partially demonstrated: recorded runs had zero mid-run interventions; final convergence pending |
+| REQ-006 | p. 3, 9 | Recover/retry/route around errors, timeouts, unexpected inputs; long runs must not crash, stall, or diverge. | Mandatory | Recovery evidence in run logs. | Partially demonstrated: R005 is a ledgered recovered execution; timeout/memory routes not yet demonstrated |
 | REQ-007 | pp. 4, 6 | Do not use external training data or weights trained on test labels. | Mandatory | Data/model provenance record. | Not evaluated |
 | REQ-008 | p. 4 | Use fixed organizer splits and metrics. Compute budget is TBD. | Mandatory | Evaluation configuration. | Not evaluated |
-| REQ-009 | p. 5 | Log each iteration's hypothesis, code diff, metrics, and errors/recovery events. | Mandatory | Complete per-iteration log. | Not started |
+| REQ-009 | p. 5 | Log each iteration's hypothesis, code diff, metrics, and errors/recovery events. | Mandatory | Complete per-iteration log. | Partially demonstrated for R005/R006 and autonomous objective runs |
 | REQ-010 | p. 7 | Submit Devpost description including tools, APIs, libraries, datasets/assets. | Mandatory | Submitted Devpost content. | Not started |
 | REQ-011 | p. 7 | Submit a public repository and README with overview, setup, reproduction, limitations, contributions. | Mandatory | Public final repository and README. | Not started |
 | REQ-012 | pp. 7-8 | Submit final output/checkpoint in Starter Kit schema and validation-best results/delta table. | Mandatory | Validated output and results table. | Not started |

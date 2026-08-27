@@ -2,6 +2,23 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Autonomous ranking and history evidence
+
+### Changed
+
+Ran the checkpoint-backed validation-only EXP-004 objective siblings and EXP-005 history continuation. Added strict-prior/train-only frozen history construction, a runtime within-user ordering-change audit, and a regression test for the audit execution path.
+
+### Measured
+
+- EXP-004A BPR: mean validation primary `0.603082`, +`0.001510` vs R001 NumPy FM.
+- EXP-004B exact listwise: mean `0.598306`; retained as a negative result.
+- EXP-005 history cross: mean `0.603259`, +`0.000177` vs BPR; changed `24,282` pairwise relations across `6,758` eligible users but is not promoted on its small score delta.
+- Initial EXP-005 audit attempt recovered from a missing NumPy import (R005); the fixed rerun is R006. No result was hidden or reused from the recovered run.
+
+### Validation
+
+The latest unit suite has 24 passing tests. Each successful run has code/diff/evaluator/checkpoint/prediction/data hashes in its generated ledger report. All reported metrics use the provisional organizer validation evaluator; no local test scoring was invoked.
+
 ## 2026-08-28 - Phase 1 integrity kernel, baseline controls, and first autonomous batch runner
 
 ### Changed

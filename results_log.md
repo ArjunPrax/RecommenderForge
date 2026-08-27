@@ -2,6 +2,77 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R006 - Checkpoint-parented history-cross BPR result
+
+Date: 2026-08-28
+Experiment: EXP-005
+Implementation / commit: `e71322a7a413212e1bd13aaa652f14a6020f39e7`
+Environment: CPython 3.13.11, NumPy 2.5.2, PyTorch 2.13.0, CPU.
+
+### Question
+
+Can a strictly earlier train-only long-view history field improve BPR FM ranking through interactions with candidate features?
+
+### Baseline
+
+R003 / EXP-004A five-seed BPR mean primary `0.603082`.
+
+### Change Tested
+
+Added a categorical user-history bucket encoding prior training-period long-view count and rate. Each training event sees only prior event labels; every validation feature is frozen from the completed training period. The bucket is an FM field, so its only route to reorder a user's candidates is through crosses with video, author, tab, and duration.
+
+### Inputs / Workload
+
+Full train/validation data, seeds 0–4. The autonomous runner loaded the immutable EXP-004A checkpoint manifest, generated a new checkpoint per seed, and used only the organizer validation evaluator.
+
+### Metrics
+
+| Metric | Mean | Population std | Delta vs BPR |
+|---|---:|---:|---:|
+| GAUC | 0.669741 | 0.000517 | +0.000206 |
+| nDCG@5 | 0.536777 | 0.000256 | +0.000148 |
+| primary | 0.603259 | 0.000319 | +0.000177 |
+
+The run used `87.89` CPU seconds, `0` GPU-hours, and `0` LLM tokens because this was the deterministic offline policy mode.
+
+### Correctness Validation
+
+Automated tests establish strict-prior training history and train-only frozen validation history. The runtime ordering audit found `24,282` changed pairwise relations across `6,758` of `18,460` eligible validation users, so the field affects within-user ranking. No hidden-test scoring occurred.
+
+### Interpretation
+
+The history cross is mechanism-valid and positive but its mean gain is materially smaller than the provisional `epsilon=0.002`. Retain it as a component candidate; do not declare it a promoted final parent or a converged improvement.
+
+### Limitations
+
+Only one aggregate history representation was tested. The automated policy was deterministic and therefore consumed no LLM tokens; a provider-backed planner remains an optional, unexercised integration.
+
+### Decision / Next Step
+
+Explore candidate-specific temporal similarity or multi-feedback only through the same frozen-parent, ordering-audit, five-seed protocol.
+
+### Reproduction
+
+`python -m tiktok_ml_agent autonomous-history --parent-ledger artifacts/autonomous-ranking-verified/ledger.sqlite --output-dir artifacts/autonomous-history-verified`
+
+## R005 - Recovered history-audit execution failure
+
+Date: 2026-08-28
+Experiment: EXP-005
+Implementation / commit: `242fbc8`
+
+### Question
+
+Does the autonomous recovery path retain an unexpected runtime failure without converting it into a model result?
+
+### Result
+
+The initial history-audit candidate trained all five validation seeds, then raised `NameError: name 'np' is not defined` while loading the parent prediction artifact for its final ordering audit. The controller finalized it as `recovered` with recovery action `revert_candidate_worktree_to_immutable_parent`; it has no metrics or checkpoint manifest and is not used for selection.
+
+### Decision / Next Step
+
+Added the missing import and a regression test that mocks the execution path through the parent-prediction audit. R006 is the subsequent successful rerun. This failure remains recorded as autonomy/recovery evidence.
+
 ## R004 - Exact per-user listwise FM regression
 
 Date: 2026-08-28
