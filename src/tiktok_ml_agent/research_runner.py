@@ -60,7 +60,10 @@ def execute_ranking_candidate(
         "epochs": int(candidate.configuration.get("epochs", 40)),
         "patience": int(candidate.configuration.get("patience", 4)),
     }
-    config = RankingFMConfig(objective=str(objective), history_cross=bool(candidate.configuration.get("history_cross", False)), **common_config)
+    config = RankingFMConfig(
+        objective=str(objective), history_cross=bool(candidate.configuration.get("history_cross", False)),
+        temporal_day_cross=bool(candidate.configuration.get("temporal_day_cross", False)), **common_config,
+    )
     adapter = KuaiRandPureAdapter(starter_kit_dir, data_dir)
     output_dir = Path(artifact_root) / candidate.experiment_id.lower() / f"{objective}-{_config_hash(candidate.configuration)[:12]}"
     output_dir.mkdir(parents=True, exist_ok=True)

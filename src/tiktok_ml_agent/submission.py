@@ -47,9 +47,14 @@ def _component_scores(manifest: CheckpointManifest, adapter: KuaiRandPureAdapter
     test = adapter.submission_rows()
     state: dict[str, Any] = torch.load(checkpoint, map_location="cpu", weights_only=False)
     history_cross = bool(state.get("history_cross", False))
+    temporal_day_cross = bool(state.get("temporal_day_cross", False))
     if history_cross:
         train_history, test_history = prior_long_view_buckets(train, test)
         matrix, dimension = encode_train_inference(train, test, extra_train=train_history, extra_inference=test_history)
+    elif temporal_day_cross:
+        train_day = [f"weekday_{(row.date % 100 - 1) % 7}" for row in train]
+        test_day = [f"weekday_{(row.date % 100 - 1) % 7}" for row in test]
+        matrix, dimension = encode_train_inference(train, test, extra_train=train_day, extra_inference=test_day)
     else:
         matrix, dimension = encode_train_inference(train, test)
     state_dict = state["state_dict"]

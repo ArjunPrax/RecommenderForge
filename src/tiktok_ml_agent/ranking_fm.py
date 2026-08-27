@@ -30,6 +30,7 @@ class RankingFMConfig(StarterFMConfig):
     pair_batch_size: int = 8192
     group_batch_rows: int = 8192
     history_cross: bool = False
+    temporal_day_cross: bool = False
 
     def __post_init__(self) -> None:
         if self.objective not in {"bpr", "listwise"}:
@@ -104,10 +105,20 @@ def run_ranking_fm(
     adapter = KuaiRandPureAdapter(starter_kit_dir, data_dir)
     train = adapter.development_rows("train")
     valid = adapter.development_rows("valid")
+    if config.history_cross and config.temporal_day_cross:
+        raise ValueError("history and temporal-day feature candidates must be evaluated independently")
     if config.history_cross:
         train_history, valid_history = prior_long_view_buckets(train, valid)
         x_train, y_train, x_valid, _, users_valid, dimension = _encode_train_validation(
             train, valid, extra_train=train_history, extra_valid=valid_history
+        )
+    elif config.temporal_day_cross:
+        # KuaiRand-Pure is confined to April/May 2022; date modulo seven is a
+        # deterministic day-of-week proxy that is known at inference time.
+        train_day = [f"weekday_{(row.date % 100 - 1) % 7}" for row in train]
+        valid_day = [f"weekday_{(row.date % 100 - 1) % 7}" for row in valid]
+        x_train, y_train, x_valid, _, users_valid, dimension = _encode_train_validation(
+            train, valid, extra_train=train_day, extra_valid=valid_day
         )
     else:
         x_train, y_train, x_valid, _, users_valid, dimension = _encode_train_validation(train, valid)
@@ -180,6 +191,7 @@ def run_ranking_fm(
                 "seed": seed,
                 "objective": config.objective,
                 "history_cross": config.history_cross,
+                "temporal_day_cross": config.temporal_day_cross,
                 "configuration": {
                     "k": config.k,
                     "lr": config.lr,

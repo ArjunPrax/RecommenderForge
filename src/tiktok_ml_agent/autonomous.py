@@ -341,3 +341,28 @@ def run_autonomous_ensemble(
     snapshot = MemoryManager(ledger).consolidate(); report = write_report(ledger, output_dir / "report.md")
     response = {"ledger": str(output_dir / "ledger.sqlite"), "report": str(report), "memory_snapshot": snapshot["snapshot_id"], "converged": controller.observe_for_convergence(records), "runs": [record.run_id for record in records]}
     ledger.close(); return response
+
+
+def run_autonomous_temporal(
+    *, repository_root: str | Path, starter_kit_dir: str | Path, data_dir: str | Path,
+    parent_ledger_path: str | Path, output_dir: str | Path,
+) -> dict[str, object]:
+    """Test an inference-available calendar cross from the frozen BPR parent."""
+    parent_ledger = ExperimentLedger(parent_ledger_path)
+    try:
+        parent = next((run for run in parent_ledger.list_runs() if run["experiment_id"] == "EXP-004A" and run["status"] == "succeeded"), None)
+    finally:
+        parent_ledger.close()
+    if not parent or not parent.get("checkpoint_manifest"):
+        raise ValueError("temporal research requires a succeeded EXP-004A parent")
+    output_dir = Path(output_dir); output_dir.mkdir(parents=True, exist_ok=True)
+    benchmark = starter_kuairand_pure_spec(starter_kit_dir); ledger = ExperimentLedger(output_dir / "ledger.sqlite")
+    knowledge = KnowledgeBase([EvidenceCard(evidence_id="KB-007", title="Inference-known weekday cross", source="Interpretation - temporal candidate from timestamp metadata", claim="A calendar field can interact with candidate features without relying on feedback labels.", assumptions=("calendar time is available before exposure",), operator_families=(OperatorFamily.TEMPORAL_HISTORY,), applicability="BPR temporal robustness candidate.", risks=("time effects may not generalize across the evaluation horizon",))])
+    context = PlannerContext(goal="Test a day-of-week candidate cross without using any post-exposure outcome.", experiment_ids=("EXP-008",), run_class=RunClass.RESEARCH, parent_run_id=parent["run_id"], parent_checkpoint_sha256=parent["checkpoint_manifest"]["checkpoint_sha256"], allowed_operator_families=(OperatorFamily.TEMPORAL_HISTORY,), allowed_paths=(), token_budget=0, compute_budget_seconds=1800)
+    planner = FixedPlanner({"rationale": "Keep the BPR model fixed and add one calendar field known at impression time.", "candidates": [{"experiment_id": "EXP-008", "operator_family": "temporal_history", "hypothesis": "An inference-known weekday cross improves temporal robustness of BPR.", "expected_mechanism": "weekday interacts with candidate fields to model repeatable time-dependent preferences.", "evidence_ids": ["KB-007"], "configuration": {"objective": "bpr", "temporal_day_cross": True, "seeds": [0, 1, 2, 3, 4]}, "controlled_variables": ["BPR loss", "FM optimizer", "seed set", "train/validation split"]}]})
+    plan = planner.plan(context, knowledge); controller = ResearchController(benchmark, ledger)
+    records = controller.execute_batch(plan.batch, lambda candidate: execute_ranking_candidate(candidate, repository_root=repository_root, starter_kit_dir=starter_kit_dir, data_dir=data_dir, artifact_root=output_dir / "artifacts"))
+    for record in records: ledger.append_event(record.run_id, "planner_decision", {"rationale": plan.rationale, "provider": "fixed_offline_policy"})
+    snapshot = MemoryManager(ledger).consolidate(); report = write_report(ledger, output_dir / "report.md")
+    response = {"ledger": str(output_dir / "ledger.sqlite"), "report": str(report), "memory_snapshot": snapshot["snapshot_id"], "converged": controller.observe_for_convergence(records), "runs": [record.run_id for record in records]}
+    ledger.close(); return response
