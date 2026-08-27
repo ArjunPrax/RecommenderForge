@@ -43,6 +43,10 @@ For the first real, validation-only objective batch:
 
 The second command deliberately does not accept a test-score option.
 
+The checkpoint-parented history-cross continuation is:
+
+`python -m tiktok_ml_agent autonomous-history --parent-ledger artifacts/autonomous-ranking-verified/ledger.sqlite --output-dir artifacts/autonomous-history`
+
 ## Expected output
 
 Not yet demonstrated.

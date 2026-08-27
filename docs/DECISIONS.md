@@ -205,6 +205,29 @@ The ledger needs a unique immutable experiment identifier per sibling, while the
 - Tasks: T2-005
 - Experiments: EXP-004, EXP-004A, EXP-004B
 
+## D013 - Train-only frozen validation history
+
+Date: 2026-08-28
+Status: Accepted
+
+### Context
+
+User-history features can leak evaluation labels, and a user-constant score cannot alter a within-user ranking by itself.
+
+### Decision
+
+For EXP-005, construct training history strictly before each training event and freeze validation history after the training period. Use the resulting categorical bucket only as an FM field so it can interact with candidate video, author, tab, and duration features. Never update it with validation labels.
+
+### Why
+
+This preserves a meaningful candidate-specific mechanism while making the temporal anti-leakage rule testable.
+
+### Related
+
+- Requirements: REQ-003, REQ-004, REQ-009
+- Tasks: T2-005
+- Experiments: EXP-005
+
 ## D004 - Retain experimental evidence
 
 Date: 2026-08-26

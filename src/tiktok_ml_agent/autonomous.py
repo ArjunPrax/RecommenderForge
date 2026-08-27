@@ -133,3 +133,92 @@ def run_autonomous_ranking(
     }
     ledger.close()
     return response
+
+
+def run_autonomous_history(
+    *,
+    repository_root: str | Path,
+    starter_kit_dir: str | Path,
+    data_dir: str | Path,
+    parent_ledger_path: str | Path,
+    output_dir: str | Path,
+) -> dict[str, object]:
+    """Run the history-cross candidate from the frozen BPR parent manifest."""
+    parent_ledger = ExperimentLedger(parent_ledger_path)
+    try:
+        parent = next(
+            (run for run in parent_ledger.list_runs() if run["experiment_id"] == "EXP-004A" and run["status"] == "succeeded"),
+            None,
+        )
+    finally:
+        parent_ledger.close()
+    if parent is None or not parent.get("checkpoint_manifest"):
+        raise ValueError("history research requires a succeeded EXP-004A parent with a checkpoint manifest")
+    parent_hash = parent["checkpoint_manifest"].get("checkpoint_sha256")
+    if not parent_hash:
+        raise ValueError("history research parent is missing a checkpoint hash")
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    benchmark = starter_kuairand_pure_spec(starter_kit_dir)
+    ledger = ExperimentLedger(output_dir / "ledger.sqlite")
+    knowledge = KnowledgeBase(
+        [
+            EvidenceCard(
+                evidence_id="KB-004",
+                title="Strictly-prior history crossed with candidate features",
+                source="Interpretation - recommender feature design constrained by within-user ranking and temporal leakage controls",
+                claim="A frozen user long-view history can only affect within-user order through interactions with candidate features.",
+                assumptions=("validation features use training-period history only",),
+                operator_families=(OperatorFamily.TEMPORAL_HISTORY,),
+                applicability="BPR FM extension after the frozen EXP-004A parent.",
+                risks=("user-only terms cannot reorder a user's candidates; temporal leakage must be mechanically prevented",),
+            )
+        ]
+    )
+    context = PlannerContext(
+        goal="Test whether a strictly-earlier train-only long-view history field improves BPR through candidate-feature FM crosses.",
+        experiment_ids=("EXP-005",),
+        run_class=RunClass.RESEARCH,
+        parent_run_id=parent["run_id"],
+        parent_checkpoint_sha256=str(parent_hash),
+        allowed_operator_families=(OperatorFamily.TEMPORAL_HISTORY,),
+        allowed_paths=(),
+        token_budget=0,
+        compute_budget_seconds=1800,
+    )
+    planner = FixedPlanner(
+        {
+            "rationale": "Keep the BPR objective fixed and add one temporally safe history field that FM can cross with each candidate's fields.",
+            "candidates": [
+                {
+                    "experiment_id": "EXP-005",
+                    "operator_family": "temporal_history",
+                    "hypothesis": "Frozen train-only user history crosses improve BPR validation ranking.",
+                    "expected_mechanism": "the history bucket interacts with video, author, tab, and duration fields rather than acting as a user-constant score.",
+                    "evidence_ids": ["KB-004"],
+                    "configuration": {"objective": "bpr", "history_cross": True, "seeds": [0, 1, 2, 3, 4]},
+                    "controlled_variables": ["BPR loss", "FM optimizer", "train/validation split", "seed set"],
+                }
+            ],
+        }
+    )
+    plan = planner.plan(context, knowledge)
+    controller = ResearchController(benchmark, ledger)
+    records = controller.execute_batch(
+        plan.batch,
+        lambda candidate: execute_ranking_candidate(
+            candidate,
+            repository_root=repository_root,
+            starter_kit_dir=starter_kit_dir,
+            data_dir=data_dir,
+            artifact_root=output_dir / "artifacts",
+        ),
+    )
+    for record in records:
+        ledger.append_event(record.run_id, "planner_decision", {"rationale": plan.rationale, "provider": "fixed_offline_policy"})
+    converged = controller.observe_for_convergence(records)
+    snapshot = MemoryManager(ledger).consolidate()
+    report = write_report(ledger, output_dir / "report.md")
+    response = {"ledger": str(output_dir / "ledger.sqlite"), "report": str(report), "memory_snapshot": snapshot["snapshot_id"], "converged": converged, "runs": [record.run_id for record in records]}
+    ledger.close()
+    return response

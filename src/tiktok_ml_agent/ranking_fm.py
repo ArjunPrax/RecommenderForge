@@ -18,6 +18,7 @@ import torch
 from torch.nn import functional as functional
 
 from .baseline_runner import StarterFMConfig, _encode_train_validation
+from .history import prior_long_view_buckets
 from .kuairand import KuaiRandPureAdapter
 from .torch_fm import TorchFM
 
@@ -27,6 +28,7 @@ class RankingFMConfig(StarterFMConfig):
     objective: str = "bpr"  # bpr | listwise
     pair_batch_size: int = 8192
     group_batch_rows: int = 8192
+    history_cross: bool = False
 
     def __post_init__(self) -> None:
         if self.objective not in {"bpr", "listwise"}:
@@ -101,7 +103,13 @@ def run_ranking_fm(
     adapter = KuaiRandPureAdapter(starter_kit_dir, data_dir)
     train = adapter.development_rows("train")
     valid = adapter.development_rows("valid")
-    x_train, y_train, x_valid, _, users_valid, dimension = _encode_train_validation(train, valid)
+    if config.history_cross:
+        train_history, valid_history = prior_long_view_buckets(train, valid)
+        x_train, y_train, x_valid, _, users_valid, dimension = _encode_train_validation(
+            train, valid, extra_train=train_history, extra_valid=valid_history
+        )
+    else:
+        x_train, y_train, x_valid, _, users_valid, dimension = _encode_train_validation(train, valid)
     users_train = [row.user_id for row in train]
     groups = _group_indices(users_train)
     model = TorchFM(dimension, k=config.k, lr=config.lr, seed=seed).to(device)
@@ -163,6 +171,7 @@ def run_ranking_fm(
                 "state_dict": model.state_dict(),
                 "seed": seed,
                 "objective": config.objective,
+                "history_cross": config.history_cross,
                 "configuration": {
                     "k": config.k,
                     "lr": config.lr,

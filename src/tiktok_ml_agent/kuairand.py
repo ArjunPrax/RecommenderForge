@@ -28,6 +28,7 @@ SPLIT_DATES: dict[SplitName, tuple[int, int]] = {
 @dataclass(frozen=True, slots=True)
 class KuaiRandRow:
     date: int
+    timestamp_ms: int
     user_id: str
     video_id: str
     author_id: str
@@ -83,7 +84,7 @@ class KuaiRandPureData:
                 reader = csv.reader(handle)
                 header = next(reader)
                 positions = {name: index for index, name in enumerate(header)}
-                required = {"date", "user_id", "video_id", "tab", "duration_ms"}
+                required = {"date", "time_ms", "user_id", "video_id", "tab", "duration_ms"}
                 missing = required - positions.keys()
                 if missing:
                     raise ValueError(f"{path} is missing required columns: {sorted(missing)}")
@@ -100,6 +101,7 @@ class KuaiRandPureData:
                     output.append(
                         KuaiRandRow(
                             date=date,
+                            timestamp_ms=int(values[positions["time_ms"]]),
                             user_id=values[positions["user_id"]],
                             video_id=video_id,
                             author_id=authors.get(video_id, "UNK"),
@@ -118,7 +120,7 @@ class KuaiRandPureData:
                 digest.update(repr(row).encode())
         for row in self.rows("test", include_labels=False):
             digest.update(
-                repr((row.date, row.user_id, row.video_id, row.author_id, row.tab, row.duration_ms)).encode()
+                repr((row.date, row.timestamp_ms, row.user_id, row.video_id, row.author_id, row.tab, row.duration_ms)).encode()
             )
         return digest.hexdigest()
 

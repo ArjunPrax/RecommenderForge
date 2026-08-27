@@ -8,7 +8,7 @@ Plan experiments here; measured outcomes belong in `results_log.md`. IDs are sta
 | EXP-002 | NumPy-to-PyTorch pointwise parity | Planned |
 | EXP-003 | Autonomous qualification run | Planned |
 | EXP-004 | Ranking objectives: BPR and exact listwise | Measured manually; autonomous rerun pending. Child candidates: EXP-004A (BPR), EXP-004B (exact listwise). See R003 and R004. |
-| EXP-005 | Candidate-specific history and temporal crosses | Planned |
+| EXP-005 | Candidate-specific history and temporal crosses | Implemented; five-seed checkpoint-parented run pending |
 | EXP-006 | Multi-feedback learning | Planned |
 | EXP-007 | Duration/watch-time corrections | Planned |
 | EXP-008 | Exposure and temporal robustness | Planned |

@@ -12,7 +12,7 @@ from .reporting import write_report
 from .baseline_runner import run_safe_numpy_fm
 from .torch_fm import run_safe_torch_fm
 from .ranking_fm import RankingFMConfig, run_ranking_fm
-from .autonomous import run_autonomous_ranking
+from .autonomous import run_autonomous_history, run_autonomous_ranking
 
 
 def main() -> None:
@@ -36,6 +36,7 @@ def main() -> None:
     ranking.add_argument("--data-dir", type=Path, default=Path("kuairand-starter-kit/KuaiRand-Pure/data"))
     ranking.add_argument("--seed", type=int, default=0)
     ranking.add_argument("--objective", choices=("bpr", "listwise"), required=True)
+    ranking.add_argument("--history-cross", action="store_true", help="add strictly-earlier long-view history as an FM cross field")
     autonomous_ranking = commands.add_parser(
         "autonomous-ranking", help="plan and run the initial checkpoint-backed ranking-objective batch"
     )
@@ -43,6 +44,12 @@ def main() -> None:
     autonomous_ranking.add_argument("--starter-kit", type=Path, default=Path("kuairand-starter-kit"))
     autonomous_ranking.add_argument("--data-dir", type=Path, default=Path("kuairand-starter-kit/KuaiRand-Pure/data"))
     autonomous_ranking.add_argument("--output-dir", type=Path, default=Path("artifacts/autonomous-ranking"))
+    autonomous_history = commands.add_parser("autonomous-history", help="run the checkpoint-parented temporal-history candidate")
+    autonomous_history.add_argument("--repository-root", type=Path, default=Path("."))
+    autonomous_history.add_argument("--starter-kit", type=Path, default=Path("kuairand-starter-kit"))
+    autonomous_history.add_argument("--data-dir", type=Path, default=Path("kuairand-starter-kit/KuaiRand-Pure/data"))
+    autonomous_history.add_argument("--parent-ledger", type=Path, default=Path("artifacts/autonomous-ranking-verified/ledger.sqlite"))
+    autonomous_history.add_argument("--output-dir", type=Path, default=Path("artifacts/autonomous-history"))
     args = parser.parse_args()
     if args.command == "qualification":
         print(json.dumps(run_qualification(args.output_dir), indent=2, sort_keys=True))
@@ -57,7 +64,7 @@ def main() -> None:
     elif args.command == "torch-baseline-valid":
         print(json.dumps(run_safe_torch_fm(args.starter_kit, args.data_dir, args.seed), indent=2, sort_keys=True))
     elif args.command == "ranking-valid":
-        config = RankingFMConfig(objective=args.objective)
+        config = RankingFMConfig(objective=args.objective, history_cross=args.history_cross)
         print(json.dumps(run_ranking_fm(args.starter_kit, args.data_dir, args.seed, config), indent=2, sort_keys=True))
     elif args.command == "autonomous-ranking":
         print(
@@ -66,6 +73,20 @@ def main() -> None:
                     repository_root=args.repository_root,
                     starter_kit_dir=args.starter_kit,
                     data_dir=args.data_dir,
+                    output_dir=args.output_dir,
+                ),
+                indent=2,
+                sort_keys=True,
+            )
+        )
+    elif args.command == "autonomous-history":
+        print(
+            json.dumps(
+                run_autonomous_history(
+                    repository_root=args.repository_root,
+                    starter_kit_dir=args.starter_kit,
+                    data_dir=args.data_dir,
+                    parent_ledger_path=args.parent_ledger,
                     output_dir=args.output_dir,
                 ),
                 indent=2,

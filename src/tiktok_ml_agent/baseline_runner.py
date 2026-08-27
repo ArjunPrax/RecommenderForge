@@ -29,43 +29,51 @@ class StarterFMConfig:
 
 
 def _encode_train_validation(
-    train: list[KuaiRandRow], valid: list[KuaiRandRow]
+    train: list[KuaiRandRow], valid: list[KuaiRandRow], *, extra_train: list[str] | None = None,
+    extra_valid: list[str] | None = None,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[str], int]:
+    if (extra_train is None) != (extra_valid is None):
+        raise ValueError("extra features must be provided for both train and validation")
+    if extra_train is not None and (len(extra_train) != len(train) or len(extra_valid or []) != len(valid)):
+        raise ValueError("extra feature lengths must match their row splits")
     durations = np.asarray([row.duration_ms for row in train])
     edges = np.quantile(durations, np.linspace(0, 1, 11)[1:-1])
 
-    def raw(row: KuaiRandRow) -> list[str]:
-        return [
+    def raw(row: KuaiRandRow, extra: str | None) -> list[str]:
+        values = [
             row.user_id,
             row.video_id,
             row.author_id,
             row.tab,
             str(int(np.searchsorted(edges, row.duration_ms))),
         ]
+        if extra is not None:
+            values.append(extra)
+        return values
 
-    vocabs = [dict() for _ in range(5)]
-    for row in train:
-        for index, value in enumerate(raw(row)):
+    vocabs = [dict() for _ in range(5 + int(extra_train is not None))]
+    for row, extra in zip(train, extra_train or [None] * len(train)):
+        for index, value in enumerate(raw(row, extra)):
             vocabs[index].setdefault(value, len(vocabs[index]))
     unknown = [len(vocab) for vocab in vocabs]
     field_dims = [len(vocab) + 1 for vocab in vocabs]
     offsets = np.cumsum([0, *field_dims[:-1]], dtype=np.int32)
 
-    def encode(rows: list[KuaiRandRow]) -> tuple[np.ndarray, np.ndarray, list[str]]:
-        matrix = np.empty((len(rows), 5), dtype=np.int32)
+    def encode(rows: list[KuaiRandRow], extras: list[str] | None) -> tuple[np.ndarray, np.ndarray, list[str]]:
+        matrix = np.empty((len(rows), len(vocabs)), dtype=np.int32)
         labels = np.empty(len(rows), dtype=np.float32)
         users: list[str] = []
-        for row_index, row in enumerate(rows):
+        for row_index, (row, extra) in enumerate(zip(rows, extras or [None] * len(rows))):
             if row.label is None:
                 raise ValueError("baseline reproduction accepts development labels only")
-            for field_index, value in enumerate(raw(row)):
+            for field_index, value in enumerate(raw(row, extra)):
                 matrix[row_index, field_index] = vocabs[field_index].get(value, unknown[field_index]) + offsets[field_index]
             labels[row_index] = row.label
             users.append(row.user_id)
         return matrix, labels, users
 
-    x_train, y_train, _ = encode(train)
-    x_valid, y_valid, users_valid = encode(valid)
+    x_train, y_train, _ = encode(train, extra_train)
+    x_valid, y_valid, users_valid = encode(valid, extra_valid)
     return x_train, y_train, x_valid, y_valid, users_valid, int(sum(field_dims))
 
 

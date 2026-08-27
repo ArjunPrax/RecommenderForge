@@ -56,6 +56,7 @@ def execute_ranking_candidate(
         lr=float(candidate.configuration.get("lr", 0.001)),
         epochs=int(candidate.configuration.get("epochs", 40)),
         patience=int(candidate.configuration.get("patience", 4)),
+        history_cross=bool(candidate.configuration.get("history_cross", False)),
     )
     adapter = KuaiRandPureAdapter(starter_kit_dir, data_dir)
     output_dir = Path(artifact_root) / candidate.experiment_id.lower() / f"{objective}-{_config_hash(candidate.configuration)[:12]}"
