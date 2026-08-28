@@ -51,7 +51,7 @@ def execute_ranking_candidate(
     metrics through the adapter's validation-only path.
     """
     objective = candidate.configuration.get("objective")
-    if objective not in {"bpr", "listwise"}:
+    if objective not in {"bpr", "lambda_bpr", "listwise"}:
         raise ValueError("ranking candidate must select bpr or listwise")
     raw_seeds = candidate.configuration.get("seeds", [0, 1, 2, 3, 4])
     if not isinstance(raw_seeds, list) or not raw_seeds or any(not isinstance(seed, int) for seed in raw_seeds):
@@ -66,6 +66,7 @@ def execute_ranking_candidate(
         objective=str(objective), history_cross=bool(candidate.configuration.get("history_cross", False)),
         temporal_day_cross=bool(candidate.configuration.get("temporal_day_cross", False)),
         negatives_per_positive=int(candidate.configuration.get("negatives_per_positive", 1)),
+        lambda_mix=float(candidate.configuration.get("lambda_mix", 0.5)),
         **common_config,
     )
     adapter = KuaiRandPureAdapter(starter_kit_dir, data_dir)

@@ -325,6 +325,24 @@ This prevents a peak model or a newly retrained model from being mislabeled as t
 - Requirements: REQ-003, REQ-012, REQ-013, REQ-016, REQ-018
 - Tasks: T2-005
 
+## D020 - Top-five-aware Lambda-BPR objective lane
+
+Date: 2026-08-28
+Status: Accepted
+
+### Decision
+
+Add EXP-014 as a controlled loss-objective candidate. It mixes ordinary same-user BPR loss with a detached nDCG@5 swap-gain-weighted BPR loss; all features, pairs, split, optimizer, and seeds remain fixed.
+
+### Why
+
+The primary metric combines GAUC and nDCG@5. This is a direct, testable mechanism for placing additional training emphasis on pair swaps that can affect the latter, without changing data access or copying the evaluator.
+
+### Related
+
+- Requirements: REQ-003, REQ-004, REQ-008, REQ-009
+- Experiments: EXP-014
+
 ## D004 - Retain experimental evidence
 
 Date: 2026-08-26

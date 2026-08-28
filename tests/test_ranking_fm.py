@@ -5,7 +5,7 @@ import unittest
 import numpy as np
 import torch
 
-from tiktok_ml_agent.ranking_fm import _exact_listwise_loss, _group_batches, _sample_bpr_pairs
+from tiktok_ml_agent.ranking_fm import _exact_listwise_loss, _group_batches, _lambda_ndcg5_weights, _sample_bpr_pairs
 
 
 class RankingObjectiveTests(unittest.TestCase):
@@ -23,6 +23,14 @@ class RankingObjectiveTests(unittest.TestCase):
         )
         self.assertEqual(len(positives), 6)
         self.assertEqual(len(negatives), 6)
+
+    def test_lambda_weights_prioritize_top_five_swaps(self) -> None:
+        group = np.arange(7)
+        labels = np.asarray([1, 0, 0, 0, 0, 0, 1])
+        scores = np.asarray([0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3])
+        weights = _lambda_ndcg5_weights([group], labels, scores, np.asarray([0, 6]), np.asarray([1, 5]))
+        self.assertGreater(weights[0], 0)
+        self.assertEqual(weights[1], 0)
 
     def test_group_batches_keep_complete_groups(self) -> None:
         groups = [np.asarray([0, 1]), np.asarray([2, 3, 4]), np.asarray([5])]

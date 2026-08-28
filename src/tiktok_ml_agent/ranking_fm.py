@@ -1,8 +1,9 @@
 """Ranking-objective FM candidates for EXP-004.
 
-Both objectives train only from permitted train rows and evaluate through the
+All objectives train only from permitted train rows and evaluate through the
 organizer validation evaluator. BPR samples positive/negative impressions from
-the same user. The exact-listwise objective processes complete per-user logged
+the same user. Lambda-BPR adds a detached nDCG@5 swap-gain weight to the same
+pair loss. The exact-listwise objective processes complete per-user logged
 impression lists without negative sampling.
 """
 
@@ -26,18 +27,21 @@ from .temporal import temporal_primary_windows
 
 @dataclass(frozen=True, slots=True)
 class RankingFMConfig(StarterFMConfig):
-    objective: str = "bpr"  # bpr | listwise
+    objective: str = "bpr"  # bpr | lambda_bpr | listwise
     pair_batch_size: int = 8192
     group_batch_rows: int = 8192
     history_cross: bool = False
     temporal_day_cross: bool = False
     negatives_per_positive: int = 1
+    lambda_mix: float = 0.5
 
     def __post_init__(self) -> None:
-        if self.objective not in {"bpr", "listwise"}:
+        if self.objective not in {"bpr", "lambda_bpr", "listwise"}:
             raise ValueError("objective must be bpr or listwise")
         if self.negatives_per_positive < 1:
             raise ValueError("negatives_per_positive must be at least one")
+        if not 0 <= self.lambda_mix <= 1:
+            raise ValueError("lambda_mix must be in [0, 1]")
 
 
 def _group_indices(users: list[str]) -> list[np.ndarray]:
@@ -64,6 +68,38 @@ def _sample_bpr_pairs(
     if not positives:
         raise ValueError("BPR requires at least one user with positive and negative impressions")
     return np.concatenate(positives), np.concatenate(negatives)
+
+
+def _lambda_ndcg5_weights(
+    groups: list[np.ndarray], labels: np.ndarray, scores: np.ndarray, positives: np.ndarray, negatives: np.ndarray,
+) -> np.ndarray:
+    """Detached per-pair nDCG@5 swap gains for same-user BPR pairs.
+
+    The rankings used for the weights are deliberately detached from autograd;
+    gradients still flow only through the pairwise score difference.  A weight
+    is non-zero precisely when exchanging the sampled positive and negative
+    can alter the user's top-five discounted gain.
+    """
+    ranks = np.empty(len(labels), dtype=np.int64)
+    ideal_dcg: dict[int, float] = {}
+    group_of = np.empty(len(labels), dtype=np.int64)
+    for group_index, group in enumerate(groups):
+        ordered = group[np.argsort(-scores[group], kind="stable")]
+        ranks[ordered] = np.arange(len(group), dtype=np.int64)
+        group_of[group] = group_index
+        positive_count = int(labels[group].sum())
+        ideal_dcg[group_index] = sum(1 / np.log2(rank + 2) for rank in range(min(5, positive_count)))
+    weights = np.zeros(len(positives), dtype=np.float32)
+    for index, (positive, negative) in enumerate(zip(positives, negatives)):
+        if group_of[positive] != group_of[negative]:
+            raise ValueError("Lambda-BPR pairs must remain within one user group")
+        denominator = ideal_dcg[int(group_of[positive])]
+        if denominator == 0:
+            continue
+        positive_discount = 1 / np.log2(ranks[positive] + 2) if ranks[positive] < 5 else 0.0
+        negative_discount = 1 / np.log2(ranks[negative] + 2) if ranks[negative] < 5 else 0.0
+        weights[index] = abs(positive_discount - negative_discount) / denominator
+    return weights
 
 
 def _group_batches(groups: list[np.ndarray], max_rows: int) -> list[np.ndarray]:
@@ -139,16 +175,30 @@ def run_ranking_fm(
     best_primary, best_state, bad_epochs = -1.0, None, 0
     started = perf_counter()
     for _epoch in range(1, config.epochs + 1):
-        if config.objective == "bpr":
+        if config.objective in {"bpr", "lambda_bpr"}:
             positives, negatives = _sample_bpr_pairs(
                 groups, y_train, rng, negatives_per_positive=config.negatives_per_positive,
+            )
+            lambda_weights = (
+                _lambda_ndcg5_weights(groups, y_train, model.predict(x_tensor).detach().cpu().numpy(), positives, negatives)
+                if config.objective == "lambda_bpr" else None
             )
             order = rng.permutation(len(positives))
             for start in range(0, len(order), config.pair_batch_size):
                 selected = order[start : start + config.pair_batch_size]
                 pos = torch.from_numpy(positives[selected]).to(device)
                 neg = torch.from_numpy(negatives[selected]).to(device)
-                loss = -functional.logsigmoid(model.logits(x_tensor[pos]) - model.logits(x_tensor[neg])).mean()
+                pair_losses = -functional.logsigmoid(model.logits(x_tensor[pos]) - model.logits(x_tensor[neg]))
+                if lambda_weights is None:
+                    loss = pair_losses.mean()
+                else:
+                    raw_weights = torch.from_numpy(lambda_weights[selected]).to(device)
+                    if bool((raw_weights > 0).any()):
+                        normalized = raw_weights / raw_weights[raw_weights > 0].mean()
+                        weighted_loss = (pair_losses * normalized).sum() / normalized.sum()
+                        loss = (1 - config.lambda_mix) * pair_losses.mean() + config.lambda_mix * weighted_loss
+                    else:
+                        loss = pair_losses.mean()
                 model.step_loss(loss)
         else:
             for batch_indices in _group_batches(groups, config.group_batch_rows):
@@ -202,6 +252,7 @@ def run_ranking_fm(
                 "history_cross": config.history_cross,
                 "temporal_day_cross": config.temporal_day_cross,
                 "negatives_per_positive": config.negatives_per_positive,
+                "lambda_mix": config.lambda_mix,
                 "configuration": {
                     "k": config.k,
                     "lr": config.lr,

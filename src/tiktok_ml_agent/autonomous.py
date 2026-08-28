@@ -415,6 +415,54 @@ def run_autonomous_negative_sampling(
     ledger.close(); return response
 
 
+def run_autonomous_lambda_ranking(
+    *,
+    repository_root: str | Path,
+    starter_kit_dir: str | Path,
+    data_dir: str | Path,
+    parent_ledger_path: str | Path,
+    output_dir: str | Path,
+) -> dict[str, object]:
+    """Evaluate a top-five-aware Lambda-BPR mixture from the BPR control."""
+    source = ExperimentLedger(parent_ledger_path)
+    try:
+        parent = next((run for run in source.list_runs() if run["experiment_id"] == "EXP-004A" and run["status"] == "succeeded"), None)
+    finally:
+        source.close()
+    if not parent or not parent.get("checkpoint_manifest"):
+        raise ValueError("Lambda-BPR research requires a succeeded EXP-004A parent")
+    parent_manifest = parent["checkpoint_manifest"]
+    output_dir = Path(output_dir); output_dir.mkdir(parents=True, exist_ok=True)
+    benchmark = starter_kuairand_pure_spec(starter_kit_dir); ledger = ExperimentLedger(output_dir / "ledger.sqlite")
+    knowledge = KnowledgeBase([EvidenceCard(
+        evidence_id="KB-012", title="LambdaRank top-k swap weighting",
+        source="Burges et al. (2010), From RankNet to LambdaRank to LambdaMART: An Overview",
+        claim="Pairwise ranking gradients can be weighted by the metric change caused by a predicted-rank swap.",
+        assumptions=("detached predicted ranks are computed from complete same-user groups", "nDCG@5 swap gain is the intended local weighting signal"),
+        operator_families=(OperatorFamily.LOSS_OBJECTIVE,), applicability="Top-five-aware BPR comparison.",
+        risks=("sparse top-five weights can reduce signal; the BPR component remains in the mixture",),
+    )])
+    context = PlannerContext(
+        goal="Test whether an nDCG@5-aware pairwise weighting improves the BPR ranking objective.", experiment_ids=("EXP-014",),
+        run_class=RunClass.RESEARCH, parent_run_id=parent["run_id"], parent_checkpoint_sha256=parent_manifest["checkpoint_sha256"],
+        allowed_operator_families=(OperatorFamily.LOSS_OBJECTIVE,), allowed_paths=(), token_budget=0, compute_budget_seconds=3600,
+    )
+    planner = FixedPlanner({"rationale": "Keep BPR fields, optimizer, splits, and seeds fixed; mix equal BPR and detached nDCG@5 swap-gain-weighted pair losses.", "candidates": [{
+        "experiment_id": "EXP-014", "operator_family": "loss_objective", "hypothesis": "A top-five-aware Lambda-BPR mixture improves primary validation score over BPR.",
+        "expected_mechanism": "same-user pair gradients are upweighted when swapping their current predicted ranks could change nDCG@5.",
+        "evidence_ids": ["KB-012"],
+        "configuration": {"objective": "lambda_bpr", "lambda_mix": 0.5, "seeds": [0, 1, 2, 3, 4], "parent_validation_prediction_path": str(Path(parent_manifest["checkpoint_path"]).with_suffix(".validation.npy"))},
+        "controlled_variables": ["FM fields", "optimizer", "train/validation split", "seed set", "same-user pair sampler"],
+    }]})
+    plan = planner.plan(context, knowledge); controller = ResearchController(benchmark, ledger)
+    records = controller.execute_batch(plan.batch, lambda candidate: execute_ranking_candidate(candidate, repository_root=repository_root, starter_kit_dir=starter_kit_dir, data_dir=data_dir, artifact_root=output_dir / "artifacts"))
+    for record in records:
+        ledger.append_event(record.run_id, "planner_decision", {"rationale": plan.rationale, "provider": "fixed_offline_policy"})
+    snapshot = MemoryManager(ledger).consolidate(); report = write_report(ledger, output_dir / "report.md")
+    response = {"ledger": str(output_dir / "ledger.sqlite"), "report": str(report), "memory_snapshot": snapshot["snapshot_id"], "converged": controller.observe_for_convergence(records), "runs": [record.run_id for record in records]}
+    ledger.close(); return response
+
+
 def run_autonomous_ensemble(
     *, repository_root: str | Path, starter_kit_dir: str | Path, data_dir: str | Path,
     bpr_ledger_path: str | Path, history_ledger_path: str | Path, output_dir: str | Path,

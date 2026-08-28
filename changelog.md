@@ -2,6 +2,16 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Top-five-aware Lambda-BPR candidate
+
+### Changed
+
+Implemented EXP-014. Lambda-BPR computes detached complete-user predicted ranks and weights pair losses by their potential nDCG@5 swap gain, mixed equally with standard BPR. It preserves same-user pair sampling, validation-only evaluation, frozen checkpoints, and the parent-ordering audit.
+
+### Validation
+
+Added a unit test that confirms top-five-changing swaps receive non-zero Lambda weights while swaps fully below rank five do not. Full-suite measurement is pending only because the 27K preflight is actively using local I/O.
+
 ## 2026-08-28 - Submission-facing draft and release controls
 
 ### Changed
