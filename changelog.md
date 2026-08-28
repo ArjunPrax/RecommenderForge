@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Ready-to-send organizer clarification draft
+
+### Changed
+
+Added a concise email draft that asks for the authoritative benchmark/metric, 1K/27K bonus reference, hidden-test boundary, convergence definition, resource rules, submission package, and starter-kit publication permission. It is not sent automatically; the human team must send it and record the response under REQ-014.
+
 ## 2026-08-28 - Atomic publication for checkpoint-backed outputs
 
 ### Changed
