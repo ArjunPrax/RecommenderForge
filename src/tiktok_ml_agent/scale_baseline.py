@@ -116,8 +116,9 @@ def generate_scale_submission(
     model_path = Path(model_path); model = load_scale_model(model_path)
     adapter = ScaleArtifactAdapter(variant, Path(data_dir))
     output_path = Path(output_path); output_path.parent.mkdir(parents=True, exist_ok=True)
+    partial_path = output_path.with_name(f"{output_path.name}.partial")
     rows = 0
-    with output_path.open("w", newline="", encoding="utf-8") as handle:
+    with partial_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle); writer.writerow(("row_id", "user_id", "video_id", "score"))
         for row_id, row in enumerate(adapter.iter_rows("test", include_labels=False)):
             score = float(model.score(str(row["video_id"]), str(row["tab"])))
@@ -125,6 +126,7 @@ def generate_scale_submission(
                 raise ValueError(f"non-finite score at row {row_id}")
             writer.writerow((row_id, row["user_id"], row["video_id"], score))
             rows += 1
+    partial_path.replace(output_path)
     return {"output": str(output_path), "rows": float(rows), "model_sha256": hash_file(model_path)}
 
 

@@ -477,6 +477,28 @@ The resulting campaign may demonstrate provisional convergence and resource acco
 - Tasks: T2-005
 - Experiments: EXP-009A through EXP-009H
 
+## D027 - Atomic checkpoint-backed output publication
+
+Date: 2026-08-28
+Status: Accepted
+
+### Context
+
+Long CSV streams can be interrupted after their final filename has already been created. A partial file at the final path could be mistaken for a valid submission.
+
+### Decision
+
+Pure and scale submission writers now write to a sibling `.partial` path and atomically replace the requested final path only after all rows have been written and validated. If generation fails, the old final file remains untouched and the partial artifact remains available for diagnosis.
+
+### Why
+
+It preserves the required frozen-checkpoint provenance while making failed long output runs distinguishable from valid artifacts.
+
+### Related
+
+- Requirements: REQ-006, REQ-012, REQ-015, REQ-018
+- Tasks: T2-004, T2-006
+
 ## D004 - Retain experimental evidence
 
 Date: 2026-08-26

@@ -2,6 +2,16 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Atomic publication for checkpoint-backed outputs
+
+### Changed
+
+Pure and scale submission writers now stream to sibling `.partial` files and atomically publish only after completion. An interrupted stream cannot overwrite or masquerade as the final requested artifact.
+
+### Validation
+
+The scale output test confirms successful publication leaves no partial file. Full suite: 49 passing.
+
 ## 2026-08-28 - Converged provisional Pure campaign with data-identity repair
 
 ### Measured

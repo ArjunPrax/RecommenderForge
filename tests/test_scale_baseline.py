@@ -52,6 +52,7 @@ class StreamingPopularityTests(unittest.TestCase):
             result = generate_scale_submission(model_path=checkpoint, variant="1k", data_dir=data, output_path=output)
             self.assertEqual(result["rows"], 1.0)
             self.assertEqual(output.read_text(encoding="utf-8").splitlines()[0], "row_id,user_id,video_id,score")
+            self.assertFalse((data / "submission.csv.partial").exists())
 
     def test_frozen_tab_model_can_be_rescored_without_refitting(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

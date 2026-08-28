@@ -116,8 +116,10 @@ def generate_submission(
     adapter.evaluator.validate_submission_rows([(row.user_id, row.video_id) for row in test], records)
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with output_path.open("w", newline="", encoding="utf-8") as handle:
+    partial_path = output_path.with_name(f"{output_path.name}.partial")
+    with partial_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
         writer.writerow(adapter.spec.submission_header)
         writer.writerows(records)
+    partial_path.replace(output_path)
     return output_path
