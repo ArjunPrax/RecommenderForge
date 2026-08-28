@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Frozen 27K item×tab blend selection
+
+### Measured
+
+R021 evaluated all declared frozen item weights `{0.25, 0.50, 0.75}`. The already-checkpointed/output-backed 0.50 setting wins at primary `0.586756`; both alternatives regress. The selection grid and validation-feedback caveat are preserved.
+
 ## 2026-08-28 - Frozen scale blend rescoring
 
 ### Changed

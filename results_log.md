@@ -2,6 +2,28 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R021 - Frozen KuaiRand-27K item×tab blend grid
+
+Date: 2026-08-28
+Experiment: EXP-015
+Implementation / commit: `d5bb038`
+
+### Change Tested
+
+Without refitting, evaluated a predeclared symmetric grid of item-rate weights `{0.25, 0.50, 0.75}` against the same frozen model SHA-256 `ea947081e440d8a3266d03b6c03ba25f00ca546424b750c08453eb7c155dfc58`. Each setting streamed all 71,149,570 validation rows through the same evaluator/shard protocol.
+
+### Metrics
+
+| Item weight | GAUC | nDCG@5 | primary |
+|---:|---:|---:|---:|
+| 0.25 | 0.572022 | 0.587229 | 0.579626 |
+| **0.50** | **0.574100** | **0.599412** | **0.586756** |
+| 0.75 | 0.573556 | 0.591308 | 0.582432 |
+
+### Interpretation
+
+The middle weight is selected within this declared three-point grid. It is exactly R020's checkpointed configuration, so the selected 27K output remains bound to the frozen model and output hash recorded there. The grid consumes validation feedback and is retained for transparency; the result remains provisional pending organizer contract clarification and is not a hidden-test claim.
+
 ## R020 - Checkpointed KuaiRand-27K item×tab output
 
 Date: 2026-08-28

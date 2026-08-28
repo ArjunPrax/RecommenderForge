@@ -18,7 +18,7 @@ Plan experiments here; measured outcomes belong in `results_log.md`. IDs are sta
 | EXP-012 | Compact DeepFM BPR backbone | Measured; R011 rejects the first configuration |
 | EXP-013 | Three-negatives-per-positive BPR sampling | Measured; R014 rejects the first configuration |
 | EXP-014 | Top-five-aware Lambda-BPR mixture | Measured; R015 rejects the fixed 50/50 mixture |
-| EXP-015 | Bounded item×tab popularity scale candidate | Checkpointed 27K validation/output chain demonstrated; R018/R019/R020 |
+| EXP-015 | Bounded item×tab popularity scale candidate | Checkpointed 27K validation/output chain and frozen 3-weight grid demonstrated; R018–R021 |
 
 ## EXP-XXX - Experiment title
 
