@@ -2,6 +2,31 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R015 - Top-five-aware Lambda-BPR result
+
+Date: 2026-08-28
+Experiment: EXP-014
+Implementation / commit: `101c41a`
+Environment: CPython 3.13.11, NumPy 2.5.2, PyTorch 2.13.0, CPU.
+
+### Change Tested
+
+Retained same-user BPR pairs, fields, optimizer, split, and five seeds. Added an equal mixture of ordinary BPR loss and detached nDCG@5 swap-gain-weighted BPR loss, where non-zero weight occurs only when a sampled pair can change the current top-five discounted gain.
+
+### Metrics
+
+| Metric | Mean | Population std | Delta vs BPR |
+|---|---:|---:|---:|
+| GAUC | 0.667510 | 0.000494 | -0.002025 |
+| nDCG@5 | 0.535785 | 0.000301 | -0.000844 |
+| primary | 0.601647 | 0.000326 | -0.001434 |
+
+The autonomous run used 121.20 CPU seconds, zero GPU-hours, zero LLM tokens, and zero manual interventions. The best seed changed 50,819 eligible within-user pairwise relations for 9,836 of 18,460 users relative to BPR.
+
+### Interpretation
+
+This fixed 50/50 Lambda-BPR mixture is materially worse than BPR on both component metrics. The failure is retained as evidence that direct top-five weighting needs a different calibration or mechanism before another attempt; it is rejected as a parent and excluded from the current ensemble.
+
 ## R014 - Three-negatives-per-positive BPR sampling result
 
 Date: 2026-08-28

@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Top-five-aware Lambda-BPR result
+
+### Measured
+
+EXP-014 reached mean validation primary `0.601647`, `-0.001434` versus BPR. Its top-five swap weighting changed real within-user orders but harmed both GAUC and nDCG@5. R015 retains it as a loss-family negative result; it is not a parent or ensemble component.
+
 ## 2026-08-28 - Top-five-aware Lambda-BPR candidate
 
 ### Changed
