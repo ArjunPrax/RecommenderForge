@@ -12,7 +12,7 @@ Updated the README, Devpost draft, demo, plan, and requirement status to match m
 
 ### Changed
 
-Added a concise email draft that asks for the authoritative benchmark/metric, 1K/27K bonus reference, hidden-test boundary, convergence definition, resource rules, submission package, and starter-kit publication permission. It is not sent automatically; the human team must send it and record the response under REQ-014.
+Added and refined a concise email draft that asks only for the authoritative benchmark/metric, 1K/27K bonus reference, convergence definition, and official submission process. The existing rules already settle the hidden-test boundary; the Starter Kit can remain excluded from the public repository, avoiding a redistribution question. It is not sent automatically; the human team must send it and record the response under REQ-014.
 
 ## 2026-08-28 - Atomic publication for checkpoint-backed outputs
 

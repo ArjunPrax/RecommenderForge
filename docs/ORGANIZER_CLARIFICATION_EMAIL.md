@@ -14,15 +14,9 @@ Our team has started implementing the Track 2 autonomous recommender-system rese
 
 3. For the KuaiRand-1K and KuaiRand-27K bonus benchmark, what is the reference score or threshold that must be beaten, and which dataset split/evaluator will be used to determine this? We have verified the artifacts and built bounded-memory baseline/output paths, but do not want to claim the bonus without the official reference.
 
-4. The downloadable starter data contains a `long_view` column for the local test-period rows. Please confirm that teams must treat this column as hidden and must not read or score it during development, even though it is physically present in the download.
+4. Could you clarify the convergence rule? In particular, for epsilon = 0.002 and N = 3, what counts as one iteration: a single candidate, a batch of sibling candidates from the same parent, a failed/recovered candidate, or a checkpoint/output regeneration?
 
-5. Could you clarify the convergence rule? In particular, for epsilon = 0.002 and N = 3, what counts as one iteration: a single candidate, a batch of sibling candidates from the same parent, a failed/recovered candidate, or a checkpoint/output regeneration?
-
-6. Are there any explicit compute, hardware, API-token, external-data, or pretrained-model restrictions beyond the rules already stated in the track document? We currently record CPU/GPU time and LLM tokens for every experiment and want to report these in the expected format.
-
-7. Please confirm the final submission package: required output filename/schema, whether a checkpoint is required in addition to predictions, the permitted number of submissions, and the final deadline/time zone.
-
-8. Finally, may the supplied starter-kit code be included in a public GitHub repository for reproducibility, or should teams publish only their own wrapper/agent code and provide separate setup instructions for downloading organizer materials?
+5. Please confirm the final submission process: whether a checkpoint is required in addition to predictions, the permitted number of submissions, and the final deadline/time zone. We will retain the Starter Kit's supplied `row_id,user_id,video_id,score` schema unless you specify otherwise.
 
 These answers will help us keep our implementation and reporting aligned with the intended competition contract. Thank you for your guidance.
 
