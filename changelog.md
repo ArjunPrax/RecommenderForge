@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - KuaiRand-27K item×tab validation improvement
+
+### Measured
+
+EXP-015 completed all 71,149,570 validation rows with primary `0.586756`, +`0.029223` over R017's item-only baseline. The visible-tab cross improved nDCG@5 by `0.055259`. R018 records the full provisional-evaluator caveat; the result is not a hidden-test or official bonus-threshold claim.
+
 ## 2026-08-28 - Bounded item×tab scale candidate
 
 ### Changed

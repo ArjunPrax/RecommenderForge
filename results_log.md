@@ -2,6 +2,30 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R018 - KuaiRand-27K bounded item×tab improvement
+
+Date: 2026-08-28
+Experiment: EXP-015
+Implementation / commit: `d061167`
+
+### Change Tested
+
+Added a second fixed 24-bit hashed rate table for `video_id × tab`, where tab is an inference-known impression field. The model blends smoothed item and item×tab long-view rates equally (`0.5/0.5`) after fitting both tables only on the 136,296,576 training rows. It uses 33,554,432 total counter slots and the identical 256-shard validation/evaluator protocol as R017.
+
+### Metrics
+
+| Metric | Item-only R017 | Item×tab R018 | Delta |
+|---|---:|---:|---:|
+| GAUC | 0.570914 | 0.574100 | +0.003186 |
+| nDCG@5 | 0.544153 | 0.599412 | +0.055259 |
+| primary | 0.557534 | 0.586756 | +0.029223 |
+
+The full 71,149,570-row validation pass took 526.90 seconds, used no GPU-hours or LLM tokens, and never read test labels.
+
+### Interpretation
+
+The inference-known tab cross substantially improves the bounded scale baseline, especially top-five ranking. This is a validation-only result under the provisional Pure evaluator; it is not an organizer 27K reference comparison, hidden-test result, or proof that any official bonus threshold has been beaten. Preserve it as the current 27K validation parent and test its robustness before designation.
+
 ## R017 - KuaiRand-27K bounded streaming popularity baseline
 
 Date: 2026-08-28
