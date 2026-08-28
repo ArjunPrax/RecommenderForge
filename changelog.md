@@ -2,6 +2,16 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Checkpoint-only final designation
+
+### Changed
+
+Added `designate-final`: it requires a converged campaign report, verifies the report/source evaluator/checkpoint identities, creates an immutable `designated_final` record, and preserves campaign resource totals in its diagnosis. It never retrains a model or enters a test-scoring path.
+
+### Validation
+
+The campaign evidence fixture now exercises full convergence → final designation and verifies the final record points to the selected source checkpoint. The suite has 40 passing tests. No real final has been designated because the current historical research ledgers are not yet a valid final campaign and REQ-014 remains unresolved.
+
 ## 2026-08-28 - Explicit campaign convergence evidence
 
 ### Changed

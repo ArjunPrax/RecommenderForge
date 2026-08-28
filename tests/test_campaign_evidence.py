@@ -6,7 +6,8 @@ import unittest
 from pathlib import Path
 
 from tiktok_ml_agent.campaign import CampaignEvidenceError, evaluate_campaign, write_campaign_report
-from tiktok_ml_agent.contracts import OperatorFamily, RunClass, RunRecord, RunStatus
+from tiktok_ml_agent.contracts import CheckpointManifest, OperatorFamily, RunClass, RunRecord, RunStatus, hash_file
+from tiktok_ml_agent.finalization import designate_final
 from tiktok_ml_agent.ledger import ExperimentLedger
 
 
@@ -22,6 +23,13 @@ def _ledger_with_run(path: Path, run_id: str, primary: float, *, evaluator: str 
     record.metrics = {"primary": primary}
     record.evaluator_sha256 = evaluator
     record.resource_usage = {"cpu_seconds": 2.0}
+    checkpoint = path.with_suffix(".checkpoint")
+    checkpoint.write_bytes(run_id.encode())
+    record.checkpoint_manifest = CheckpointManifest(
+        checkpoint_path=str(checkpoint), checkpoint_sha256=hash_file(checkpoint), code_revision="fixture",
+        data_fingerprint="fixture", evaluator_sha256=evaluator, configuration_sha256="config",
+        validation_prediction_sha256="prediction", validation_metrics={"primary": primary},
+    ).to_dict()
     ledger.finalize_run(record)
     ledger.close()
 
@@ -48,6 +56,12 @@ class CampaignEvidenceTests(unittest.TestCase):
             self.assertEqual(report["resource_totals"], {"cpu_seconds": 6.0})
             output = write_campaign_report(config_path, root / "output.json")
             self.assertTrue(output.is_file())
+            final = designate_final(campaign_report_path=output, final_ledger_path=root / "final.sqlite")
+            final_ledger = ExperimentLedger(final["final_ledger"])
+            final_record = final_ledger.get_run(final["final_run_id"])
+            final_ledger.close()
+            self.assertEqual(final_record["run_class"], "designated_final")
+            self.assertEqual(final_record["parent_run_id"], "run-2")
 
     def test_mixed_evaluators_are_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

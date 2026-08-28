@@ -307,6 +307,24 @@ This makes the convergence and resource claim reviewable while preserving isolat
 - Requirements: REQ-005, REQ-009, REQ-013, REQ-016, REQ-019
 - Tasks: T2-005
 
+## D019 - Designate finals only from converged campaign evidence
+
+Date: 2026-08-28
+Status: Accepted
+
+### Decision
+
+Create a new immutable `designated_final` ledger record only when a campaign report is converged and its selected source checkpoint, evaluator hash, and report hash all verify. The operation may generate an output from that frozen checkpoint, but it never retrains or scores test labels.
+
+### Why
+
+This prevents a peak model or a newly retrained model from being mislabeled as the submitted converged result.
+
+### Related
+
+- Requirements: REQ-003, REQ-012, REQ-013, REQ-016, REQ-018
+- Tasks: T2-005
+
 ## D004 - Retain experimental evidence
 
 Date: 2026-08-26

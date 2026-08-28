@@ -37,6 +37,7 @@ The official PDF currently conflicts over the target/metrics. The supplied start
 .venv/bin/python -m tiktok_ml_agent baseline-valid
 .venv/bin/python -m tiktok_ml_agent autonomous-ranking
 .venv/bin/python -m tiktok_ml_agent campaign-status --campaign path/to/campaign.json --output artifacts/campaign.json
+.venv/bin/python -m tiktok_ml_agent designate-final --campaign-report artifacts/campaign.json --final-ledger artifacts/final/ledger.sqlite
 ```
 
 All development commands are validation-only. `submission` reconstructs a measured frozen checkpoint and validates row alignment; it does not score local test labels.

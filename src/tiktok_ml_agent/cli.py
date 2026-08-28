@@ -17,6 +17,7 @@ from .submission import generate_submission
 from .scale import ScaleArtifactAdapter, write_preflight
 from .scale_baseline import run_streaming_popularity
 from .campaign import write_campaign_report
+from .finalization import designate_final
 
 
 def main() -> None:
@@ -30,6 +31,9 @@ def main() -> None:
     campaign = commands.add_parser("campaign-status", help="materialize convergence evidence from declared ledger runs")
     campaign.add_argument("--campaign", type=Path, required=True, help="JSON campaign configuration with explicit ledger/run references")
     campaign.add_argument("--output", type=Path, required=True)
+    finalization = commands.add_parser("designate-final", help="bind a converged campaign's frozen best checkpoint as designated final")
+    finalization.add_argument("--campaign-report", type=Path, required=True)
+    finalization.add_argument("--final-ledger", type=Path, required=True)
     baseline = commands.add_parser("baseline-valid", help="run one organizer FM seed on train/validation only")
     baseline.add_argument("--starter-kit", type=Path, default=Path("kuairand-starter-kit"))
     baseline.add_argument("--data-dir", type=Path, default=Path("kuairand-starter-kit/KuaiRand-Pure/data"))
@@ -130,6 +134,8 @@ def main() -> None:
             ledger.close()
     elif args.command == "campaign-status":
         print(write_campaign_report(args.campaign, args.output))
+    elif args.command == "designate-final":
+        print(json.dumps(designate_final(campaign_report_path=args.campaign_report, final_ledger_path=args.final_ledger), indent=2, sort_keys=True))
     elif args.command == "baseline-valid":
         print(json.dumps(run_safe_numpy_fm(args.starter_kit, args.data_dir, args.seed), indent=2, sort_keys=True))
     elif args.command == "torch-baseline-valid":

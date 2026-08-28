@@ -166,13 +166,19 @@ def evaluate_campaign(path: str | Path) -> dict[str, Any]:
     if len(evaluator_hashes) != 1:
         raise CampaignEvidenceError("campaign mixes evaluator identities")
     status = tracker.status()
+    best_run: dict[str, Any] | None = None
+    if status.best_run_id is not None:
+        for batch in resolved_batches:
+            best_run = next((run for run in batch["runs"] if run["run_id"] == status.best_run_id), None)
+            if best_run is not None:
+                break
     return {
         "campaign_id": config["campaign_id"], "benchmark_id": config["benchmark_id"],
         "baseline_primary": status.baseline_primary, "epsilon": epsilon, "patience": patience,
         "converged": status.converged, "stagnation": status.stagnation,
         "significant_anchor": status.significant_anchor, "best_primary": status.best_primary,
         "best_run_id": status.best_run_id, "evaluator_sha256": next(iter(evaluator_hashes)),
-        "resource_totals": resource_totals, "batches": resolved_batches,
+        "best_run": best_run, "resource_totals": resource_totals, "batches": resolved_batches,
     }
 
 
