@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Bounded item×tab scale candidate
+
+### Changed
+
+Added EXP-015, a fixed-memory blend of hashed item and item×inference-known-tab long-view rates. It uses only training labels, keeps the 27K bounded user-sharded evaluator, and can score the same item differently by visible tab. Unit coverage confirms the tab context changes the blended score on a controlled fixture.
+
 ## 2026-08-28 - KuaiRand-27K bounded streaming baseline
 
 ### Measured

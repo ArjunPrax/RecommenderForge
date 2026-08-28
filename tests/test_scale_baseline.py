@@ -6,7 +6,7 @@ from pathlib import Path
 
 from tiktok_ml_agent.benchmark import load_organizer_evaluator
 from tiktok_ml_agent.scale import ScaleArtifactAdapter
-from tiktok_ml_agent.scale_baseline import fit_hashed_streaming_popularity, fit_streaming_popularity, run_streaming_popularity
+from tiktok_ml_agent.scale_baseline import fit_hashed_streaming_popularity, fit_streaming_popularity, fit_tab_conditioned_hashed_popularity, run_streaming_popularity
 
 
 class StreamingPopularityTests(unittest.TestCase):
@@ -28,6 +28,16 @@ class StreamingPopularityTests(unittest.TestCase):
             model = fit_hashed_streaming_popularity(ScaleArtifactAdapter("1k", data), bits=12)
             self.assertEqual(len(model.totals), 4096)
             self.assertEqual(model.score("video"), model.score("video"))
+
+    def test_tab_conditioned_model_uses_inference_known_context(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            data = Path(directory)
+            header = "user_id,video_id,date,time_ms,long_view,duration_ms,tab\n"
+            (data / "log_standard_4_08_to_4_21_1k.csv").write_text(
+                header + "u,video,20220408,1,1,10,0\nu,video,20220408,2,0,10,1\n", encoding="utf-8"
+            )
+            model = fit_tab_conditioned_hashed_popularity(ScaleArtifactAdapter("1k", data), bits=12, item_weight=0.0)
+            self.assertGreater(model.score("video", "0"), model.score("video", "1"))
 
     def test_sharded_evaluation_matches_unsharded_organizer_evaluator(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

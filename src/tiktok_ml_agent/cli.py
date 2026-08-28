@@ -127,6 +127,8 @@ def main() -> None:
     scale_baseline.add_argument("--data-dir", type=Path, required=True)
     scale_baseline.add_argument("--evaluator", type=Path, default=Path("kuairand-starter-kit/evaluate.py"))
     scale_baseline.add_argument("--hash-bits", type=int, help="fixed popularity-table bits; defaults to 24 for 27K and exact counts for 1K")
+    scale_baseline.add_argument("--feature-mode", choices=("item", "item_tab"), default="item", help="item rate or item×inference-known-tab rate blend")
+    scale_baseline.add_argument("--item-weight", type=float, default=0.5, help="item-rate weight for item_tab mode")
     scale_baseline.add_argument("--shards", type=int, default=256, help="number of user-consistent validation shards")
     scale_baseline.add_argument("--scratch-dir", type=Path, default=Path("artifacts/scale-scratch"), help="ignored temporary directory for sharded validation")
     scale_baseline.add_argument("--output", type=Path, help="optional JSON artifact for measured scale-baseline metrics")
@@ -198,7 +200,7 @@ def main() -> None:
     elif args.command == "scale-preflight":
         print(write_preflight(ScaleArtifactAdapter(args.variant, args.data_dir), args.output))
     elif args.command == "scale-popularity":
-        result = run_streaming_popularity(variant=args.variant, data_dir=args.data_dir, evaluator_path=args.evaluator, hash_bits=args.hash_bits, shards=args.shards, scratch_dir=args.scratch_dir)
+        result = run_streaming_popularity(variant=args.variant, data_dir=args.data_dir, evaluator_path=args.evaluator, hash_bits=args.hash_bits, shards=args.shards, scratch_dir=args.scratch_dir, feature_mode=args.feature_mode, item_weight=args.item_weight)
         if args.output:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(result, indent=2, sort_keys=True), encoding="utf-8")

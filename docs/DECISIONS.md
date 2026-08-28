@@ -343,6 +343,24 @@ The primary metric combines GAUC and nDCG@5. This is a direct, testable mechanis
 - Requirements: REQ-003, REQ-004, REQ-008, REQ-009
 - Experiments: EXP-014
 
+## D021 - Bounded item×tab scale candidate
+
+Date: 2026-08-28
+Status: Accepted
+
+### Decision
+
+Add a fixed-memory item×inference-known-tab popularity cross for 1K/27K scale experiments. It trains separate hashed item and item×tab rate tables on training labels only, then blends their smoothed rates during validation/test feature scoring.
+
+### Why
+
+The item-only scale baseline cannot use a candidate's visible tab/context. The cross can change an individual user's ordering without retaining the full 27K item universe or looking at any future outcome.
+
+### Related
+
+- Requirements: REQ-003, REQ-004, REQ-008
+- Tasks: T2-006
+
 ## D004 - Retain experimental evidence
 
 Date: 2026-08-26
