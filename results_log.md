@@ -2,6 +2,24 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R020 - Checkpointed KuaiRand-27K item×tab output
+
+Date: 2026-08-28
+Experiment: EXP-015
+Implementation / commit: `f232324`
+
+### Revalidation and frozen artifact
+
+Repeated R018's exact configuration after adding the required scale-checkpoint path. The persisted model `artifacts/scale/kuairand-27k-item-tab-model.npz` has SHA-256 `ea947081e440d8a3266d03b6c03ba25f00ca546424b750c08453eb7c155dfc58`; its full validation result reproduced R018 exactly: GAUC `0.574100`, nDCG@5 `0.599412`, primary `0.586756` over 71,149,570 rows. The checkpointed pass took 523.55 seconds.
+
+### Feature-only output validation
+
+Generated `artifacts/submissions/kuairand-27k-item-tab.csv` by loading that frozen model—without refitting or test-label access. The CSV has the provisional header `row_id,user_id,video_id,score`, exactly 114,832,240 lines (one header plus every one of R016's 114,832,239 test rows), and final row id `114832238`. Its SHA-256 is `c4e95a9702ffc61dbbf5e2a369d3902df7945d40efb033a4c9ad2caaac37fcc5`.
+
+### Interpretation
+
+The scale checkpoint→validation→feature-only-output chain is now demonstrated end to end on the full 27K artifact. It remains an internal/provisional evaluation artifact: no local test score was computed, no final campaign designation has occurred, and organizer metric clarification is still required for a final official claim.
+
 ## R019 - KuaiRand-1K item×tab robustness result
 
 Date: 2026-08-28

@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Full checkpointed 27K output
+
+### Measured
+
+R020 reran the 27K item×tab leader with a persisted 256 MB counter checkpoint, exactly reproduced its validation metrics, and streamed a 4.6 GB provisional-schema output for all 114,832,239 test rows. Header, row count, terminal row ID, and output hash were verified. No test labels were read or scored.
+
 ## 2026-08-28 - Frozen scale-model output path
 
 ### Changed
