@@ -2,6 +2,30 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R019 - KuaiRand-1K item×tab robustness result
+
+Date: 2026-08-28
+Experiment: EXP-015
+Implementation / commit: `d061167`
+
+### Change Tested
+
+Ran the exact same declared 24-bit item/item×tab (`0.5/0.5`) rate blend as R018 on the official 1K artifact. It used only 1K training labels and the same provisional evaluator/sharded validation policy.
+
+### Metrics
+
+| Metric | Item-only R012 | Item×tab R019 | Delta |
+|---|---:|---:|---:|
+| GAUC | 0.542570 | 0.542923 | +0.000354 |
+| nDCG@5 | 0.545226 | 0.548764 | +0.003538 |
+| primary | 0.543898 | 0.545843 | +0.001946 |
+
+The full 2,524,980-row validation pass took 18.76 seconds and exposed no test labels.
+
+### Interpretation
+
+The tab cross's improvement direction is consistent across 1K and 27K, though its magnitude differs. This supports the mechanism as a scale candidate but does not make 1K a selection proxy or establish an organizer leaderboard threshold.
+
 ## R018 - KuaiRand-27K bounded item×tab improvement
 
 Date: 2026-08-28

@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Cross-variant item×tab robustness
+
+### Measured
+
+The exact R018 item×tab mechanism improved 1K validation primary from `0.543898` to `0.545843` (+`0.001946`). R019 records it as a cross-variant robustness observation, not a 1K proxy gate or organizer-threshold claim.
+
 ## 2026-08-28 - KuaiRand-27K item×tab validation improvement
 
 ### Measured
