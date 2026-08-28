@@ -2,6 +2,16 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Converged provisional Pure campaign with data-identity repair
+
+### Measured
+
+R023 first rejected a draft campaign because historical EXP-009A and its first confirmations carried different data fingerprints. After enforcing a one-data-identity gate, EXP-009E revalidated the exact frozen leader vector and EXP-009F–H supplied three sequential declared confirmations. The repaired campaign converged under provisional ε=`0.002`, N=`3`, with leader primary `0.604017`, 0 LLM tokens, and 0 GPU-hours. `designate-final` correctly refused this report because REQ-014 is unresolved.
+
+### Output
+
+The revalidated leader checkpoint generated `170,588` feature-only Pure test rows plus header from the frozen manifest (SHA-256 `60538bb59c96547bfb3e8f90ff56d8c0b5b2e2002c38ba708ecf5e2dfe82a672`). This is a provisional artifact, not an official submitted final.
+
 ## 2026-08-28 - Provisional campaign gate and frozen-leader confirmations
 
 ### Changed

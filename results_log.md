@@ -2,6 +2,46 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R023 - Revalidated, converged provisional Pure campaign
+
+Date: 2026-08-28
+Experiments: EXP-009E, EXP-009F, EXP-009G, EXP-009H
+Implementation / commits: `81b6bf8`, with campaign safeguards from `e5307f2`
+Environment: CPython 3.13.11, NumPy 2.5.2, PyTorch 2.13.0, CPU.
+
+### Purpose
+
+Materialize a declared post-leader convergence campaign without silently mixing data/evaluator identities or treating a provisional organizer contract as an official final.
+
+### Provenance repair
+
+The first EXP-009A/EXP-009B–D draft was rejected after the campaign evaluator detected differing run-level data fingerprints. This is retained as an integrity finding, not a valid convergence claim. EXP-009E then remeasured EXP-009A's exact frozen BPR/history/temporal vector (`0.375/0.375/0.25`) after verifying every component checkpoint hash. EXP-009F–H are one-vector, frozen-component confirmations from EXP-009E; no component was retrained and no weight grid was searched.
+
+### Campaign result
+
+All four valid campaign records bind evaluator SHA-256 `ecfde28392eb14fec4f488083251df50624e1af2b86278b962daecfb42d195de` and data fingerprint `37d896c3e8c698f173e985917fbc714bbc8d0c93f7bf0fd2d81fbd00e7342fc4`.
+
+| Batch | Run | Vector (BPR/history/temporal) | primary |
+|---|---|---|---:|
+| Leader revalidation | EXP-009E | 0.375 / 0.375 / 0.250 | 0.604017 |
+| Confirmation 1 | EXP-009F | 0.500 / 0.375 / 0.125 | 0.603893 |
+| Confirmation 2 | EXP-009G | 0.250 / 0.625 / 0.125 | 0.603799 |
+| Confirmation 3 | EXP-009H | 0.250 / 0.250 / 0.500 | 0.603868 |
+
+Relative to the recorded NumPy FM baseline `0.601572`, the revalidated leader is `+0.002445` primary. It becomes the significant anchor; the three later declared batches do not exceed it by ε=`0.002`, yielding stagnation `3` and provisional convergence under the starter profile.
+
+### Resource and integrity evidence
+
+The four campaign records aggregate `26.65` CPU seconds, `0` GPU seconds, `0` LLM input/output tokens, and `0` manual interventions. They score only validation labels. The frozen EXP-009E manifest generated `artifacts/submissions/kuairand-pure-provisional-campaign-leader.csv`: `170,588` feature-only test rows plus header, SHA-256 `60538bb59c96547bfb3e8f90ff56d8c0b5b2e2002c38ba708ecf5e2dfe82a672`.
+
+### Limitation and decision
+
+This is a **provisional** campaign, not an official final: the PDF/Starter Kit target-and-metric conflict remains REQ-014. The campaign report sets `finalization_eligible=false`; a direct `designate-final` attempt was rejected before a final record could be created. Do not submit or describe this as beating an organizer benchmark until the organizer confirms the contract.
+
+### Reproduction
+
+`.venv/bin/python -m tiktok_ml_agent campaign-status --campaign experiments/kuairand-pure-provisional-campaign.json --output artifacts/campaigns/kuairand-pure-provisional-v1.json`
+
 ## R022 - Strict-prior video×tab candidate-history cross regression
 
 Date: 2026-08-28

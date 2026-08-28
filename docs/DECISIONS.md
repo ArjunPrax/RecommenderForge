@@ -461,7 +461,7 @@ The organizer PDF/Starter Kit metric conflict is unresolved (REQ-014). A converg
 
 ### Decision
 
-Campaign manifests now declare `contract_status` as `confirmed` or `provisional`; only confirmed reports are eligible for `designate-final`. Run EXP-009B, EXP-009C, and EXP-009D as three sequential, single-vector frozen-ensemble confirmations from EXP-009A. Before executing, verify each BPR/history/temporal component checkpoint hash exactly matches EXP-009A's frozen ensemble artifact.
+Campaign manifests now declare `contract_status` as `confirmed` or `provisional`; only confirmed reports are eligible for `designate-final`. Campaign evaluation also requires one common data fingerprint and evaluator hash. After the initial EXP-009A/EXP-009B–D draft exposed a data-fingerprint mismatch, revalidate the exact historical vector as EXP-009E, then run EXP-009F, EXP-009G, and EXP-009H as three sequential, single-vector frozen-ensemble confirmations. Before executing, verify each BPR/history/temporal component checkpoint hash exactly matches the frozen leader artifact.
 
 ### Why
 
@@ -475,7 +475,7 @@ The resulting campaign may demonstrate provisional convergence and resource acco
 
 - Requirements: REQ-003, REQ-008, REQ-012, REQ-013, REQ-014, REQ-016, REQ-018
 - Tasks: T2-005
-- Experiments: EXP-009A, EXP-009B, EXP-009C, EXP-009D
+- Experiments: EXP-009A through EXP-009H
 
 ## D004 - Retain experimental evidence
 
