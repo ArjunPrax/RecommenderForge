@@ -661,18 +661,19 @@ def run_autonomous_ensemble_confirmation(
     components of EXP-009A.  This provides honest post-leader convergence
     evidence without retraining components or inspecting test labels.
     """
+    leader_experiment_id = "EXP-009E"
     source = ExperimentLedger(leader_ledger_path)
     try:
-        leader = next((run for run in source.list_runs() if run["experiment_id"] == "EXP-009A" and run["status"] == "succeeded"), None)
+        leader = next((run for run in source.list_runs() if run["experiment_id"] == leader_experiment_id and run["status"] == "succeeded"), None)
     finally:
         source.close()
     if not leader or not leader.get("checkpoint_manifest"):
-        raise ValueError("ensemble confirmation requires a succeeded EXP-009A leader manifest")
+        raise ValueError(f"ensemble confirmation requires a succeeded {leader_experiment_id} leader manifest")
     leader_manifest = leader["checkpoint_manifest"]
     try:
         parent_ensemble = json.loads(Path(leader_manifest["checkpoint_path"]).read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:
-        raise ValueError("ensemble confirmation cannot read the frozen EXP-009A artifact") from error
+        raise ValueError(f"ensemble confirmation cannot read the frozen {leader_experiment_id} artifact") from error
     component_refs = [
         {"ledger": str(bpr_ledger_path), "experiment_id": "EXP-004A"},
         {"ledger": str(history_ledger_path), "experiment_id": "EXP-005"},
@@ -690,7 +691,7 @@ def run_autonomous_ensemble_confirmation(
             raise ValueError(f"ensemble confirmation component {component['experiment_id']} is unavailable")
         resolved_hashes.append(str(record["checkpoint_manifest"]["checkpoint_sha256"]))
     if parent_hashes != resolved_hashes:
-        raise ValueError("ensemble confirmation components do not match the frozen EXP-009A leader")
+        raise ValueError(f"ensemble confirmation components do not match the frozen {leader_experiment_id} leader")
     output_dir = Path(output_dir); output_dir.mkdir(parents=True, exist_ok=True)
     benchmark = starter_kuairand_pure_spec(starter_kit_dir)
     ledger = ExperimentLedger(output_dir / "ledger.sqlite")
@@ -703,22 +704,22 @@ def run_autonomous_ensemble_confirmation(
         risks=("validation feedback can overfit if vectors are not predeclared and fully recorded",),
     )])
     confirmations = (
-        ("EXP-009B", [0.50, 0.375, 0.125], "more BPR mass"),
-        ("EXP-009C", [0.25, 0.625, 0.125], "more history mass"),
-        ("EXP-009D", [0.25, 0.25, 0.50], "more temporal mass"),
+        ("EXP-009F", [0.50, 0.375, 0.125], "more BPR mass"),
+        ("EXP-009G", [0.25, 0.625, 0.125], "more history mass"),
+        ("EXP-009H", [0.25, 0.25, 0.50], "more temporal mass"),
     )
     controller = ResearchController(benchmark, ledger)
     records = []
     for experiment_id, vector, rationale_suffix in confirmations:
         context = PlannerContext(
-            goal=f"Confirm the frozen EXP-009A ensemble with one predeclared vector using {rationale_suffix}.",
+            goal=f"Confirm the frozen {leader_experiment_id} ensemble with one predeclared vector using {rationale_suffix}.",
             experiment_ids=(experiment_id,), run_class=RunClass.RESEARCH,
             parent_run_id=leader["run_id"], parent_checkpoint_sha256=leader_manifest["checkpoint_sha256"],
             allowed_operator_families=(OperatorFamily.ENSEMBLE,), allowed_paths=(), token_budget=0, compute_budget_seconds=600,
         )
         planner = FixedPlanner({"rationale": f"Evaluate exactly one frozen-component vector ({rationale_suffix}); do not search weights or retrain.", "candidates": [{
             "experiment_id": experiment_id, "operator_family": "ensemble",
-            "hypothesis": f"The frozen EXP-009A component blend remains robust under the predeclared {rationale_suffix} perturbation.",
+            "hypothesis": f"The frozen {leader_experiment_id} component blend remains robust under the predeclared {rationale_suffix} perturbation.",
             "expected_mechanism": "a fixed alternative rank-space weighting exposes sensitivity without changing components or data.",
             "evidence_ids": ["KB-014"],
             "configuration": {"components": component_refs, "weight_grid": [vector], "seeds": [0, 1, 2, 3, 4]},
@@ -729,6 +730,76 @@ def run_autonomous_ensemble_confirmation(
         for record in batch_records:
             ledger.append_event(record.run_id, "planner_decision", {"rationale": plan.rationale, "provider": "fixed_offline_policy"})
         records.extend(batch_records)
+    snapshot = MemoryManager(ledger).consolidate(); report = write_report(ledger, output_dir / "report.md")
+    response = {"ledger": str(output_dir / "ledger.sqlite"), "report": str(report), "memory_snapshot": snapshot["snapshot_id"], "converged": controller.observe_for_convergence(records), "runs": [record.run_id for record in records]}
+    ledger.close(); return response
+
+
+def run_autonomous_ensemble_revalidation(
+    *, repository_root: str | Path, starter_kit_dir: str | Path, data_dir: str | Path,
+    source_leader_ledger_path: str | Path, bpr_ledger_path: str | Path, history_ledger_path: str | Path,
+    temporal_ledger_path: str | Path, output_dir: str | Path,
+) -> dict[str, object]:
+    """Revalidate EXP-009A's exact frozen vector under the current data identity."""
+    source = ExperimentLedger(source_leader_ledger_path)
+    try:
+        prior = next((run for run in source.list_runs() if run["experiment_id"] == "EXP-009A" and run["status"] == "succeeded"), None)
+    finally:
+        source.close()
+    if not prior or not prior.get("checkpoint_manifest"):
+        raise ValueError("ensemble revalidation requires the historical EXP-009A manifest")
+    try:
+        prior_ensemble = json.loads(Path(prior["checkpoint_manifest"]["checkpoint_path"]).read_text(encoding="utf-8"))
+        vector = prior_ensemble["component_weights"]
+    except (OSError, json.JSONDecodeError, KeyError) as error:
+        raise ValueError("ensemble revalidation cannot read the historical EXP-009A vector") from error
+    if not isinstance(vector, list) or len(vector) != 3:
+        raise ValueError("historical EXP-009A vector is invalid")
+    component_refs = [
+        {"ledger": str(bpr_ledger_path), "experiment_id": "EXP-004A"},
+        {"ledger": str(history_ledger_path), "experiment_id": "EXP-005"},
+        {"ledger": str(temporal_ledger_path), "experiment_id": "EXP-008"},
+    ]
+    prior_hashes = [component.get("checkpoint_sha256") for component in prior_ensemble.get("components", [])]
+    current_hashes: list[str] = []
+    for component in component_refs:
+        component_ledger = ExperimentLedger(component["ledger"])
+        try:
+            record = next((run for run in component_ledger.list_runs() if run["experiment_id"] == component["experiment_id"] and run["status"] == "succeeded"), None)
+        finally:
+            component_ledger.close()
+        if not record or not record.get("checkpoint_manifest"):
+            raise ValueError(f"ensemble revalidation component {component['experiment_id']} is unavailable")
+        current_hashes.append(str(record["checkpoint_manifest"]["checkpoint_sha256"]))
+    if prior_hashes != current_hashes:
+        raise ValueError("historical EXP-009A component identities no longer match")
+    output_dir = Path(output_dir); output_dir.mkdir(parents=True, exist_ok=True)
+    benchmark = starter_kuairand_pure_spec(starter_kit_dir); ledger = ExperimentLedger(output_dir / "ledger.sqlite")
+    knowledge = KnowledgeBase([EvidenceCard(
+        evidence_id="KB-015", title="Frozen ensemble data-identity revalidation",
+        source="Interpretation - remeasurement required after a campaign data-fingerprint mismatch",
+        claim="A frozen score blend must be remeasured under one data fingerprint before it can anchor a campaign.",
+        assumptions=("component checkpoint hashes match the historical blend",), operator_families=(OperatorFamily.ENSEMBLE,),
+        applicability="Data-identity repair before provisional campaign construction.",
+        risks=("the historical and current results may differ; no value is silently reused",),
+    )])
+    context = PlannerContext(
+        goal="Revalidate the exact frozen EXP-009A component vector under the current KuaiRand-Pure data identity.",
+        experiment_ids=("EXP-009E",), run_class=RunClass.RESEARCH, parent_run_id=prior["run_id"],
+        parent_checkpoint_sha256=prior["checkpoint_manifest"]["checkpoint_sha256"],
+        allowed_operator_families=(OperatorFamily.ENSEMBLE,), allowed_paths=(), token_budget=0, compute_budget_seconds=600,
+    )
+    planner = FixedPlanner({"rationale": "Reuse exactly the historical EXP-009A frozen vector once, with component hashes checked, to establish one current data identity before campaign continuation.", "candidates": [{
+        "experiment_id": "EXP-009E", "operator_family": "ensemble",
+        "hypothesis": "The exact frozen EXP-009A vector can be remeasured with the current data fingerprint without changing components or weights.",
+        "expected_mechanism": "identical immutable component predictions are rescored on one current validation-data identity.",
+        "evidence_ids": ["KB-015"],
+        "configuration": {"components": component_refs, "weight_grid": [vector], "seeds": [0, 1, 2, 3, 4]},
+        "controlled_variables": ["frozen component checkpoints", "single historical vector", "validation rows", "seed set"],
+    }]})
+    plan = planner.plan(context, knowledge); controller = ResearchController(benchmark, ledger)
+    records = controller.execute_batch(plan.batch, lambda candidate: execute_three_rank_ensemble(candidate, repository_root=repository_root, starter_kit_dir=starter_kit_dir, data_dir=data_dir, artifact_root=output_dir / "artifacts"))
+    for record in records: ledger.append_event(record.run_id, "planner_decision", {"rationale": plan.rationale, "provider": "fixed_offline_policy"})
     snapshot = MemoryManager(ledger).consolidate(); report = write_report(ledger, output_dir / "report.md")
     response = {"ledger": str(output_dir / "ledger.sqlite"), "report": str(report), "memory_snapshot": snapshot["snapshot_id"], "converged": controller.observe_for_convergence(records), "runs": [record.run_id for record in records]}
     ledger.close(); return response

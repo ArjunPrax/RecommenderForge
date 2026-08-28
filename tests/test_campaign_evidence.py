@@ -11,7 +11,7 @@ from tiktok_ml_agent.finalization import designate_final
 from tiktok_ml_agent.ledger import ExperimentLedger
 
 
-def _ledger_with_run(path: Path, run_id: str, primary: float, *, evaluator: str = "evaluator-a") -> None:
+def _ledger_with_run(path: Path, run_id: str, primary: float, *, evaluator: str = "evaluator-a", data_fingerprint: str = "fixture") -> None:
     ledger = ExperimentLedger(path)
     record = RunRecord(
         run_id=run_id, experiment_id="EXP-900", run_class=RunClass.RESEARCH,
@@ -22,12 +22,13 @@ def _ledger_with_run(path: Path, run_id: str, primary: float, *, evaluator: str 
     record.status = RunStatus.SUCCEEDED
     record.metrics = {"primary": primary}
     record.evaluator_sha256 = evaluator
+    record.data_fingerprint = data_fingerprint
     record.resource_usage = {"cpu_seconds": 2.0}
     checkpoint = path.with_suffix(".checkpoint")
     checkpoint.write_bytes(run_id.encode())
     record.checkpoint_manifest = CheckpointManifest(
         checkpoint_path=str(checkpoint), checkpoint_sha256=hash_file(checkpoint), code_revision="fixture",
-        data_fingerprint="fixture", evaluator_sha256=evaluator, configuration_sha256="config",
+        data_fingerprint=data_fingerprint, evaluator_sha256=evaluator, configuration_sha256="config",
         validation_prediction_sha256="prediction", validation_metrics={"primary": primary},
     ).to_dict()
     ledger.finalize_run(record)
@@ -93,6 +94,23 @@ class CampaignEvidenceTests(unittest.TestCase):
             report_path = write_campaign_report(path, root / "report.json")
             with self.assertRaises(CampaignEvidenceError):
                 designate_final(campaign_report_path=report_path, final_ledger_path=root / "final.sqlite")
+
+    def test_mixed_data_fingerprints_are_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _ledger_with_run(root / "one.sqlite", "one", 0.61, data_fingerprint="first")
+            _ledger_with_run(root / "two.sqlite", "two", 0.62, data_fingerprint="second")
+            config = {
+                "campaign_id": "fixture", "benchmark_id": "kuairand-pure", "contract_status": "confirmed",
+                "baseline_primary": 0.60,
+                "batches": [
+                    {"batch_id": "b1", "runs": [{"ledger": "one.sqlite", "run_id": "one"}]},
+                    {"batch_id": "b2", "runs": [{"ledger": "two.sqlite", "run_id": "two"}]},
+                ],
+            }
+            path = root / "campaign.json"; path.write_text(json.dumps(config), encoding="utf-8")
+            with self.assertRaises(CampaignEvidenceError):
+                evaluate_campaign(path)
 
 
 if __name__ == "__main__":

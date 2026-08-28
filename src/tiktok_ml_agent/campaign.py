@@ -110,6 +110,7 @@ def evaluate_campaign(path: str | Path) -> dict[str, Any]:
     seen_batch_ids: set[str] = set()
     resource_totals: dict[str, float] = {}
     evaluator_hashes: set[str] = set()
+    data_fingerprints: set[str] = set()
     resolved_batches: list[dict[str, Any]] = []
     for ordinal, raw_batch in enumerate(config["batches"], start=1):
         if not isinstance(raw_batch, dict):
@@ -152,6 +153,10 @@ def evaluate_campaign(path: str | Path) -> dict[str, Any]:
             if not isinstance(evaluator_hash, str) or not evaluator_hash:
                 raise CampaignEvidenceError(f"run {run_id} has no evaluator hash")
             evaluator_hashes.add(evaluator_hash)
+            data_fingerprint = run.get("data_fingerprint")
+            if not isinstance(data_fingerprint, str) or not data_fingerprint:
+                raise CampaignEvidenceError(f"run {run_id} has no data fingerprint")
+            data_fingerprints.add(data_fingerprint)
             primary = float(run["metrics"]["primary"])
             scored_runs.append((run_id, primary))
             evidence_runs.append({
@@ -167,6 +172,8 @@ def evaluate_campaign(path: str | Path) -> dict[str, Any]:
         resolved_batches.append({"batch_id": batch_id, "runs": evidence_runs, "selected_run_id": status.iterations[-1].selected_run_id, "selected_primary": status.iterations[-1].primary})
     if len(evaluator_hashes) != 1:
         raise CampaignEvidenceError("campaign mixes evaluator identities")
+    if len(data_fingerprints) != 1:
+        raise CampaignEvidenceError("campaign mixes data identities")
     status = tracker.status()
     best_run: dict[str, Any] | None = None
     if status.best_run_id is not None:
@@ -182,6 +189,7 @@ def evaluate_campaign(path: str | Path) -> dict[str, Any]:
         "converged": status.converged, "stagnation": status.stagnation,
         "significant_anchor": status.significant_anchor, "best_primary": status.best_primary,
         "best_run_id": status.best_run_id, "evaluator_sha256": next(iter(evaluator_hashes)),
+        "data_fingerprint": next(iter(data_fingerprints)),
         "best_run": best_run, "resource_totals": resource_totals, "batches": resolved_batches,
     }
 
