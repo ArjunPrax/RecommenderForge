@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Submission-facing draft and release controls
+
+### Changed
+
+Added a fact-checked Devpost draft and human-gated release checklist. The draft calls out the provisional metric contract, validation-only scope, current measured leader, negative results, resource accounting, and remaining 27K/final-campaign work; it does not fabricate a submission or hidden-test score.
+
 ## 2026-08-28 - Checkpoint-only final designation
 
 ### Changed
