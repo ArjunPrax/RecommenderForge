@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - EXP-016 video×tab candidate-history result
+
+### Measured
+
+R022 completed five validation-only BPR seeds at mean primary `0.602934`, `-0.000148` versus the BPR parent. The strict-prior global video×tab bucket changed 22,725 within-user pairwise relations across 6,576 eligible validation users, but did not improve the multi-seed result. The best frozen checkpoint produced a 170,588-row, feature-only provisional output with verified alignment; no test labels were read or scored.
+
 ## 2026-08-28 - Strict-prior video×tab candidate-history lane
 
 ### Changed

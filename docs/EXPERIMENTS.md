@@ -19,7 +19,7 @@ Plan experiments here; measured outcomes belong in `results_log.md`. IDs are sta
 | EXP-013 | Three-negatives-per-positive BPR sampling | Measured; R014 rejects the first configuration |
 | EXP-014 | Top-five-aware Lambda-BPR mixture | Measured; R015 rejects the fixed 50/50 mixture |
 | EXP-015 | Bounded item×tab popularity scale candidate | Checkpointed 27K validation/output chain and frozen 3-weight grid demonstrated; R018–R021 |
-| EXP-016 | Strict-prior video×tab candidate-history cross | Implemented; five-seed validation run pending. |
+| EXP-016 | Strict-prior video×tab candidate-history cross | Measured; R022 rejects it against the BPR parent while retaining its integrity evidence. |
 
 ## EXP-XXX - Experiment title
 

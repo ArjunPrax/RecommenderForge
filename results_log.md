@@ -2,6 +2,55 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R022 - Strict-prior video×tab candidate-history cross regression
+
+Date: 2026-08-28
+Experiment: EXP-016
+Implementation / commit: `7c2bdf8`
+Environment: CPython 3.13.11, NumPy 2.5.2, PyTorch 2.13.0, CPU.
+
+### Question
+
+Does a global video×tab engagement bucket, constructed strictly before each train event and frozen after training, improve BPR validation ranking?
+
+### Baseline
+
+R003 / EXP-004A five-seed BPR mean primary `0.603082`.
+
+### Change Tested
+
+Added one categorical FM field keyed by `(video_id, tab)`. Each train row receives the bucket from earlier timestamp-ordered permitted training labels only; the row's own label updates its state afterwards. Validation and feature-only submission rows use the completed training state and their labels are neither required nor read.
+
+### Inputs / Workload
+
+Full KuaiRand-Pure train/validation rows, seeds 0–4, and the provisional organizer evaluator hash `ecfde28392eb14fec4f488083251df50624e1af2b86278b962daecfb42d195de`. The fixed offline planner used zero LLM tokens and the run took `97.71` CPU seconds with zero GPU seconds and zero recorded manual interventions.
+
+### Metrics
+
+| Metric | BPR R003 | EXP-016 | Delta |
+|---|---:|---:|---:|
+| GAUC | 0.669535 | 0.669419 | -0.000116 |
+| nDCG@5 | 0.536628 | 0.536450 | -0.000178 |
+| primary | 0.603082 | 0.602934 | -0.000148 |
+
+Population standard deviation for primary was `0.000348`. The selected best seed (2) had validation primary `0.603398`; it is frozen only as the experiment's reproducible artifact, not selected over the multi-seed decision.
+
+### Correctness Validation
+
+Synthetic tests prove strict-prior construction and frozen, label-free evaluation state. The full suite passed 45 tests before execution. The runtime ordering audit found `22,725` changed pairwise relations across `6,576` of `18,460` eligible validation users, proving this candidate-specific field actually changes within-user ordering. The frozen best checkpoint generated `170,588` aligned test rows plus header at `artifacts/submissions/exp-016-provisional.csv` (SHA-256 `d85837a9e7829a7325b4809eb44b89138f3144bec3ae215d5bf69bf67dac9ffa`) without test scoring or test-label access.
+
+### Interpretation
+
+The intended mechanism is active but does not improve the declared multi-seed BPR comparison. The scale item×tab result therefore does not transfer automatically to this Pure FM representation. Retain R022 as a negative result and do not make it a parent or ensemble component.
+
+### Limitations
+
+This remains validation-only evidence under the provisional starter evaluator; REQ-014 organizer clarification is still required before any final metric-specific selection or official-bonus claim.
+
+### Reproduction
+
+`.venv/bin/python -m tiktok_ml_agent autonomous-item-tab-history --repository-root . --starter-kit kuairand-starter-kit --data-dir kuairand-starter-kit/KuaiRand-Pure/data --parent-ledger artifacts/autonomous-ranking-verified/ledger.sqlite --output-dir artifacts/autonomous-item-tab-history`
+
 ## R021 - Frozen KuaiRand-27K item×tab blend grid
 
 Date: 2026-08-28
