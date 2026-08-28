@@ -2,6 +2,31 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R017 - KuaiRand-27K bounded streaming popularity baseline
+
+Date: 2026-08-28
+Experiment: EXP-011
+Implementation / commit: `35d5b8d`
+
+### Change Tested
+
+Trained a one-pass, fixed-memory 24-bit hashed long-view popularity table on all 136,296,576 training rows. The model uses 16,777,216 counter slots rather than retaining the full item-ID universe. Validation was written into 256 user-consistent temporary shards and each shard delegated its metric calculation to the supplied evaluator; the aggregate uses that evaluator's documented GAUC positive-weighting and nDCG user-weighting. No test label was indexed, materialized, or scored.
+
+### Metrics
+
+| Metric | Value |
+|---|---:|
+| GAUC | 0.570914 |
+| nDCG@5 | 0.544153 |
+| primary | 0.557534 |
+| validation rows | 71,149,570 |
+| validation users | 26,729 |
+| wall seconds | 431.83 |
+
+### Interpretation
+
+This completes a full bounded-memory train/validation run on the official 27K artifact. It is a scale/integrity baseline using the provisional Pure evaluator, not an organizer-provided 27K reference or hidden-test result. It therefore does not establish that the bonus benchmark has been beaten; further comparable 27K candidates and organizer-contract confirmation remain required.
+
 ## R016 - KuaiRand-27K official artifact preflight
 
 Date: 2026-08-28

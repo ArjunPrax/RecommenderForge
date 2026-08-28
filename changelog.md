@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - KuaiRand-27K bounded streaming baseline
+
+### Measured
+
+EXP-011 completed full 27K train/validation streaming with a fixed 24-bit hashed popularity table and 256 user-consistent validation shards. R017 records provisional primary `0.557534` over 71,149,570 validation rows in 431.83 seconds. The result is a bonus-scale baseline, not a claim of beating an organizer benchmark.
+
 ## 2026-08-28 - Persistent scale-baseline metric artifacts
 
 ### Changed
