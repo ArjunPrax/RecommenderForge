@@ -9,7 +9,7 @@ hash table and evaluates validation in user-consistent shards.
 from __future__ import annotations
 
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from time import perf_counter
 from typing import Protocol
@@ -126,6 +126,31 @@ def generate_scale_submission(
             writer.writerow((row_id, row["user_id"], row["video_id"], score))
             rows += 1
     return {"output": str(output_path), "rows": float(rows), "model_sha256": hash_file(model_path)}
+
+
+def rescore_frozen_scale_model(
+    *,
+    model_path: str | Path,
+    variant: str,
+    data_dir: str | Path,
+    evaluator_path: str | Path,
+    shards: int = 256,
+    scratch_dir: str | Path | None = None,
+    item_weight: float | None = None,
+) -> dict[str, float | str]:
+    """Re-evaluate a frozen model with an optional declared item×tab blend weight."""
+    started = perf_counter(); model = load_scale_model(model_path)
+    if item_weight is not None:
+        if not isinstance(model, TabConditionedHashedPopularity):
+            raise ValueError("item_weight override requires a frozen item_tab scale model")
+        if not 0 <= item_weight <= 1:
+            raise ValueError("item_weight must be in [0, 1]")
+        model = replace(model, item_weight=item_weight)
+    scale = ScaleArtifactAdapter(variant, Path(data_dir))
+    spec = BenchmarkSpec(benchmark_id=f"kuairand-{variant}", profile_id="provisional-long-view-gauc-ndcg5-v1", label="long_view", metrics=("GAUC", "nDCG@5", "primary"), evaluator_path=str(evaluator_path), evaluator_sha256=hash_file(evaluator_path), source_note="Interpretation - provisional starter evaluator applied to bonus artifact pending organizer contract.")
+    metrics = _score_validation_sharded(adapter=scale, evaluator=BenchmarkAdapter.from_organizer_file(spec), model=model, shards=shards, scratch_dir=scratch_dir)
+    metrics.update({"model_sha256": hash_file(model_path), "item_weight": float(model.item_weight) if isinstance(model, TabConditionedHashedPopularity) else -1.0, "wall_seconds": perf_counter() - started})
+    return metrics
 
 
 def fit_streaming_popularity(adapter: ScaleArtifactAdapter) -> StreamingPopularity:

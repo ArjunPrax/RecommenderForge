@@ -379,6 +379,24 @@ Scale candidates must meet the same no-retrain final-output standard as Pure che
 - Requirements: REQ-003, REQ-012, REQ-015, REQ-018
 - Tasks: T2-006
 
+## D023 - Frozen scale blend rescoring
+
+Date: 2026-08-28
+Status: Accepted
+
+### Decision
+
+Permit a declared item×tab blend-weight comparison only by re-evaluating the same frozen persisted counter tables. The rescore path cannot fit a new model or access test labels.
+
+### Why
+
+It isolates one hyperparameter from model/data changes and preserves checkpoint provenance for any selected scale configuration.
+
+### Related
+
+- Requirements: REQ-003, REQ-004, REQ-009, REQ-018
+- Experiments: EXP-015
+
 ## D004 - Retain experimental evidence
 
 Date: 2026-08-26

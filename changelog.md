@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Frozen scale blend rescoring
+
+### Changed
+
+Added `scale-rescore`, a validation-only route that loads a frozen item×tab counter checkpoint and varies only its declared blend weight. It never re-fits tables or exposes test labels; a controlled fixture verifies the override path.
+
 ## 2026-08-28 - Full checkpointed 27K output
 
 ### Measured

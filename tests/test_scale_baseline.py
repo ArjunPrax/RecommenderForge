@@ -6,7 +6,7 @@ from pathlib import Path
 
 from tiktok_ml_agent.benchmark import load_organizer_evaluator
 from tiktok_ml_agent.scale import ScaleArtifactAdapter
-from tiktok_ml_agent.scale_baseline import fit_hashed_streaming_popularity, fit_streaming_popularity, fit_tab_conditioned_hashed_popularity, generate_scale_submission, load_scale_model, save_scale_model, run_streaming_popularity
+from tiktok_ml_agent.scale_baseline import fit_hashed_streaming_popularity, fit_streaming_popularity, fit_tab_conditioned_hashed_popularity, generate_scale_submission, load_scale_model, rescore_frozen_scale_model, save_scale_model, run_streaming_popularity
 
 
 class StreamingPopularityTests(unittest.TestCase):
@@ -52,6 +52,18 @@ class StreamingPopularityTests(unittest.TestCase):
             result = generate_scale_submission(model_path=checkpoint, variant="1k", data_dir=data, output_path=output)
             self.assertEqual(result["rows"], 1.0)
             self.assertEqual(output.read_text(encoding="utf-8").splitlines()[0], "row_id,user_id,video_id,score")
+
+    def test_frozen_tab_model_can_be_rescored_without_refitting(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            data = Path(directory)
+            header = "user_id,video_id,date,time_ms,long_view,duration_ms,tab\n"
+            (data / "log_standard_4_08_to_4_21_1k.csv").write_text(header + "u,a,20220408,1,1,10,0\nu,b,20220408,2,0,10,1\n", encoding="utf-8")
+            (data / "log_standard_4_22_to_5_08_1k.csv").write_text(header + "u,a,20220422,1,1,10,0\nu,b,20220422,2,0,10,1\n", encoding="utf-8")
+            model = fit_tab_conditioned_hashed_popularity(ScaleArtifactAdapter("1k", data), bits=12, item_weight=0.5)
+            checkpoint = save_scale_model(model, data / "model.npz")
+            root = Path(__file__).resolve().parents[1]
+            result = rescore_frozen_scale_model(model_path=checkpoint, variant="1k", data_dir=data, evaluator_path=root / "kuairand-starter-kit/evaluate.py", item_weight=0.25, shards=2)
+            self.assertEqual(result["item_weight"], 0.25)
 
     def test_sharded_evaluation_matches_unsharded_organizer_evaluator(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
