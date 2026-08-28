@@ -26,9 +26,9 @@ The point is not merely to find a higher validation number. It is to make autono
 
 The initial benchmark implementation uses the supplied KuaiRand-Pure starter evaluator as a provisional executable contract while an organizer metric/label ambiguity is tracked openly. The agent reproduced the pointwise FM, established a PyTorch parity gate, evaluated pairwise BPR, grouped listwise ranking, strict train-only history crosses, a temporal cross, multi-feedback learning, watch-completion supervision, a compact DeepFM backbone, denser BPR sampling, and frozen rank ensembles.
 
-The current validation leader is a frozen BPR/history/temporal rank blend with mean primary `0.604017`, compared with the reproduced pointwise baseline `0.601572` (+`0.002444`). This is not a hidden-test result and is not yet a final designated submission.
+The current validation leader is a frozen BPR/history/temporal rank blend with mean primary `0.604017`, compared with the reproduced pointwise baseline `0.601572` (+`0.002445`). It was revalidated inside a declared campaign with one common data fingerprint/evaluator and three subsequent non-significant confirmation batches. This is not a hidden-test result and is not an official designated submission because the organizer metric contract is still unresolved.
 
-For bonus-scale artifacts, the agent streams KuaiRand-1K and KuaiRand-27K data, avoids loading test labels, uses bounded item statistics, and evaluates validation in user-consistent shards. KuaiRand-1K preflight and baseline are completed; 27K preflight is in progress at the time of this draft.
+For bonus-scale artifacts, the agent streams KuaiRand-1K and KuaiRand-27K data, avoids loading test labels, uses bounded item statistics, and evaluates validation in user-consistent shards. Both artifacts are checksum/preflight verified. The 27K item×tab baseline reached provisional validation primary `0.586756`, then generated a checkpoint-backed, feature-only output for all 114,832,239 test rows. This is not a claim of beating an organizer bonus threshold because no official reference threshold has been provided.
 
 ## Evidence and autonomy
 
@@ -50,8 +50,7 @@ The supplied PDF narrative and runnable Starter Kit conflict over the label and 
 
 ## Next steps before submission
 
-1. Complete the checksum-verified KuaiRand-27K preflight/baseline.
-2. Complete a clean, explicit campaign from an immutable leader through its declared convergence point.
-3. Generate the final output from the campaign-designated checkpoint without retraining or test scoring.
-4. Update the benchmark contract if organizers resolve the evaluator ambiguity.
-5. Publish the reviewed repository and replace this draft's provisional wording with measured final evidence.
+1. Obtain the organizer's written answer to the benchmark/metric and bonus-threshold questions.
+2. Update the benchmark contract and, if necessary, repeat affected validation/campaign work under the confirmed evaluator.
+3. Create the official designated-final record and output only after that confirmation.
+4. Publish the reviewed repository and replace this draft's provisional wording with confirmed final evidence.

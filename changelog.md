@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Release-facing documentation refresh and provenance declaration
+
+### Changed
+
+Updated the README, Devpost draft, demo, plan, and requirement status to match measured 27K and provisional-campaign evidence. Added a concise provenance declaration covering the permitted organizer artifacts, frozen evaluator/model identities, and no-external-data/weights policy. The unresolved organizer contract and human release actions remain explicit.
+
 ## 2026-08-28 - Ready-to-send organizer clarification draft
 
 ### Changed

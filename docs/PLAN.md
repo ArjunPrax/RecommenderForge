@@ -133,4 +133,4 @@ Relevant requirements: REQ-004, REQ-008, REQ-012, REQ-013
 
 Definition of done: Official artifacts available; baseline, scalable training, recovery, and output validation complete.
 
-Notes: KuaiRand-1K official archive is checksum-verified and its streaming baseline is measured (R012). KuaiRand-27K remains pending due its 46GB size; do not represent the task as complete until both artifacts meet the definition of done.
+Notes: KuaiRand-1K and KuaiRand-27K official archives are checksum-verified. R012 records the 1K baseline; R016–R021 record 27K preflight, bounded baseline, item×tab improvement, frozen rescore, and checkpoint-backed feature-only output. Scale recovery/final campaign designation remain release work, not completed claims.

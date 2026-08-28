@@ -1,6 +1,6 @@
 # Demo
 
-Status: Planned. The final event includes Presentation & Communication scoring.
+Status: Demo-ready provisionally. The final event includes Presentation & Communication scoring.
 
 ## Officially captured evidence
 
@@ -47,9 +47,9 @@ The checkpoint-parented history-cross continuation is:
 
 `python -m tiktok_ml_agent autonomous-history --parent-ledger artifacts/autonomous-ranking-verified/ledger.sqlite --output-dir artifacts/autonomous-history`
 
-## Expected output
+## Demonstrated output
 
-Not yet demonstrated.
+The qualification workflow records a controlled failure and enforced deadline recovery. The Pure campaign records a revalidated leader, three post-leader confirmations, data/evaluator identities, resource totals, and a feature-only output from the frozen leader. The contract remains provisional, so the demo must not call this an official submission.
 
 ## Recovery plan
 
