@@ -499,6 +499,41 @@ It preserves the required frozen-checkpoint provenance while making failed long 
 - Requirements: REQ-006, REQ-012, REQ-015, REQ-018
 - Tasks: T2-004, T2-006
 
+## D028 - Identity-gated resumable scale processing
+
+Date: 2026-08-28
+Status: Accepted
+
+### Context
+
+The 27K passes are long: validation streams 71,149,570 rows and feature-only output generation writes 114,832,239 rows. An interruption previously discarded the entire pass. Naive resumption is worse than restarting, because silently continuing a run whose model, data, evaluator, configuration, or destination has changed would produce an artifact that no single identity explains.
+
+### Decision
+
+Long scale validation and scale output generation persist progress beside their artifact and resume only when every one of the following still matches the stored record: frozen model SHA-256, caller-supplied data fingerprint, organizer evaluator SHA-256, canonical configuration hash, resolved output target, split, variant, and a structural signature of the exact source log files. Any difference raises `ScaleResumeMismatch` instead of resuming. Resume never widens data access: validation reads only the `valid` split and output generation requests feature-only rows.
+
+Progress state is published atomically. Output resumption truncates the `.partial` file to the last recorded byte boundary and verifies the recorded content digest before appending, so bytes written after the last checkpoint by a torn write are discarded rather than blended into the artifact. Validation shard scratch is verified by recorded byte length only: it is internal, append-only, and fully reconstructible, whereas the published output receives the stronger content check.
+
+### Why
+
+It makes an interrupted 27K pass recoverable without weakening the frozen-identity guarantee that makes the resulting artifact meaningful. A resumed run either reproduces the uninterrupted result exactly or refuses to start.
+
+### Alternatives Considered
+
+Restarting from zero on every interruption, which wastes the whole pass; resuming on row count alone, which cannot detect a changed model, evaluator, or source; and hashing all shard scratch at every checkpoint, whose cost grows with the run it is meant to protect.
+
+### Consequences
+
+Atomic publication is unchanged: the final path is still replaced only after every row is written. A completed, identity-matching record is reused rather than recomputed. The structural source signature is name/size/mtime, not a content hash, so the strong data identity remains the caller-supplied preflight fingerprint; this is stated in the code and must not be described as a cryptographic guarantee over 46 GB of logs.
+
+### Related
+
+- Requirements: REQ-006, REQ-012, REQ-018
+- Tasks: T2-006
+- Experiments: EXP-017
+- Decisions: extends D027 (atomic publication) and D022 (frozen scale models)
+
+
 ## D004 - Retain experimental evidence
 
 Date: 2026-08-26
