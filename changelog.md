@@ -2,6 +2,16 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Provisional campaign gate and frozen-leader confirmations
+
+### Changed
+
+Campaign reports now carry an explicit confirmed/provisional contract status, and `designate-final` rejects provisional reports. Added a three-batch post-leader confirmation route (EXP-009B–D): each batch scores one predeclared frozen BPR/history/temporal rank vector and verifies its component hashes match EXP-009A before any validation work.
+
+### Validation
+
+Added a test proving a converged provisional report cannot create a final record. Existing campaign and full-suite checks pass (48 tests). The actual confirmation run and provisional campaign report are pending.
+
 ## 2026-08-28 - Enforced candidate deadline and timeout recovery
 
 ### Changed

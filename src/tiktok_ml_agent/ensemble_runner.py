@@ -6,6 +6,7 @@ import json
 from hashlib import sha256
 from pathlib import Path
 from statistics import mean, pstdev
+from time import perf_counter
 from typing import Any
 
 import numpy as np
@@ -113,6 +114,7 @@ def execute_three_rank_ensemble(
     artifact_root: str | Path,
 ) -> ExecutionResult:
     """Evaluate a declared three-component rank blend, retaining every grid value."""
+    started = perf_counter()
     raw_components = candidate.configuration.get("components")
     raw_weights = candidate.configuration.get("weight_grid")
     seeds = candidate.configuration.get("seeds", [0, 1, 2, 3, 4])
@@ -154,4 +156,4 @@ def execute_three_rank_ensemble(
     ensemble_path.write_text(json.dumps(ensemble, sort_keys=True, indent=2), encoding="utf-8")
     revision, diff = _git_identity(Path(repository_root))
     manifest = CheckpointManifest(checkpoint_path=str(ensemble_path), checkpoint_sha256=hash_file(ensemble_path), code_revision=revision, data_fingerprint=adapter.data.data_fingerprint(), evaluator_sha256=adapter.spec.evaluator_sha256, configuration_sha256=sha256(json.dumps(dict(candidate.configuration), sort_keys=True).encode()).hexdigest(), validation_prediction_sha256=hash_file(prediction_path), validation_metrics={key: float(value) for key, value in metrics.items() if not key.endswith("_std")})
-    return ExecutionResult(metrics=metrics, checkpoint_manifest=manifest, code_revision=revision, diff_sha256=diff, data_fingerprint=manifest.data_fingerprint, evaluator_sha256=manifest.evaluator_sha256, seeds=tuple(seeds), diagnosis={"summary": "Three-component frozen rank ensemble evaluated over declared five-seed grid.", "selected_weights": list(selected_vector), "weight_primary_means": ensemble["all_weight_primary_means"], "component_runs": [record["run_id"] for record, _ in components]}, resource_usage={"cpu_seconds": 0.0, "gpu_seconds": 0.0, "llm_input_tokens": 0.0, "llm_output_tokens": 0.0})
+    return ExecutionResult(metrics=metrics, checkpoint_manifest=manifest, code_revision=revision, diff_sha256=diff, data_fingerprint=manifest.data_fingerprint, evaluator_sha256=manifest.evaluator_sha256, seeds=tuple(seeds), diagnosis={"summary": "Three-component frozen rank ensemble evaluated over declared five-seed grid.", "selected_weights": list(selected_vector), "weight_primary_means": ensemble["all_weight_primary_means"], "component_runs": [record["run_id"] for record, _ in components]}, resource_usage={"cpu_seconds": perf_counter() - started, "gpu_seconds": 0.0, "llm_input_tokens": 0.0, "llm_output_tokens": 0.0})

@@ -450,6 +450,33 @@ The qualification fixture records a controlled timeout recovery, and tests cover
 - Requirements: REQ-006, REQ-009, REQ-013, REQ-019
 - Tasks: T2-004, T2-006
 
+## D026 - Provisional-contract finalization gate and frozen-leader confirmations
+
+Date: 2026-08-28
+Status: Accepted
+
+### Context
+
+The organizer PDF/Starter Kit metric conflict is unresolved (REQ-014). A converged local campaign must not be able to silently become an official designated final. At the same time, the final campaign needs post-leader evidence rather than a retrospective collection of unrelated historical runs.
+
+### Decision
+
+Campaign manifests now declare `contract_status` as `confirmed` or `provisional`; only confirmed reports are eligible for `designate-final`. Run EXP-009B, EXP-009C, and EXP-009D as three sequential, single-vector frozen-ensemble confirmations from EXP-009A. Before executing, verify each BPR/history/temporal component checkpoint hash exactly matches EXP-009A's frozen ensemble artifact.
+
+### Why
+
+This preserves a real, immutable post-leader sequence and prevents an implementation convenience from bypassing a documented organizer-contract blocker. Single predeclared vectors avoid treating repeated validation feedback as an unrestricted ensemble search.
+
+### Consequences
+
+The resulting campaign may demonstrate provisional convergence and resource accounting, but no official final record can be designated until REQ-014 is resolved. A full campaign ledger retains all vectors, metrics, and zero-token policy provenance.
+
+### Related
+
+- Requirements: REQ-003, REQ-008, REQ-012, REQ-013, REQ-014, REQ-016, REQ-018
+- Tasks: T2-005
+- Experiments: EXP-009A, EXP-009B, EXP-009C, EXP-009D
+
 ## D004 - Retain experimental evidence
 
 Date: 2026-08-26

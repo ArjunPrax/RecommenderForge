@@ -83,8 +83,10 @@ def _load_campaign(path: str | Path) -> dict[str, Any]:
         raise CampaignEvidenceError(f"cannot read campaign configuration: {error}") from error
     if not isinstance(payload, dict):
         raise CampaignEvidenceError("campaign configuration must be a JSON object")
-    for field in ("campaign_id", "benchmark_id"):
+    for field in ("campaign_id", "benchmark_id", "contract_status"):
         _required_string(payload, field)
+    if payload["contract_status"] not in {"confirmed", "provisional"}:
+        raise CampaignEvidenceError("campaign contract_status must be 'confirmed' or 'provisional'")
     if not isinstance(payload.get("baseline_primary"), (int, float)):
         raise CampaignEvidenceError("campaign baseline_primary must be numeric")
     if not isinstance(payload.get("batches"), list) or not payload["batches"]:
@@ -174,6 +176,8 @@ def evaluate_campaign(path: str | Path) -> dict[str, Any]:
                 break
     return {
         "campaign_id": config["campaign_id"], "benchmark_id": config["benchmark_id"],
+        "contract_status": config["contract_status"],
+        "finalization_eligible": config["contract_status"] == "confirmed",
         "baseline_primary": status.baseline_primary, "epsilon": epsilon, "patience": patience,
         "converged": status.converged, "stagnation": status.stagnation,
         "significant_anchor": status.significant_anchor, "best_primary": status.best_primary,

@@ -26,6 +26,8 @@ def designate_final(*, campaign_report_path: str | Path, final_ledger_path: str 
         raise CampaignEvidenceError(f"cannot read campaign report: {error}") from error
     if campaign.get("converged") is not True:
         raise CampaignEvidenceError("cannot designate a final from an unconverged campaign")
+    if campaign.get("finalization_eligible") is not True:
+        raise CampaignEvidenceError("cannot designate a final while the benchmark contract remains provisional")
     source_ref = campaign.get("best_run")
     if not isinstance(source_ref, dict):
         raise CampaignEvidenceError("converged campaign has no eligible best run")

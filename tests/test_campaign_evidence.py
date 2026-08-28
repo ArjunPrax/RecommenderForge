@@ -41,7 +41,7 @@ class CampaignEvidenceTests(unittest.TestCase):
             for index, score in enumerate((0.601, 0.6015, 0.6014), start=1):
                 _ledger_with_run(root / f"run-{index}.sqlite", f"run-{index}", score)
             config = {
-                "campaign_id": "fixture", "benchmark_id": "kuairand-pure", "baseline_primary": 0.60,
+                "campaign_id": "fixture", "benchmark_id": "kuairand-pure", "contract_status": "confirmed", "baseline_primary": 0.60,
                 "epsilon": 0.002, "patience": 3,
                 "batches": [
                     {"batch_id": f"b{index}", "runs": [{"ledger": f"run-{index}.sqlite", "run_id": f"run-{index}"}]}
@@ -69,12 +69,30 @@ class CampaignEvidenceTests(unittest.TestCase):
             _ledger_with_run(root / "one.sqlite", "one", 0.61, evaluator="one")
             _ledger_with_run(root / "two.sqlite", "two", 0.62, evaluator="two")
             config = {
-                "campaign_id": "fixture", "benchmark_id": "kuairand-pure", "baseline_primary": 0.60,
+                "campaign_id": "fixture", "benchmark_id": "kuairand-pure", "contract_status": "confirmed", "baseline_primary": 0.60,
                 "batches": [{"batch_id": "b1", "runs": [{"ledger": "one.sqlite", "run_id": "one"}, {"ledger": "two.sqlite", "run_id": "two"}]}],
             }
             path = root / "campaign.json"; path.write_text(json.dumps(config), encoding="utf-8")
             with self.assertRaises(CampaignEvidenceError):
                 evaluate_campaign(path)
+
+    def test_provisional_contract_cannot_designate_final(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for index, score in enumerate((0.601, 0.6015, 0.6014), start=1):
+                _ledger_with_run(root / f"run-{index}.sqlite", f"run-{index}", score)
+            config = {
+                "campaign_id": "fixture", "benchmark_id": "kuairand-pure", "contract_status": "provisional",
+                "baseline_primary": 0.60, "epsilon": 0.002, "patience": 3,
+                "batches": [
+                    {"batch_id": f"b{index}", "runs": [{"ledger": f"run-{index}.sqlite", "run_id": f"run-{index}"}]}
+                    for index in range(1, 4)
+                ],
+            }
+            path = root / "campaign.json"; path.write_text(json.dumps(config), encoding="utf-8")
+            report_path = write_campaign_report(path, root / "report.json")
+            with self.assertRaises(CampaignEvidenceError):
+                designate_final(campaign_report_path=report_path, final_ledger_path=root / "final.sqlite")
 
 
 if __name__ == "__main__":
