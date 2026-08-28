@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - KuaiRand-27K official artifact preflight
+
+### Measured
+
+Verified the official 27K archive MD5 and streamed its four standard-log shards once. R016 records 136,296,576 train, 71,149,570 validation, and 114,832,239 feature-only test rows. This proves artifact availability and split integrity, not a model score; the bounded validation baseline is now running.
+
 ## 2026-08-28 - Top-five-aware Lambda-BPR result
 
 ### Measured

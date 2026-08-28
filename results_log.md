@@ -2,6 +2,20 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R016 - KuaiRand-27K official artifact preflight
+
+Date: 2026-08-28
+Experiment: EXP-011
+Implementation / commit: `4697247`
+
+### Dataset Integrity
+
+The official `KuaiRand-27K.tar.gz` archive was downloaded and verified against the published MD5 `3e3c799a24e2d23a4d2c757fbf9adf59`. One-pass source-order preflight (`one-pass-source-order-v2`) identified 136,296,576 train rows, 71,149,570 validation rows, and 114,832,239 test rows across the four official dated log shards. The feature-only test fingerprint is `9eabadd1f15369e681f34cbdbd83b0c309352b4d71fb050f005b771f4b0bf4c9`.
+
+### Interpretation
+
+The bonus artifact is available and its streaming split boundary is demonstrated. This is not a model metric or an organizer 27K benchmark result. The bounded validation baseline is running separately and no test `long_view` value was indexed, materialized, or scored.
+
 ## R015 - Top-five-aware Lambda-BPR result
 
 Date: 2026-08-28
