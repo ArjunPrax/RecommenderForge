@@ -10,7 +10,7 @@ Pure and scale submission writers now stream to sibling `.partial` files and ato
 
 ### Validation
 
-The scale output test confirms successful publication leaves no partial file. Full suite: 49 passing.
+The scale output test confirms successful publication leaves no partial file. The revalidated Pure campaign checkpoint also regenerated its real output through this path with no partial file and the same SHA-256 `60538bb…`. Full suite: 49 passing.
 
 ## 2026-08-28 - Converged provisional Pure campaign with data-identity repair
 

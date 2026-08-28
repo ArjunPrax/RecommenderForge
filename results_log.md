@@ -34,6 +34,8 @@ Relative to the recorded NumPy FM baseline `0.601572`, the revalidated leader is
 
 The four campaign records aggregate `26.65` CPU seconds, `0` GPU seconds, `0` LLM input/output tokens, and `0` manual interventions. They score only validation labels. The frozen EXP-009E manifest generated `artifacts/submissions/kuairand-pure-provisional-campaign-leader.csv`: `170,588` feature-only test rows plus header, SHA-256 `60538bb59c96547bfb3e8f90ff56d8c0b5b2e2002c38ba708ecf5e2dfe82a672`.
 
+After D027, the same frozen manifest regenerated that output through the atomic `.partial` publication path; the partial file was absent after completion and the output SHA-256 was unchanged.
+
 ### Limitation and decision
 
 This is a **provisional** campaign, not an official final: the PDF/Starter Kit target-and-metric conflict remains REQ-014. The campaign report sets `finalization_eligible=false`; a direct `designate-final` attempt was rejected before a final record could be created. Do not submit or describe this as beating an organizer benchmark until the organizer confirms the contract.
