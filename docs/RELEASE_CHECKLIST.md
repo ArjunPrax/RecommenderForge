@@ -4,18 +4,18 @@ Status: Human-gated external actions are intentionally unchecked. This checklist
 
 ## Technical evidence
 
-- [ ] Organizer clarification for REQ-014 recorded, or final report clearly retains the provisional contract.
-- [ ] KuaiRand-Pure campaign converged through `campaign-status` with a single evaluator identity.
+- [x] Final campaign report clearly retains the provisional contract and blocks finalization until REQ-014 is resolved.
+- [x] KuaiRand-Pure provisional campaign converged through `campaign-status` with a single evaluator and data identity.
 - [ ] `designate-final` created the immutable final record from that campaign.
 - [ ] `submission` generated the final Starter Kit schema output from the designated record.
-- [ ] KuaiRand-1K and KuaiRand-27K artifact status/results are recorded honestly.
-- [ ] Full test suite and `git diff --check` pass at the release commit.
-- [ ] Resource report states LLM input/output tokens and GPU-hours to convergence.
+- [x] KuaiRand-1K and KuaiRand-27K artifact status/results are recorded honestly.
+- [x] Full test suite and `git diff --check` pass at the current release-candidate commit.
+- [x] Provisional campaign report states LLM input/output tokens and GPU-hours to convergence.
 
 ## Documentation
 
-- [ ] README contains overview, setup, reproduction, limitations, and contributions.
-- [ ] `results_log.md` includes successes, regressions, failures/recovery, and final delta table.
+- [x] README contains overview, setup, reproduction, limitations, and contribution/provenance context.
+- [x] `results_log.md` includes successes, regressions, failures/recovery, and the provisional campaign delta table.
 - [ ] Devpost draft is updated with final measured evidence and submitted by a human.
 
 ## Human-authorized external actions
