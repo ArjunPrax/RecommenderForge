@@ -2,6 +2,16 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Strict-prior video×tab candidate-history lane
+
+### Changed
+
+Added EXP-016 as an independent BPR FM candidate. The new global video×tab long-view bucket is constructed strictly before each train event and then frozen after training for validation and feature-only submission. It is motivated by R018's scale result, not treated as a proxy or pre-accepted improvement.
+
+### Validation
+
+Added a synthetic strict-prior/frozen-evaluation test. The full suite has 45 passing tests. Five-seed validation is next; no result is claimed yet.
+
 ## 2026-08-28 - Frozen 27K item×tab blend selection
 
 ### Measured

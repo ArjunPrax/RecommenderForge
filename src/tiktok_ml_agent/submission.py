@@ -12,7 +12,7 @@ import numpy as np
 
 from .baseline_runner import encode_train_inference
 from .contracts import CheckpointManifest, hash_file
-from .history import prior_long_view_buckets
+from .history import prior_long_view_buckets, prior_video_tab_buckets
 from .kuairand import KuaiRandPureAdapter
 from .ledger import ExperimentLedger
 from .multitask_fm import MultiTaskFM
@@ -50,8 +50,12 @@ def _component_scores(manifest: CheckpointManifest, adapter: KuaiRandPureAdapter
     state: dict[str, Any] = torch.load(checkpoint, map_location="cpu", weights_only=False)
     history_cross = bool(state.get("history_cross", False))
     temporal_day_cross = bool(state.get("temporal_day_cross", False))
+    item_tab_history_cross = bool(state.get("item_tab_history_cross", False))
     if history_cross:
         train_history, test_history = prior_long_view_buckets(train, test)
+        matrix, dimension = encode_train_inference(train, test, extra_train=train_history, extra_inference=test_history)
+    elif item_tab_history_cross:
+        train_history, test_history = prior_video_tab_buckets(train, test)
         matrix, dimension = encode_train_inference(train, test, extra_train=train_history, extra_inference=test_history)
     elif temporal_day_cross:
         train_day = [f"weekday_{(row.date % 100 - 1) % 7}" for row in train]

@@ -397,6 +397,33 @@ It isolates one hyperparameter from model/data changes and preserves checkpoint 
 - Requirements: REQ-003, REQ-004, REQ-009, REQ-018
 - Experiments: EXP-015
 
+## D024 - Strict-prior video×tab candidate-history lane
+
+Date: 2026-08-28
+Status: Accepted
+
+### Context
+
+EXP-015's frozen 27K item×tab scale result provides a bounded, cross-variant indication that the visible candidate/tab interaction may be useful. KuaiRand-Pure's FM already receives raw video and tab fields, but it has not received an engagement-rate representation of their interaction.
+
+### Decision
+
+Evaluate one independent EXP-016 BPR candidate with a categorical global video×tab long-view bucket. Training rows receive the bucket computed before their own timestamp-ordered label update; validation and submission rows use the completed training-only state. This field is evaluated independently from user-history and weekday fields.
+
+### Why
+
+The feature varies across candidates within a user impression list, unlike a user-only first-order feature, while the strict-prior/frozen construction mechanically prevents validation or test-label leakage.
+
+### Consequences
+
+Five-seed validation is required before any promotion decision. EXP-016 remains a research result even if it improves validation; final metric-specific selection remains blocked by REQ-014.
+
+### Related
+
+- Requirements: REQ-003, REQ-004, REQ-009, REQ-018
+- Tasks: T2-005
+- Experiments: EXP-016, EXP-015
+
 ## D004 - Retain experimental evidence
 
 Date: 2026-08-26

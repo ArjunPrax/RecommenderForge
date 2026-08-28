@@ -233,6 +233,103 @@ def run_autonomous_history(
     return response
 
 
+def run_autonomous_item_tab_history(
+    *,
+    repository_root: str | Path,
+    starter_kit_dir: str | Path,
+    data_dir: str | Path,
+    parent_ledger_path: str | Path,
+    output_dir: str | Path,
+) -> dict[str, object]:
+    """Test a strict-prior, global video×tab history field from frozen BPR."""
+    parent_ledger = ExperimentLedger(parent_ledger_path)
+    try:
+        parent = next(
+            (run for run in parent_ledger.list_runs() if run["experiment_id"] == "EXP-004A" and run["status"] == "succeeded"),
+            None,
+        )
+    finally:
+        parent_ledger.close()
+    if parent is None or not parent.get("checkpoint_manifest"):
+        raise ValueError("video-tab research requires a succeeded EXP-004A parent with a checkpoint manifest")
+    parent_hash = parent["checkpoint_manifest"].get("checkpoint_sha256")
+    if not parent_hash:
+        raise ValueError("video-tab research parent is missing a checkpoint hash")
+    parent_prediction_path = Path(parent["checkpoint_manifest"]["checkpoint_path"]).with_suffix(".validation.npy")
+    if not parent_prediction_path.is_file():
+        raise ValueError("video-tab research parent validation predictions are unavailable for ordering audit")
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    benchmark = starter_kuairand_pure_spec(starter_kit_dir)
+    ledger = ExperimentLedger(output_dir / "ledger.sqlite")
+    knowledge = KnowledgeBase(
+        [
+            EvidenceCard(
+                evidence_id="KB-013",
+                title="Strictly-prior candidate video×tab history",
+                source="Interpretation - train-only candidate cross motivated by R018's bounded item×tab scale result",
+                claim="A global video×tab engagement bucket can change within-user ranking because it varies by candidate, provided it is strictly prior for training and frozen after training for evaluation.",
+                assumptions=("video ID and tab are present at inference", "only permitted training labels update the bucket"),
+                operator_families=(OperatorFamily.CANDIDATE_CROSS,),
+                applicability="Candidate-specific BPR FM extension after the frozen EXP-004A parent.",
+                risks=("target leakage if a row updates its own feature", "global buckets may be too sparse or redundant with FM item/tab fields"),
+            )
+        ]
+    )
+    context = PlannerContext(
+        goal="Test whether strictly-prior global video×tab history supplies a candidate-specific feature beyond BPR FM fields.",
+        experiment_ids=("EXP-016",),
+        run_class=RunClass.RESEARCH,
+        parent_run_id=parent["run_id"],
+        parent_checkpoint_sha256=str(parent_hash),
+        allowed_operator_families=(OperatorFamily.CANDIDATE_CROSS,),
+        allowed_paths=(),
+        token_budget=0,
+        compute_budget_seconds=1800,
+    )
+    planner = FixedPlanner(
+        {
+            "rationale": "Keep the BPR objective fixed and add one global candidate-specific history field. Its construction is strict-prior for train and train-frozen for validation/submission.",
+            "candidates": [
+                {
+                    "experiment_id": "EXP-016",
+                    "operator_family": "candidate_cross",
+                    "hypothesis": "Strictly-prior video×tab buckets improve BPR validation ranking beyond the frozen BPR parent.",
+                    "expected_mechanism": "the bucket varies across candidate video/tab pairs within a user list and is crossed by FM with the base fields.",
+                    "evidence_ids": ["KB-013"],
+                    "configuration": {
+                        "objective": "bpr",
+                        "item_tab_history_cross": True,
+                        "seeds": [0, 1, 2, 3, 4],
+                        "parent_validation_prediction_path": str(parent_prediction_path),
+                    },
+                    "controlled_variables": ["BPR loss", "FM optimizer", "train/validation split", "seed set"],
+                }
+            ],
+        }
+    )
+    plan = planner.plan(context, knowledge)
+    controller = ResearchController(benchmark, ledger)
+    records = controller.execute_batch(
+        plan.batch,
+        lambda candidate: execute_ranking_candidate(
+            candidate,
+            repository_root=repository_root,
+            starter_kit_dir=starter_kit_dir,
+            data_dir=data_dir,
+            artifact_root=output_dir / "artifacts",
+        ),
+    )
+    for record in records:
+        ledger.append_event(record.run_id, "planner_decision", {"rationale": plan.rationale, "provider": "fixed_offline_policy"})
+    converged = controller.observe_for_convergence(records)
+    snapshot = MemoryManager(ledger).consolidate()
+    report = write_report(ledger, output_dir / "report.md")
+    response = {"ledger": str(output_dir / "ledger.sqlite"), "report": str(report), "memory_snapshot": snapshot["snapshot_id"], "converged": converged, "runs": [record.run_id for record in records]}
+    ledger.close()
+    return response
+
+
 def run_autonomous_multitask(
     *,
     repository_root: str | Path,
