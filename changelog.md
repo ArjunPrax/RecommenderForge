@@ -2,6 +2,16 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Frozen scale-model output path
+
+### Changed
+
+Scale baselines can now persist their bounded hashed counter tables as `.npz` checkpoints and generate a streaming `row_id,user_id,video_id,score` output solely from that checkpoint. The first R018 run predates this safeguard and is not eligible as a final scale output; any designated scale result must be rerun with a model artifact.
+
+### Validation
+
+Added a controlled test for save/load equivalence and feature-only submission generation. Full suite: 43 passing.
+
 ## 2026-08-28 - Cross-variant item×tab robustness
 
 ### Measured

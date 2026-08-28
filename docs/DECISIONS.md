@@ -361,6 +361,24 @@ The item-only scale baseline cannot use a candidate's visible tab/context. The c
 - Requirements: REQ-003, REQ-004, REQ-008
 - Tasks: T2-006
 
+## D022 - Frozen scale models for feature-only outputs
+
+Date: 2026-08-28
+Status: Accepted
+
+### Decision
+
+Persist bounded hashed scale models after fitting and generate scale submissions only by loading that exact persisted artifact. The output streamer exposes test identifiers/features only and verifies sequential rows plus finite scores while writing.
+
+### Why
+
+Scale candidates must meet the same no-retrain final-output standard as Pure checkpoints. A transient terminal metric without its fitted table is not eligible for designation.
+
+### Related
+
+- Requirements: REQ-003, REQ-012, REQ-015, REQ-018
+- Tasks: T2-006
+
 ## D004 - Retain experimental evidence
 
 Date: 2026-08-26

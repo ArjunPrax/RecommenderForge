@@ -14,6 +14,7 @@ from pathlib import Path
 from time import perf_counter
 from typing import Protocol
 import csv
+import math
 import tempfile
 import zlib
 
@@ -82,6 +83,49 @@ class TabConditionedHashedPopularity:
         item_rate = self._rate(self.item_positives, self.item_totals, video_id)
         tab_rate = self._rate(self.item_tab_positives, self.item_tab_totals, f"{video_id}\x1f{tab or 'UNK'}")
         return self.item_weight * item_rate + (1 - self.item_weight) * tab_rate
+
+
+def save_scale_model(model: PopularityScorer, path: str | Path) -> Path:
+    """Persist a fitted bounded model so a submission never retrains it."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if isinstance(model, HashedStreamingPopularity):
+        np.savez(path, model_type="hashed_item", positives=model.positives, totals=model.totals, global_rate=model.global_rate, bits=model.bits)
+    elif isinstance(model, TabConditionedHashedPopularity):
+        np.savez(path, model_type="hashed_item_tab", item_positives=model.item_positives, item_totals=model.item_totals, item_tab_positives=model.item_tab_positives, item_tab_totals=model.item_tab_totals, global_rate=model.global_rate, bits=model.bits, item_weight=model.item_weight)
+    else:
+        raise ValueError("only bounded hashed scale models can be checkpointed for scalable submission")
+    return path
+
+
+def load_scale_model(path: str | Path) -> PopularityScorer:
+    """Load a bounded scale checkpoint without touching any data labels."""
+    with np.load(Path(path), allow_pickle=False) as archive:
+        model_type = str(archive["model_type"].item())
+        if model_type == "hashed_item":
+            return HashedStreamingPopularity(archive["positives"], archive["totals"], float(archive["global_rate"]), int(archive["bits"]))
+        if model_type == "hashed_item_tab":
+            return TabConditionedHashedPopularity(archive["item_positives"], archive["item_totals"], archive["item_tab_positives"], archive["item_tab_totals"], float(archive["global_rate"]), int(archive["bits"]), float(archive["item_weight"]))
+    raise ValueError("unrecognized scale model checkpoint")
+
+
+def generate_scale_submission(
+    *, model_path: str | Path, variant: str, data_dir: str | Path, output_path: str | Path,
+) -> dict[str, float | str]:
+    """Stream a feature-only starter-schema output from a frozen scale model."""
+    model_path = Path(model_path); model = load_scale_model(model_path)
+    adapter = ScaleArtifactAdapter(variant, Path(data_dir))
+    output_path = Path(output_path); output_path.parent.mkdir(parents=True, exist_ok=True)
+    rows = 0
+    with output_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle); writer.writerow(("row_id", "user_id", "video_id", "score"))
+        for row_id, row in enumerate(adapter.iter_rows("test", include_labels=False)):
+            score = float(model.score(str(row["video_id"]), str(row["tab"])))
+            if not math.isfinite(score):
+                raise ValueError(f"non-finite score at row {row_id}")
+            writer.writerow((row_id, row["user_id"], row["video_id"], score))
+            rows += 1
+    return {"output": str(output_path), "rows": float(rows), "model_sha256": hash_file(model_path)}
 
 
 def fit_streaming_popularity(adapter: ScaleArtifactAdapter) -> StreamingPopularity:
@@ -239,7 +283,8 @@ def run_streaming_popularity(
     scratch_dir: str | Path | None = None,
     feature_mode: str = "item",
     item_weight: float = 0.5,
-) -> dict[str, float]:
+    model_output: str | Path | None = None,
+) -> dict[str, float | str]:
     """Train on a stream and score only the official validation date range."""
     started = perf_counter(); scale = ScaleArtifactAdapter(variant, Path(data_dir))
     spec = BenchmarkSpec(benchmark_id=f"kuairand-{variant}", profile_id="provisional-long-view-gauc-ndcg5-v1", label="long_view", metrics=("GAUC", "nDCG@5", "primary"), evaluator_path=str(evaluator_path), evaluator_sha256=hash_file(evaluator_path), source_note="Interpretation - provisional starter evaluator applied to bonus artifact pending organizer contract.")
@@ -261,8 +306,14 @@ def run_streaming_popularity(
         model = fit_tab_conditioned_hashed_popularity(scale, bits=effective_bits, item_weight=item_weight)
         model_slots = float(2 * len(model.item_totals))
         model_hash_bits = float(effective_bits)
+    model_sha256: str | None = None
+    if model_output is not None:
+        checkpoint = save_scale_model(model, model_output)
+        model_sha256 = hash_file(checkpoint)
     metrics = _score_validation_sharded(
         adapter=scale, evaluator=evaluator, model=model, shards=shards, scratch_dir=scratch_dir,
     )
     metrics.update({"model_slots": model_slots, "model_hash_bits": model_hash_bits, "item_weight": float(item_weight), "wall_seconds": perf_counter() - started})
+    if model_sha256 is not None:
+        metrics["model_sha256"] = model_sha256
     return metrics

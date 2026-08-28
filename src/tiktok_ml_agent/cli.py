@@ -15,7 +15,7 @@ from .ranking_fm import RankingFMConfig, run_ranking_fm
 from .autonomous import run_autonomous_backbone, run_autonomous_ensemble, run_autonomous_history, run_autonomous_lambda_ranking, run_autonomous_multitask, run_autonomous_negative_sampling, run_autonomous_ranking, run_autonomous_temporal, run_autonomous_three_ensemble, run_autonomous_watchtime
 from .submission import generate_submission
 from .scale import ScaleArtifactAdapter, write_preflight
-from .scale_baseline import run_streaming_popularity
+from .scale_baseline import generate_scale_submission, run_streaming_popularity
 from .campaign import write_campaign_report
 from .finalization import designate_final
 
@@ -132,6 +132,12 @@ def main() -> None:
     scale_baseline.add_argument("--shards", type=int, default=256, help="number of user-consistent validation shards")
     scale_baseline.add_argument("--scratch-dir", type=Path, default=Path("artifacts/scale-scratch"), help="ignored temporary directory for sharded validation")
     scale_baseline.add_argument("--output", type=Path, help="optional JSON artifact for measured scale-baseline metrics")
+    scale_baseline.add_argument("--model-output", type=Path, help="optional frozen bounded model checkpoint for feature-only submission")
+    scale_submission = commands.add_parser("scale-submission", help="stream a feature-only scale submission from a frozen bounded model")
+    scale_submission.add_argument("--variant", choices=("1k", "27k"), required=True)
+    scale_submission.add_argument("--data-dir", type=Path, required=True)
+    scale_submission.add_argument("--model", type=Path, required=True)
+    scale_submission.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "qualification":
         print(json.dumps(run_qualification(args.output_dir), indent=2, sort_keys=True))
@@ -200,11 +206,13 @@ def main() -> None:
     elif args.command == "scale-preflight":
         print(write_preflight(ScaleArtifactAdapter(args.variant, args.data_dir), args.output))
     elif args.command == "scale-popularity":
-        result = run_streaming_popularity(variant=args.variant, data_dir=args.data_dir, evaluator_path=args.evaluator, hash_bits=args.hash_bits, shards=args.shards, scratch_dir=args.scratch_dir, feature_mode=args.feature_mode, item_weight=args.item_weight)
+        result = run_streaming_popularity(variant=args.variant, data_dir=args.data_dir, evaluator_path=args.evaluator, hash_bits=args.hash_bits, shards=args.shards, scratch_dir=args.scratch_dir, feature_mode=args.feature_mode, item_weight=args.item_weight, model_output=args.model_output)
         if args.output:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(result, indent=2, sort_keys=True), encoding="utf-8")
         print(json.dumps(result, indent=2, sort_keys=True))
+    elif args.command == "scale-submission":
+        print(json.dumps(generate_scale_submission(model_path=args.model, variant=args.variant, data_dir=args.data_dir, output_path=args.output), indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":
