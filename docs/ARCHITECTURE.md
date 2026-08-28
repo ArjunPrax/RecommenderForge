@@ -18,7 +18,7 @@ The project is an autonomous research control plane around organizer-supplied re
 - **Executor:** invokes a host-owned command factory in a disposable candidate worktree; candidate patches are path-scoped and must emit structured result JSON.
 - **Validator:** static checks, test-access policy, checkpoint checks, and organizer evaluator delegation.
 - **Ledger:** SQLite/JSON evidence with run class, hypothesis, diff/config/data/evaluator identity, metrics, reflection, failures, and resources.
-- **Controller:** deterministic candidate selection, recovery, convergence, checkpoint freezing, and report export.
+- **Controller:** deterministic candidate selection, POSIX main-thread wall-clock budget enforcement, recovery, convergence, checkpoint freezing, and report export.
 - **Campaign convergence:** evaluates epsilon/N over complete candidate batches across the campaign, rather than incorrectly treating siblings as sequential iterations.
 
 ## Data flow

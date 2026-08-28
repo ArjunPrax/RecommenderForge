@@ -424,6 +424,32 @@ Five-seed validation is required before any promotion decision. EXP-016 remains 
 - Tasks: T2-005
 - Experiments: EXP-016, EXP-015
 
+## D025 - Enforce planner wall-clock budgets
+
+Date: 2026-08-28
+Status: Accepted
+
+### Context
+
+The controller could classify a raised `TimeoutError`, but a planned compute budget did not interrupt a stalled in-process candidate. This left the runtime-recovery claim weaker than its ledger schema.
+
+### Decision
+
+On the main POSIX thread, wrap every candidate with its planner-supplied `compute_budget_seconds` in an interval-timer deadline. An expired or zero budget raises `TimeoutError`, is finalized as a recovered record, preserves partial artifacts, and allows sibling execution to continue. Non-POSIX or threaded hosts retain accounting/recovery but do not install a process-global signal handler.
+
+### Why
+
+The mechanism makes the candidate compute budget operational without introducing an unrestricted subprocess or weakening the immutable parent/recovery policy.
+
+### Consequences
+
+The qualification fixture records a controlled timeout recovery, and tests cover both an already-exhausted budget and interruption of an in-flight candidate. This is controller evidence; it is not a claim that an arbitrary external subprocess can be preempted.
+
+### Related
+
+- Requirements: REQ-006, REQ-009, REQ-013, REQ-019
+- Tasks: T2-004, T2-006
+
 ## D004 - Retain experimental evidence
 
 Date: 2026-08-26

@@ -2,6 +2,16 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Enforced candidate deadline and timeout recovery
+
+### Changed
+
+The controller now enforces each planner-provided compute budget with a main-thread POSIX wall-clock deadline. A timed-out candidate is finalized as recovered, with its recovery path and budget retained in the immutable record; later siblings can continue. Threaded/non-POSIX execution deliberately keeps accounting/recovery but does not install an unsafe process-global timer.
+
+### Validation
+
+Qualification now records a controlled timeout recovery alongside its existing generic failure. Unit coverage proves both exhausted-budget non-execution and interruption of a running candidate. Full suite: 47 passing.
+
 ## 2026-08-28 - EXP-016 video×tab candidate-history result
 
 ### Measured

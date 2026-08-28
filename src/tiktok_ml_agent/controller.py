@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from contextlib import contextmanager
 from hashlib import sha256
+import signal
+import threading
 from time import perf_counter
 from typing import Callable, Iterable, Protocol
 from uuid import uuid4
@@ -87,6 +90,40 @@ class RecoveryPolicy:
 Executor = Callable[[ExperimentSpec], ExecutionResult]
 
 
+@contextmanager
+def _candidate_wall_clock_limit(seconds: int | None):
+    """Interrupt a budgeted candidate on the main POSIX thread.
+
+    The planner supplies a wall-clock budget for every real research batch.
+    An expired budget fails as a normal ``TimeoutError`` so the controller
+    records its recovery action and continues with later sibling candidates.
+    Qualification and unit callers without a budget remain deterministic.
+    """
+    if seconds is None:
+        yield
+        return
+    if seconds <= 0:
+        raise TimeoutError("candidate compute budget was exhausted before execution")
+    if threading.current_thread() is not threading.main_thread() or not hasattr(signal, "setitimer"):
+        # Threaded/non-POSIX hosts retain accounting and exception recovery,
+        # but cannot safely install a process-global signal handler here.
+        yield
+        return
+    previous_handler = signal.getsignal(signal.SIGALRM)
+    previous_timer = signal.getitimer(signal.ITIMER_REAL)
+
+    def _raise_timeout(_signum: int, _frame: object) -> None:
+        raise TimeoutError(f"candidate exceeded its {seconds}-second compute budget")
+
+    signal.signal(signal.SIGALRM, _raise_timeout)
+    signal.setitimer(signal.ITIMER_REAL, float(seconds))
+    try:
+        yield
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, *previous_timer)
+        signal.signal(signal.SIGALRM, previous_handler)
+
+
 class RunAwareExecutor(Protocol):
     """Executor variant that needs the ledger run ID for isolated artifacts."""
 
@@ -122,10 +159,11 @@ class ResearchController:
             )
             started = perf_counter()
             try:
-                if hasattr(executor, "execute"):
-                    result = executor.execute(run_id, candidate)  # type: ignore[union-attr]
-                else:
-                    result = executor(candidate)
+                with _candidate_wall_clock_limit(candidate.compute_budget_seconds):
+                    if hasattr(executor, "execute"):
+                        result = executor.execute(run_id, candidate)  # type: ignore[union-attr]
+                    else:
+                        result = executor(candidate)
                 record.status = RunStatus.SUCCEEDED
                 record.metrics = result.metrics
                 record.diagnosis = result.diagnosis
@@ -146,6 +184,8 @@ class ResearchController:
                 record.error = f"{type(error).__name__}: {error}"
                 record.recovery = RecoveryPolicy.action_for(error)
                 record.resource_usage["wall_seconds"] = perf_counter() - started
+                if candidate.compute_budget_seconds is not None:
+                    record.diagnosis["compute_budget_seconds"] = candidate.compute_budget_seconds
                 self.ledger.append_event(
                     run_id,
                     "candidate_recovered",

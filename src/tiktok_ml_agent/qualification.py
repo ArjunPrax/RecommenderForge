@@ -169,6 +169,21 @@ def run_qualification(output_dir: str | Path) -> dict[str, str | bool | int]:
         ),
     )
     second_records = controller.execute_batch(second_batch, execute)
+    timeout_candidate = ExperimentSpec(
+        experiment_id="EXP-003",
+        run_class=RunClass.QUALIFICATION,
+        operator_family=OperatorFamily.HYPERPARAMETER,
+        hypothesis="An exhausted candidate budget must be recorded as a timeout recovery.",
+        expected_mechanism="The controller interrupts execution before an expired candidate can stall the batch.",
+        evidence_ids=("KB-001",),
+        configuration={"checkpoint_name": "timeout"},
+        compute_budget_seconds=0,
+    )
+    timeout_record = controller.execute_batch(
+        CandidateBatch("qualification-timeout", None, None, (timeout_candidate,)), execute
+    )[0]
+    if timeout_record.status.value != "recovered" or timeout_record.recovery != "terminate_stalled_candidate_and_return_to_parent":
+        raise RuntimeError("qualification timeout recovery was not recorded")
     rehearsal = ConvergenceTracker(spec.epsilon, spec.patience)
     converged = False
     for record in [*first_records, *second_records]:

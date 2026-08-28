@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import tempfile
+import signal
+import time
 import unittest
 from pathlib import Path
 
@@ -55,4 +57,48 @@ class ControllerTests(unittest.TestCase):
             executor = Executor()
             record = controller.execute_batch(CandidateBatch("batch", None, None, (candidate,)), executor)[0]
             self.assertEqual(executor.seen, (record.run_id, "EXP-003"))
+            ledger.close()
+
+    def test_exhausted_budget_recovers_without_invoking_candidate(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            ledger = ExperimentLedger(Path(directory) / "ledger.sqlite")
+            controller = ResearchController(BenchmarkSpec("fixture", "v1", "label", ("primary",)), ledger)
+            candidate = ExperimentSpec(
+                "EXP-003", RunClass.QUALIFICATION, OperatorFamily.HYPERPARAMETER,
+                "times out", "deadline stops execution", compute_budget_seconds=0,
+            )
+            invoked = False
+
+            def executor(_candidate):
+                nonlocal invoked
+                invoked = True
+                return ExecutionResult(metrics={"primary": 0.6})
+
+            record = controller.execute_batch(CandidateBatch("batch", None, None, (candidate,)), executor)[0]
+            self.assertFalse(invoked)
+            self.assertEqual(record.status.value, "recovered")
+            self.assertEqual(record.recovery, "terminate_stalled_candidate_and_return_to_parent")
+            self.assertEqual(record.diagnosis["compute_budget_seconds"], 0)
+            ledger.close()
+
+    @unittest.skipUnless(hasattr(signal, "setitimer"), "requires POSIX interval timers")
+    def test_wall_clock_budget_interrupts_running_candidate(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            ledger = ExperimentLedger(Path(directory) / "ledger.sqlite")
+            controller = ResearchController(BenchmarkSpec("fixture", "v1", "label", ("primary",)), ledger)
+            candidate = ExperimentSpec(
+                "EXP-003", RunClass.QUALIFICATION, OperatorFamily.HYPERPARAMETER,
+                "times out", "wall-clock deadline interrupts execution", compute_budget_seconds=1,
+            )
+
+            def executor(_candidate):
+                time.sleep(2)
+                return ExecutionResult(metrics={"primary": 0.6})
+
+            started = time.monotonic()
+            record = controller.execute_batch(CandidateBatch("batch", None, None, (candidate,)), executor)[0]
+            self.assertLess(time.monotonic() - started, 1.5)
+            self.assertEqual(record.status.value, "recovered")
+            self.assertIn("TimeoutError", record.error or "")
+            self.assertEqual(record.recovery, "terminate_stalled_candidate_and_return_to_parent")
             ledger.close()
