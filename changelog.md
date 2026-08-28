@@ -2,6 +2,12 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-28 - Persistent scale-baseline metric artifacts
+
+### Changed
+
+Added `--output` to `scale-popularity`, which writes its measured JSON metrics atomically after the full bounded validation run. A first 27K invocation completed but its terminal-only JSON was unavailable after the runner's time limit; it is deliberately not recorded as a result. The repeat run will persist the evidence artifact.
+
 ## 2026-08-28 - KuaiRand-27K official artifact preflight
 
 ### Measured
