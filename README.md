@@ -1,6 +1,6 @@
 # TikTok TechJam 2026 - Track 2
 
-Autonomous ML research agent for TikTok TechJam 2026 Track 2. The project has a measured, converged **provisional** KuaiRand-Pure campaign; organizer metric clarification and human release actions remain outstanding.
+Autonomous ML research agent for TikTok TechJam 2026 Track 2. The project has a measured, converged **team-interpreted** KuaiRand-Pure campaign, an immutable designated-final record, and a schema-valid feature-only output. It does not claim organizer confirmation or a hidden-test result.
 
 The project will address the official Track 2 challenge: an autonomous ML research agent for recommender systems. Exact organizer wording, requirements, and unresolved source conflicts are in [docs/PROBLEM.md](docs/PROBLEM.md) and [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md).
 
@@ -23,7 +23,7 @@ For the large official artifact, the scale baseline is deliberately bounded-memo
 
 The agent reproduces the organizer KuaiRand-Pure baseline, proposes bounded research candidates, executes each candidate in an isolated worktree, evaluates only permitted validation data, recovers from failures, records complete evidence, and freezes the exact validation-best checkpoint for output generation. It also enforces candidate deadlines, common evaluator/data identities in campaigns, and atomic output publication.
 
-The official PDF currently conflicts over the target/metrics. The supplied starter-kit evaluator is the provisional executable contract; see [docs/PROBLEM.md](docs/PROBLEM.md), [docs/DECISIONS.md](docs/DECISIONS.md), and the ready-to-send [organizer questions](docs/ORGANIZER_CLARIFICATION_EMAIL.md).
+The official PDF conflicts over the target/metrics. **Interpretation - not explicit organizer wording:** D029 uses the detailed Starter Kit as the pinned execution contract (`long_view`, GAUC, nDCG@5); D031 distinguishes this team interpretation from organizer confirmation. Any corrected evaluator is a new incompatible profile that must be rerun. See [docs/PROBLEM.md](docs/PROBLEM.md) and [docs/DECISIONS.md](docs/DECISIONS.md).
 
 The revalidated provisional campaign leader has validation primary `0.604017` against reproduced baseline `0.601572` (+`0.002445`). This is not a hidden-test or official leaderboard claim; complete evidence is in [results_log.md](results_log.md#r023---revalidated-converged-provisional-pure-campaign).
 
@@ -34,11 +34,16 @@ The revalidated provisional campaign leader has validation primary `0.604017` ag
 .venv/bin/python -m tiktok_ml_agent qualification
 .venv/bin/python -m tiktok_ml_agent baseline-valid
 .venv/bin/python -m tiktok_ml_agent autonomous-ranking
-.venv/bin/python -m tiktok_ml_agent campaign-status --campaign experiments/kuairand-pure-provisional-campaign.json --output artifacts/campaigns/kuairand-pure-provisional-v1.json
-.venv/bin/python -m tiktok_ml_agent submission --ledger artifacts/autonomous-ensemble-revalidation/ledger.sqlite --run-id exp-009e-367544f3516d --output artifacts/submissions/kuairand-pure-provisional-campaign-leader.csv
+.venv/bin/python -m tiktok_ml_agent campaign-status --campaign experiments/kuairand-pure-team-interpreted-campaign.json --output artifacts/campaigns/kuairand-pure-team-interpreted-v1.json
+.venv/bin/python -m tiktok_ml_agent designate-final --campaign-report artifacts/campaigns/kuairand-pure-team-interpreted-v1.json --final-ledger artifacts/finals/kuairand-pure-team-interpreted.sqlite
+.venv/bin/python -m tiktok_ml_agent submission --ledger artifacts/finals/kuairand-pure-team-interpreted.sqlite --run-id final-07eadac3e123 --output artifacts/submissions/kuairand-pure-team-interpreted-final.csv
 ```
 
-All development commands are validation-only. `submission` reconstructs a measured frozen checkpoint and validates row alignment; it does not score local test labels. `designate-final` intentionally rejects the included campaign until the organizer contract is confirmed.
+All development commands are validation-only. `submission` reconstructs a measured frozen checkpoint and validates row alignment; it does not score local test labels. `designate-final` rejects a `provisional` campaign, and records `team_interpreted` separately from organizer-`confirmed` designation.
+
+## Contributions
+
+The team designed the benchmark contract and delivery direction. Codex implemented and verified the safety controls, autonomous research workflow, model experiments, large-scale recovery, immutable artifact chain, and documentation. The repository history preserves the contribution-level evidence for review.
 
 ## Start here
 

@@ -2,6 +2,39 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R027 - Team-interpreted designated final and checkpoint-backed output
+
+Date: 2026-08-29
+Campaign: `kuairand-pure-team-interpreted-ensemble-v1`
+Implementation / commit: `1b6e3d6`
+Status: **Interpretation - not explicit organizer wording: team-interpreted, not organizer-confirmed.**
+
+### Purpose
+
+Complete the converged internal campaign → designation → output chain under D029/D031 without changing the model, retraining it, accessing test labels, or claiming a hidden-test score.
+
+### Campaign and designation evidence
+
+`campaign-status` evaluated the four declared R023 batches under one evaluator SHA-256 `ecfde283…d195de` and one data fingerprint `37d896c3…342fc4`. It remained converged with best run `exp-009e-367544f3516d` at primary `0.6040165329754438` (GAUC `0.6708446078630199`, nDCG@5 `0.5371884580878676`).
+
+`designate-final` created immutable run `final-07eadac3e123` in `artifacts/finals/kuairand-pure-team-interpreted.sqlite`. Its diagnosis and finalization event both store `designation_status="team_interpreted"`; its parent is exactly the campaign best run and its frozen checkpoint SHA-256 is `85bc25dbb1469ab043896b4f3872a295521908f85a1794db747b446399921c2f`.
+
+### Output validation
+
+`submission` loaded that designated record's frozen checkpoint and generated `artifacts/submissions/kuairand-pure-team-interpreted-final.csv` without retraining. The adapter validated the Starter Kit row alignment and finite scores. The output has `170,589` lines (one header plus `170,588` test rows) and SHA-256 `60538bb59c96547bfb3e8f90ff56d8c0b5b2e2002c38ba708ecf5e2dfe82a672`.
+
+### Resource and integrity statement
+
+The campaign resource report aggregates `0` LLM input tokens, `0` LLM output tokens, and `0` GPU-hours; those are measured values for the deterministic offline-planner campaign, not omitted measurements. The output path accepts feature-only test rows and does not invoke test scoring. All score values here are validation-only under the Starter-Kit-pinned profile.
+
+### Limitation
+
+This is ready for human release review, but it is neither an official organizer submission nor evidence of hidden-test improvement. If organizers provide a corrected benchmark evaluator, the contract changes and affected campaign evidence must be rerun rather than compared across hashes.
+
+### Reproduction
+
+`.venv/bin/python -m tiktok_ml_agent campaign-status --campaign experiments/kuairand-pure-team-interpreted-campaign.json --output artifacts/campaigns/kuairand-pure-team-interpreted-v1.json && .venv/bin/python -m tiktok_ml_agent designate-final --campaign-report artifacts/campaigns/kuairand-pure-team-interpreted-v1.json --final-ledger artifacts/finals/kuairand-pure-team-interpreted.sqlite && .venv/bin/python -m tiktok_ml_agent submission --ledger artifacts/finals/kuairand-pure-team-interpreted.sqlite --run-id final-07eadac3e123 --output artifacts/submissions/kuairand-pure-team-interpreted-final.csv`
+
 ## R026 - Strict-prior user×author affinity BPR result
 
 Date: 2026-08-29

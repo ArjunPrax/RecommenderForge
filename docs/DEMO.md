@@ -49,7 +49,7 @@ The checkpoint-parented history-cross continuation is:
 
 ## Demonstrated output
 
-The qualification workflow records a controlled failure and enforced deadline recovery. The Pure campaign records a revalidated leader, three post-leader confirmations, data/evaluator identities, resource totals, and a feature-only output from the frozen leader. The contract remains provisional, so the demo must not call this an official submission.
+The qualification workflow records a controlled failure and enforced deadline recovery. The Pure campaign records a revalidated leader, three post-leader confirmations, data/evaluator identities, resource totals, a team-interpreted designated-final record, and a feature-only output from the frozen leader. The demo must not call this an organizer-confirmed or hidden-test submission.
 
 ## Recovery plan
 

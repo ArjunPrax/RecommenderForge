@@ -2,6 +2,24 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-29 - Team-interpreted final designation and output chain
+
+### Changed
+
+D031 adds an explicit `team_interpreted` campaign status between fail-closed `provisional` and organizer-`confirmed`. A team-interpreted campaign may bind its converged frozen checkpoint, but the status is retained in the campaign report, final record, ledger event, and CLI response. `provisional` remains ineligible; no code path turns a team interpretation into organizer confirmation.
+
+### Measured
+
+R027 materialized the team-interpreted report, designated `final-07eadac3e123` from the exact converged EXP-009E checkpoint, and generated a 170,588-row feature-only Starter Kit output. Its SHA-256 is `60538bb59c96547bfb3e8f90ff56d8c0b5b2e2002c38ba708ecf5e2dfe82a672`; it matches the existing frozen-leader output. No retraining, test-label access, or test scoring occurred.
+
+### Validation
+
+The suite passes 67 tests, including a new test proving that `team_interpreted` is retained in the designated-final diagnosis while `provisional` still fails closed. README, Devpost draft, demo, requirements, and release checklist now distinguish internal completion from organizer confirmation and human publication/submission.
+
+### Related
+
+Task: T2-008. Decisions: D029, D031. Result: R027. Requirements: REQ-001, REQ-003, REQ-008, REQ-012–REQ-019.
+
 ## 2026-08-29 - EXP-018 strict-prior user-author affinity candidate
 
 ### Changed
