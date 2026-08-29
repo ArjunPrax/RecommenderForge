@@ -123,7 +123,7 @@ Definition of done: Measured multi-seed results, mechanism-aware reflections, an
 ### T2-006 - KuaiRand-1K and 27K adaptation
 
 Owner: Codex + Claude
-Status: IN_PROGRESS
+Status: REVIEW
 Priority: High
 Depends on: organizer artifact contract, T2-004, T2-005
 
@@ -133,4 +133,4 @@ Relevant requirements: REQ-004, REQ-008, REQ-012, REQ-013
 
 Definition of done: Official artifacts available; baseline, scalable training, recovery, and output validation complete.
 
-Notes: KuaiRand-1K and KuaiRand-27K official archives are checksum-verified. R012 records the 1K baseline; R016–R021 record 27K preflight, bounded baseline, item×tab improvement, frozen rescore, and checkpoint-backed feature-only output. Scale recovery/final campaign designation remain release work, not completed claims.
+Notes: KuaiRand-1K and KuaiRand-27K official archives are checksum-verified. R012 records the 1K baseline; R016–R021 record 27K preflight, bounded baseline, item×tab improvement, frozen rescore, and checkpoint-backed feature-only output. R024–R025 demonstrate full 27K validation and output interruption/resume equivalence, including real torn-write truncation and matching full-output SHA-256. D029 permits continued execution under the Starter-Kit-pinned contract. T2-006's implementation definition of done is met and awaits branch review/integration.

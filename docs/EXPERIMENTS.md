@@ -20,6 +20,7 @@ Plan experiments here; measured outcomes belong in `results_log.md`. IDs are sta
 | EXP-014 | Top-five-aware Lambda-BPR mixture | Measured; R015 rejects the fixed 50/50 mixture |
 | EXP-015 | Bounded item×tab popularity scale candidate | Checkpointed 27K validation/output chain and frozen 3-weight grid demonstrated; R018–R021 |
 | EXP-016 | Strict-prior video×tab candidate-history cross | Measured; R022 rejects it against the BPR parent while retaining its integrity evidence. |
+| EXP-017 | Resumable, identity-gated 27K scale validation and output | Robustness capability, not a metric change; full-artifact validation and output interruption→resume equivalence, torn-write truncation, and mismatch rejection measured in R024–R025. |
 | EXP-018 | Strict-prior user×author affinity candidate cross | Measured; R026 improves BPR but does not displace the frozen R023 leader. |
 
 ## EXP-XXX - Experiment title

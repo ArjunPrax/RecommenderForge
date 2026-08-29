@@ -499,6 +499,69 @@ It preserves the required frozen-checkpoint provenance while making failed long 
 - Requirements: REQ-006, REQ-012, REQ-015, REQ-018
 - Tasks: T2-004, T2-006
 
+## D028 - Identity-gated resumable scale processing
+
+Date: 2026-08-28
+Status: Accepted
+
+### Context
+
+The 27K passes are long: validation streams 71,149,570 rows and feature-only output generation writes 114,832,239 rows. An interruption previously discarded the entire pass. Naive resumption is worse than restarting, because silently continuing a run whose model, data, evaluator, configuration, or destination has changed would produce an artifact that no single identity explains.
+
+### Decision
+
+Long scale validation and scale output generation persist progress beside their artifact and resume only when every one of the following still matches the stored record: frozen model SHA-256, caller-supplied data fingerprint, organizer evaluator SHA-256, canonical configuration hash, resolved output target, split, variant, and a structural signature of the exact source log files. Any difference raises `ScaleResumeMismatch` instead of resuming. Resume never widens data access: validation reads only the `valid` split and output generation requests feature-only rows.
+
+Progress state is published atomically. Output resumption truncates the `.partial` file to the last recorded byte boundary and verifies the recorded content digest before appending, so bytes written after the last checkpoint by a torn write are discarded rather than blended into the artifact. Validation shard scratch is verified by recorded byte length only: it is internal, append-only, and fully reconstructible, whereas the published output receives the stronger content check.
+
+### Why
+
+It makes an interrupted 27K pass recoverable without weakening the frozen-identity guarantee that makes the resulting artifact meaningful. A resumed run either reproduces the uninterrupted result exactly or refuses to start.
+
+### Alternatives Considered
+
+Restarting from zero on every interruption, which wastes the whole pass; resuming on row count alone, which cannot detect a changed model, evaluator, or source; and hashing all shard scratch at every checkpoint, whose cost grows with the run it is meant to protect.
+
+### Consequences
+
+Atomic publication is unchanged: the final path is still replaced only after every row is written. A completed, identity-matching record is reused rather than recomputed. The structural source signature is name/size/mtime, not a content hash, so the strong data identity remains the caller-supplied preflight fingerprint; this is stated in the code and must not be described as a cryptographic guarantee over 46 GB of logs.
+
+### Related
+
+- Requirements: REQ-006, REQ-012, REQ-018
+- Tasks: T2-006
+- Experiments: EXP-017
+- Decisions: extends D027 (atomic publication) and D022 (frozen scale models)
+
+## D029 - Starter-Kit-pinned execution contract while organizer response is absent
+
+Date: 2026-08-29
+Status: Accepted
+
+### Context
+
+The current official PDF contains contradictory narrative descriptions of the KuaiRand target and metrics. Its Starter Kit section is nevertheless specific: it calls the supplied Factorization Machine the official baseline, names `evaluate.py` as the exact scoring code, and pins `long_view`, GAUC, nDCG@5, epsilon=`0.002`, N=`3`, and the submission schema. The PDF also says the exact label definition and K values are pinned in the Starter Kit.
+
+### Decision
+
+**Interpretation - not explicit organizer wording:** execute, validate, and generate all internal artifacts against the versioned Starter Kit contract (`long_view`, GAUC, nDCG@5, epsilon=`0.002`, N=`3`, `row_id,user_id,video_id,score`). Continue the required Pure campaign and both bonus attempts rather than waiting for an email response.
+
+This does not relabel the contract as organizer-confirmed. Results and public materials must continue to say “Starter-Kit-pinned execution contract”; no result may be represented as an official NDCG@10/Recall@50 outcome without a corrected organizer evaluator.
+
+### Why
+
+This follows the most executable and detailed part of the official source, keeps all work reproducible, and avoids pausing the autonomous-research evidence trail over an ambiguity that does not prevent safe implementation.
+
+### Consequences
+
+REQ-014 is no longer an implementation blocker. It remains a reporting caveat: if organizers supply a new evaluator, it receives a new hash and results are rerun rather than compared across contracts. The finalization gate remains conservative until the team performs a release review against the then-current official materials.
+
+### Related
+
+- Requirements: REQ-002, REQ-008, REQ-014, REQ-015, REQ-016, REQ-018
+- Tasks: T2-005, T2-006
+- Decisions: D007, D026, D028
+
 ## D030 - Strict-prior user-author affinity candidate lane
 
 Date: 2026-08-29
@@ -506,11 +569,11 @@ Status: Accepted
 
 ### Context
 
-The base BPR FM has user, video, author, tab, and duration fields, but its tested history feature has only represented global user engagement. A user-author history can vary across candidate videos within a user’s ranking list, making it a valid personalised ranking feature if it does not consume validation or test labels.
+The base BPR FM has user, video, author, tab, and duration fields, but its tested history feature has only represented global user engagement. A user-author history can vary across candidate videos within a user's ranking list, making it a valid personalised feature if it does not consume validation or test labels.
 
 ### Decision
 
-Evaluate EXP-018 as one independent five-seed BPR candidate. Each training row receives the `(user_id, author_id)` long-view bucket from strictly earlier training events before its own label updates state. Validation and feature-only submission rows use only the completed training state. The feature is evaluated independently from all other optional history/temporal fields, and a runtime ordering audit must show that it changes within-user validation relations before its metric can be considered.
+Evaluate EXP-018 as one independent five-seed BPR candidate. Each training row receives the `(user_id, author_id)` long-view bucket from strictly earlier training events before its own label updates state. Validation and feature-only submission rows use the completed training state only. The feature is evaluated independently from all other optional history/temporal fields, and a runtime ordering audit must show that it changes within-user validation relations before its metric can be considered.
 
 ### Why
 
@@ -518,13 +581,14 @@ This tests a candidate-specific personal-affinity mechanism that the existing us
 
 ### Consequences
 
-The result will be retained whether it improves or regresses. It cannot be promoted on a single seed; its five-seed mean is compared against R003 BPR and may become an ensemble component only after immutable checkpoint/prediction provenance is recorded.
+The result is retained whether it improves or regresses. It cannot be promoted on a single seed; its five-seed mean is compared against R003 BPR and may become an ensemble component only after immutable checkpoint/prediction provenance is recorded.
 
 ### Related
 
 - Requirements: REQ-003, REQ-004, REQ-009, REQ-018
 - Tasks: T2-005
 - Experiments: EXP-018, EXP-004A
+
 
 ## D004 - Retain experimental evidence
 

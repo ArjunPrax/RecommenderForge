@@ -10,7 +10,7 @@ The project is an autonomous research control plane around organizer-supplied re
 
 - **Benchmark contract and adapter:** data partitions, evaluator path/hash, submission schema, hidden-test policy.
 - **Scale adapter:** streams official 1K/27K logs, uses bounded item statistics and user-consistent validation shards, and never exposes bonus-test labels.
-- **Scale checkpoint/output:** persists fitted bounded counters and streams feature-only scale-schema outputs from those exact counters; it never refits during submission.
+- **Scale checkpoint/output:** persists fitted bounded counters and streams feature-only scale-schema outputs from those exact counters; it never refits during submission. Long scale validation and output generation checkpoint progress and resume only under an identical frozen run identity.
 - **Train-only auxiliary channel:** can expose organizer outcomes such as watch completion only to a training candidate; validation/test records cannot carry those fields.
 - **Research knowledge base:** structured evidence cards for papers, organizer guidance, and measured findings.
 - **Memory manager:** bounded planner context distilled from, but never replacing, the append-only ledger.
@@ -42,6 +42,7 @@ BenchmarkSpec + KnowledgeBase + MemorySnapshot
 - `EvidenceCard` and `MemorySnapshot`: retrievable research evidence and bounded planner state.
 - `campaign-status`: materializes an auditable convergence/resource report from explicit cross-ledger run references; it refuses mixed evaluators and post-convergence continuation.
 - `designate-final`: creates a new immutable final record only from a converged campaign's verified existing checkpoint; it then feeds the feature-only output generator without retraining.
+- `scale-resume-validation` / `scale-resume-submission`: CLI entry points for identity-gated recovery. They require the frozen model, preflight data fingerprint, persisted state path, and versioned evaluator identity; the submission command never scores or reads test labels.
 
 ## Execution environment
 
@@ -65,7 +66,7 @@ Use the organizer evaluator for any official validation score. Inner development
 
 ## Known tradeoffs
 
-- The starter evaluator is provisional due to the organizer conflict.
+- **Interpretation - not explicit organizer wording:** the Starter Kit is the team’s pinned execution contract (D029), while any organizer correction is a new incompatible evaluator profile.
 - Bounded operator taxonomy improves safety and comparability, but `novel` preserves exploration.
 - Working-memory summaries reduce token growth; the original ledger remains retrievable.
 - Full-fidelity Pure evaluation is preferred over unvalidated small-data pruning.

@@ -19,6 +19,63 @@ The full suite passed 50 tests before the real run, including a new strict-prior
 ### Related
 
 Task: T2-005. Decision: D030. Experiment: EXP-018. Result: R026. Requirements: REQ-003, REQ-004, REQ-009, REQ-018.
+## 2026-08-29 - Starter-Kit-pinned execution contract and completed real 27K output recovery
+
+### Decision and changed interface
+
+The official PDF's Starter Kit section provides the exact executable evaluator, baseline, label, metrics, convergence rule, and submission schema, despite contradictory narrative pages. D029 therefore records the team’s **Interpretation - not explicit organizer wording**: continue on the versioned Starter-Kit-pinned `long_view` / GAUC / nDCG@5 contract rather than pause implementation. This is not an organizer confirmation; any corrected evaluator is a new incompatible profile that must be rerun.
+
+Added normal CLI routes for Claude’s existing identity-gated implementation: `scale-resume-validation` and `scale-resume-submission`. Both require a frozen model, preflight data fingerprint, persisted state, and evaluator identity. The output route remains feature-only and does not score the test split.
+
+### Measured
+
+R025 deliberately interrupted a real 27K output run after a persisted checkpoint, leaving an uncheckpointed tail. Resumption started from row `16,000,000`, truncated and digest-verified the partial prefix, wrote all `114,832,239` rows, and atomically published a `4,957,087,059`-byte CSV. Its full SHA-256 exactly equals R020’s uninterrupted output: `c4e95a9702ffc61dbbf5e2a369d3902df7945d40efb033a4c9ad2caaac37fcc5`. No `.partial` artifact remained.
+
+### Validation and status
+
+CLI help was exercised and the full suite passes: 65 tests. T2-006 now meets its implementation definition of done and is in review pending integration; it makes no hidden-test or official bonus-score claim.
+
+### Related
+
+Task: T2-006. Decisions: D028, D029. Experiment: EXP-017. Results: R024, R025. Requirements: REQ-006, REQ-008, REQ-012, REQ-014, REQ-018.
+
+## 2026-08-28 - Resumable, identity-gated 27K scale processing
+
+### Changed
+
+Long KuaiRand-27K passes are now recoverable. `score_scale_validation_resumable` and `generate_scale_submission_resumable` checkpoint progress beside their artifact and resume from the last boundary, but only when the frozen model SHA-256, caller-supplied data fingerprint, organizer evaluator SHA-256, canonical configuration hash, resolved output target, split, variant, and a structural signature of the source logs all still match. Any difference raises `ScaleResumeMismatch` naming the differing fields rather than resuming.
+
+Output resumption truncates the sibling `.partial` file to the last recorded byte boundary and verifies the recorded digest before appending, so bytes from a torn write are discarded instead of being blended into the artifact. Atomic publication is unchanged: the final path is still replaced only after the last row. The cross-shard aggregation was extracted into one `_ShardAccumulator` shared by the existing and resumable validation paths, so the documented weighting has a single implementation.
+
+### Measured
+
+Resumed a real interrupted 27K validation. The frozen R020 model was interrupted at 30,000,000 of 71,149,570 rows, then resumed to GAUC `0.574100`, nDCG@5 `0.599412`, primary `0.586756` - identical to the uninterrupted R018/R020 figures, and produced by a different code path. A wrong data fingerprint was refused on the same real run. See R024.
+
+### Validation
+
+65 tests pass (49 before, 16 added). New coverage: interruption-to-resume equivalence for output generation and for both validation stages, discarding bytes written after the last checkpoint, reuse of a completed record without re-reading data, `resume=False` restart, agreement with the unsharded organizer evaluator, spy assertions that neither entry point requests the `test` split with labels, and six mismatch-rejection paths asserting the exact differing-field set.
+
+### Known limitations
+
+Resumed **output** generation at 27K scale is **Not yet demonstrated** on the real artifact; only validation was run end to end. The structural source signature is name/size/mtime, not a content hash over 46 GB, so the strong data identity stays the preflight fingerprint. This is provisional-contract evidence, not an organizer 27K comparison.
+
+### Files
+
+`src/tiktok_ml_agent/scale_baseline.py`, `tests/test_scale_baseline.py`, `docs/DECISIONS.md`, `docs/EXPERIMENTS.md`, `results_log.md`, `changelog.md`.
+
+### Related
+
+Task: T2-006. Decision: D028 (extends D027, D022). Experiment: EXP-017. Result: R024. Requirements: REQ-006, REQ-012, REQ-018.
+
+### Handoff Notes
+
+Two things for the next owner.
+
+First, a resource-accounting caveat found while measuring: `wall_seconds` in every scale result is `time.perf_counter`, which resolves to `mach_absolute_time()` on macOS and does not advance while the system sleeps. The resumed run reported `241.64` active seconds against `11,064.5` elapsed seconds because the machine slept mid-run. R018's `526.90` and R020's `523.55` carry the same definition. Since resource use is a judged deliverable, decide deliberately whether reported timings should be active-process or elapsed time, and label them accordingly. Nothing was renamed here: the same pattern lives in modules outside this task's file scope.
+
+Second, `docs/WORKBOARD.md` lists T2-006 as Codex-owned while `CLAUDE.md` assigns scale adaptations to Claude. This branch proceeded on explicit human instruction, which outranks the workboard under the `AGENTS.md` precedence order, and the workboard was left untouched because it is outside this task's file scope. The owning task should reconcile the row.
+
+Committed on `divija-T2-006-scale-resume`; not pushed and not merged.
 
 ## 2026-08-28 - Release-facing documentation refresh and provenance declaration
 

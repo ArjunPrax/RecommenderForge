@@ -46,6 +46,92 @@ This is validation-only evidence under the Starter-Kit-pinned execution contract
 ### Reproduction
 
 `.venv/bin/python -m tiktok_ml_agent autonomous-user-author-history --repository-root . --starter-kit kuairand-starter-kit --data-dir kuairand-starter-kit/KuaiRand-Pure/data --parent-ledger artifacts/autonomous-ranking-verified/ledger.sqlite --output-dir artifacts/autonomous-user-author-history`
+## R025 - Interrupted KuaiRand-27K output resumes to the identical published artifact
+
+Date: 2026-08-29
+Experiment: EXP-017
+Implementation: `divija-T2-006-scale-resume`
+Environment: CPython 3.13.11, NumPy 2.5.2, Apple M4 Pro, CPU only.
+
+### Question
+
+Can the full 114,832,239-row feature-only 27K output survive a real interruption, discard bytes written after its last checkpoint, and resume to the exact artifact produced by the uninterrupted R020 chain?
+
+### Procedure
+
+Used the R020 frozen item×tab model (SHA-256 `ea947081e440d8a3266d03b6c03ba25f00ca546424b750c08453eb7c155dfc58`) through the new `scale-resume-submission` CLI with `checkpoint_every=1,000,000`. The identity bound the R016 preflight fingerprint `9eabadd1f15369e681f34cbdbd83b0c309352b4d71fb050f005b771f4b0bf4c9`, evaluator SHA-256 `ecfde283…d195de`, 27K variant, `test` feature-only split, and exact output target. The process was deliberately interrupted after a checkpoint; the next invocation reused the same identity and state path.
+
+### Recovery result
+
+The persisted state resumed from row `16,000,000`. Its `.partial` file contained bytes beyond the checkpoint boundary, so the implementation truncated that tail and verified the checkpoint prefix digest before appending. The recovered writer completed all `114,832,239` data rows (`114,832,240` lines including the header), atomically published the final file, and left no partial artifact.
+
+| Artifact | SHA-256 |
+|---|---|
+| R020 uninterrupted output | `c4e95a9702ffc61dbbf5e2a369d3902df7945d40efb033a4c9ad2caaac37fcc5` |
+| R025 interrupted then resumed output | `c4e95a9702ffc61dbbf5e2a369d3902df7945d40efb033a4c9ad2caaac37fcc5` |
+
+The matching full-file digests prove byte-for-byte equality, not merely matching row counts or predictions.
+
+### Benchmark integrity and limitations
+
+This command passed `include_labels=False` for the `test` split and did not invoke the evaluator to score test data. The independent unit suite has spy assertions for this path; the full suite passed 65 tests before the real run. The result proves recovery and output integrity, not a hidden-test metric, an organizer 27K reference comparison, or an official bonus score. **Interpretation - not explicit organizer wording:** it uses the Starter-Kit-pinned contract described in D029.
+
+### Reproduction
+
+`.venv/bin/python -m tiktok_ml_agent scale-resume-submission --variant 27k --data-dir kuairand-starter-kit/KuaiRand-27K/data --model artifacts/scale/kuairand-27k-item-tab-model.npz --output artifacts/submissions/kuairand-27k-item-tab-resumed.csv --state artifacts/scale-resume/27k-output/progress.json --data-fingerprint 9eabadd1f15369e681f34cbdbd83b0c309352b4d71fb050f005b771f4b0bf4c9 --evaluator kuairand-starter-kit/evaluate.py --checkpoint-every 1000000`
+
+## R024 - Interrupted KuaiRand-27K validation resumes to an identical result
+
+Date: 2026-08-28
+Experiment: EXP-017
+Implementation: `divija-T2-006-scale-resume`
+Environment: CPython 3.13.11, NumPy 2.5.2, Apple M4 Pro, CPU only.
+
+### Question
+
+Can a long 27K pass survive an interruption and resume to exactly the result an uninterrupted pass produced, while refusing to resume across a changed identity?
+
+### Procedure
+
+The frozen 27K item×tab model `artifacts/scale/kuairand-27k-item-tab-model.npz` (SHA-256 `ea947081…dfc58`, `bits=24`, `item_weight=0.5`, the same checkpoint recorded in R020) was scored through `score_scale_validation_resumable` with `shards=256`, `checkpoint_every=10,000,000`, and the R016 preflight fingerprint `9eabadd1…bf4c9` bound as the run's data identity. A progress hook raised at the first checkpoint at or beyond 30,000,000 rows to force an interruption. The same call was then re-issued to resume.
+
+### Interruption
+
+The run stopped at `rows_completed=30,000,000` with `stage=stream` and 837,408,845 bytes of shard scratch across 256 shards. Persisted progress recorded the run identity and per-shard byte lengths only.
+
+### Resumed result
+
+The resumed call reported `resumed_from_row=30,000,000` and completed all 71,149,570 validation rows over 26,729 users.
+
+| Metric | R018 / R020 uninterrupted | R024 resumed | Delta |
+|---|---:|---:|---:|
+| GAUC | 0.574100 | 0.574100 | 0.000000 |
+| nDCG@5 | 0.599412 | 0.599412 | 0.000000 |
+| primary | 0.586756 | 0.586756 | 0.000000 |
+| rows | 71,149,570 | 71,149,570 | 0 |
+
+Full precision: GAUC `0.5741001229849156`, nDCG@5 `0.5994124051627833`, primary `0.5867562640738495`. This is agreement across two implementations, not a self-comparison: R018/R020 used the non-resumable `_score_validation_sharded` path, and the resumed run used the checkpointed path.
+
+### Mismatch rejection
+
+Re-issuing the completed run with `data_fingerprint="wrong-fingerprint"` was refused with `ScaleResumeMismatch: … differing fields: data_fingerprint`. Six further rejection paths — frozen model, evaluator, configuration, output target, changed source logs, and unreadable state — are covered by deterministic tests on a synthetic 1K-shaped fixture.
+
+### Benchmark integrity
+
+The run read only the `valid` split; a spy assertion in the test suite confirms neither resumable entry point ever requests the `test` split with labels. The persisted state contains no label material. Shard scratch was deleted after completion, leaving only the completed record. Evaluator SHA-256 `ecfde283…d195de` and model SHA-256 match the identities already bound in R020 and R023.
+
+### Timing, and a measurement caveat
+
+The pre-interruption segment took 85.8 s of elapsed time for 30,000,000 rows. The resumed call reported `wall_seconds=241.64` while the surrounding script measured 11,064.5 s elapsed. The two disagree because `time.perf_counter` resolves to `mach_absolute_time()` on macOS, which does not advance while the system is asleep; the resumed pass ran unattended and the machine slept. **`wall_seconds` in every scale result is therefore active-process time, not elapsed wall-clock.** R018's `526.90` and R020's `523.55` carry the same definition. No timing claim from this run is a validated elapsed-time measurement, and the resumed segment's active time should not be compared against R020's full-pass figure as though both were wall-clock.
+
+### Limitations
+
+R025 now supplies full-artifact output-resume evidence. The structural source signature is name/size/mtime, not a content hash over 46 GB, so the strong data identity remains the caller-supplied preflight fingerprint. This remains a Starter-Kit-pinned validation result and is not an organizer 27K reference comparison or a hidden-test claim.
+
+### Reproduction
+
+`score_scale_validation_resumable(model_path="artifacts/scale/kuairand-27k-item-tab-model.npz", variant="27k", data_dir="kuairand-starter-kit/KuaiRand-27K/data", evaluator_path="kuairand-starter-kit/evaluate.py", state_dir="artifacts/scale-resume/27k-validation", shards=256, checkpoint_every=10_000_000, data_fingerprint="9eabadd1f15369e681f34cbdbd83b0c309352b4d71fb050f005b771f4b0bf4c9")`
+
 
 ## R023 - Revalidated, converged provisional Pure campaign
 
