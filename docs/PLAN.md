@@ -191,3 +191,22 @@ Definition of done: Tracked-file audit finds no data, generated artifacts, or cr
 Validation: R030's commands and output.
 
 Files/components: `results_log.md`, `changelog.md`, `docs/RELEASE_CHECKLIST.md`.
+
+### T2-012 - Data-free CI integrity gate
+
+Owner: Codex
+Status: DONE
+Priority: High
+Depends on: T2-010, T2-011
+
+Goal: Ensure every pushed branch and pull request runs the locked dependency environment, the data-free integrity suite, and whitespace validation without downloading competition data.
+
+Relevant requirements: REQ-003, REQ-006, REQ-011, REQ-017
+
+Definition of done: A least-privilege GitHub Actions workflow triggers on push/PR, uses the lockfile, and runs the complete data-free unit suite plus `git diff --check`; a local contract test protects these commands.
+
+Validation: `tests.test_ci_contract.ContinuousIntegrationContractTests.test_integrity_workflow_runs_the_locked_data_free_suite`; remote execution is **Not yet demonstrated** until a human-authorized push.
+
+Files/components: `.github/workflows/integrity.yml`, `tests/test_ci_contract.py`.
+
+Notes: R031 validates the workflow syntax, locked environment, and local contract test. Remote workflow execution is **Not yet demonstrated** because it requires the human-authorized push.

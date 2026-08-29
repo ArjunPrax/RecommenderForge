@@ -10,7 +10,8 @@ Status: Human-gated external actions are intentionally unchecked. This checklist
 - [x] `submission` generated the aligned Starter Kit schema output from the designated record.
 - [x] KuaiRand-1K and KuaiRand-27K artifact status/results are recorded honestly.
 - [x] R028 proves a deadline kills a real trusted child and removes its disposable worktree.
-- [x] Full test suite (70 tests) and `git diff --check` pass at the current release-candidate commit.
+- [x] Data-free PR/push CI workflow is authored and locally contract-validated; remote execution awaits a push.
+- [x] Full test suite (71 tests) and `git diff --check` pass at the current release-candidate commit.
 - [x] Team-interpreted campaign report states LLM input/output tokens and GPU-hours to convergence.
 
 ## Documentation

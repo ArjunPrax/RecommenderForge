@@ -2,6 +2,27 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R031 - Data-free CI integrity-gate validation
+
+Date: 2026-08-29
+Task: T2-012
+
+### Purpose
+
+Provide an automated, least-privilege PR/push gate for the data-free integrity suite so future review does not depend solely on a local terminal run.
+
+### Result
+
+Added `.github/workflows/integrity.yml`, triggered on `push` and `pull_request`, with read-only contents permission. It selects Python 3.13, installs the `uv.lock` environment, runs all data-free unit tests, and checks whitespace errors. The workflow parsed successfully; `uv lock --check` resolved 32 locked packages; the local CI contract test passed; and the complete suite passed `71` tests.
+
+### Limitation
+
+Remote GitHub Actions execution is **Not yet demonstrated** because the branch has not been pushed. This workflow deliberately does not download the organizer Starter Kit or any competition data.
+
+### Reproduction
+
+`ruby -e 'require "yaml"; YAML.load_file(".github/workflows/integrity.yml")' && UV_CACHE_DIR=/private/tmp/t2-uv-cache uv lock --check && .venv/bin/python -m unittest discover -s tests -v && git diff --check`
+
 ## R030 - Tracked-content security and Git-integrity audit
 
 Date: 2026-08-29

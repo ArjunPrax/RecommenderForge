@@ -2,6 +2,20 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-29 - Data-free CI integrity gate
+
+### Changed
+
+Added a least-privilege GitHub Actions workflow for every push and pull request. It uses the lockfile, runs the full data-free unit suite, and checks whitespace errors; it does not fetch competition data. A local contract test protects the required workflow commands.
+
+### Validation
+
+Workflow YAML parsing and `uv lock --check` passed; the latter resolved 32 locked packages. The complete local suite passes 71 tests. Remote Actions execution is **Not yet demonstrated** until the reviewed branch is pushed.
+
+### Related
+
+Task: T2-012. Result: R031. Requirements: REQ-003, REQ-006, REQ-011, REQ-017.
+
 ## 2026-08-29 - Release-integrity audit
 
 ### Validation
