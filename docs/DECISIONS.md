@@ -533,6 +533,35 @@ Atomic publication is unchanged: the final path is still replaced only after eve
 - Experiments: EXP-017
 - Decisions: extends D027 (atomic publication) and D022 (frozen scale models)
 
+## D029 - Starter-Kit-pinned execution contract while organizer response is absent
+
+Date: 2026-08-29
+Status: Accepted
+
+### Context
+
+The current official PDF contains contradictory narrative descriptions of the KuaiRand target and metrics. Its Starter Kit section is nevertheless specific: it calls the supplied Factorization Machine the official baseline, names `evaluate.py` as the exact scoring code, and pins `long_view`, GAUC, nDCG@5, epsilon=`0.002`, N=`3`, and the submission schema. The PDF also says the exact label definition and K values are pinned in the Starter Kit.
+
+### Decision
+
+**Interpretation - not explicit organizer wording:** execute, validate, and generate all internal artifacts against the versioned Starter Kit contract (`long_view`, GAUC, nDCG@5, epsilon=`0.002`, N=`3`, `row_id,user_id,video_id,score`). Continue the required Pure campaign and both bonus attempts rather than waiting for an email response.
+
+This does not relabel the contract as organizer-confirmed. Results and public materials must continue to say “Starter-Kit-pinned execution contract”; no result may be represented as an official NDCG@10/Recall@50 outcome without a corrected organizer evaluator.
+
+### Why
+
+This follows the most executable and detailed part of the official source, keeps all work reproducible, and avoids pausing the autonomous-research evidence trail over an ambiguity that does not prevent safe implementation.
+
+### Consequences
+
+REQ-014 is no longer an implementation blocker. It remains a reporting caveat: if organizers supply a new evaluator, it receives a new hash and results are rerun rather than compared across contracts. The finalization gate remains conservative until the team performs a release review against the then-current official materials.
+
+### Related
+
+- Requirements: REQ-002, REQ-008, REQ-014, REQ-015, REQ-016, REQ-018
+- Tasks: T2-005, T2-006
+- Decisions: D007, D026, D028
+
 
 ## D004 - Retain experimental evidence
 

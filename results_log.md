@@ -2,6 +2,40 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R025 - Interrupted KuaiRand-27K output resumes to the identical published artifact
+
+Date: 2026-08-29
+Experiment: EXP-017
+Implementation: `divija-T2-006-scale-resume`
+Environment: CPython 3.13.11, NumPy 2.5.2, Apple M4 Pro, CPU only.
+
+### Question
+
+Can the full 114,832,239-row feature-only 27K output survive a real interruption, discard bytes written after its last checkpoint, and resume to the exact artifact produced by the uninterrupted R020 chain?
+
+### Procedure
+
+Used the R020 frozen item×tab model (SHA-256 `ea947081e440d8a3266d03b6c03ba25f00ca546424b750c08453eb7c155dfc58`) through the new `scale-resume-submission` CLI with `checkpoint_every=1,000,000`. The identity bound the R016 preflight fingerprint `9eabadd1f15369e681f34cbdbd83b0c309352b4d71fb050f005b771f4b0bf4c9`, evaluator SHA-256 `ecfde283…d195de`, 27K variant, `test` feature-only split, and exact output target. The process was deliberately interrupted after a checkpoint; the next invocation reused the same identity and state path.
+
+### Recovery result
+
+The persisted state resumed from row `16,000,000`. Its `.partial` file contained bytes beyond the checkpoint boundary, so the implementation truncated that tail and verified the checkpoint prefix digest before appending. The recovered writer completed all `114,832,239` data rows (`114,832,240` lines including the header), atomically published the final file, and left no partial artifact.
+
+| Artifact | SHA-256 |
+|---|---|
+| R020 uninterrupted output | `c4e95a9702ffc61dbbf5e2a369d3902df7945d40efb033a4c9ad2caaac37fcc5` |
+| R025 interrupted then resumed output | `c4e95a9702ffc61dbbf5e2a369d3902df7945d40efb033a4c9ad2caaac37fcc5` |
+
+The matching full-file digests prove byte-for-byte equality, not merely matching row counts or predictions.
+
+### Benchmark integrity and limitations
+
+This command passed `include_labels=False` for the `test` split and did not invoke the evaluator to score test data. The independent unit suite has spy assertions for this path; the full suite passed 65 tests before the real run. The result proves recovery and output integrity, not a hidden-test metric, an organizer 27K reference comparison, or an official bonus score. **Interpretation - not explicit organizer wording:** it uses the Starter-Kit-pinned contract described in D029.
+
+### Reproduction
+
+`.venv/bin/python -m tiktok_ml_agent scale-resume-submission --variant 27k --data-dir kuairand-starter-kit/KuaiRand-27K/data --model artifacts/scale/kuairand-27k-item-tab-model.npz --output artifacts/submissions/kuairand-27k-item-tab-resumed.csv --state artifacts/scale-resume/27k-output/progress.json --data-fingerprint 9eabadd1f15369e681f34cbdbd83b0c309352b4d71fb050f005b771f4b0bf4c9 --evaluator kuairand-starter-kit/evaluate.py --checkpoint-every 1000000`
+
 ## R024 - Interrupted KuaiRand-27K validation resumes to an identical result
 
 Date: 2026-08-28
@@ -48,7 +82,7 @@ The pre-interruption segment took 85.8 s of elapsed time for 30,000,000 rows. Th
 
 ### Limitations
 
-Correctness evidence for resumed **output generation** at 27K scale is **Not yet demonstrated**: only validation was run against the full artifact. Output resumption, torn-write truncation, and the remaining rejection paths are covered by deterministic tests, not by a 114,832,239-row run. The structural source signature is name/size/mtime, not a content hash over 46 GB, so the strong data identity remains the caller-supplied preflight fingerprint. This remains a provisional-contract validation result and is not an organizer 27K reference comparison or a hidden-test claim.
+R025 now supplies full-artifact output-resume evidence. The structural source signature is name/size/mtime, not a content hash over 46 GB, so the strong data identity remains the caller-supplied preflight fingerprint. This remains a Starter-Kit-pinned validation result and is not an organizer 27K reference comparison or a hidden-test claim.
 
 ### Reproduction
 

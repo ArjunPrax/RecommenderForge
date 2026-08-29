@@ -2,6 +2,26 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-29 - Starter-Kit-pinned execution contract and completed real 27K output recovery
+
+### Decision and changed interface
+
+The official PDF's Starter Kit section provides the exact executable evaluator, baseline, label, metrics, convergence rule, and submission schema, despite contradictory narrative pages. D029 therefore records the team’s **Interpretation - not explicit organizer wording**: continue on the versioned Starter-Kit-pinned `long_view` / GAUC / nDCG@5 contract rather than pause implementation. This is not an organizer confirmation; any corrected evaluator is a new incompatible profile that must be rerun.
+
+Added normal CLI routes for Claude’s existing identity-gated implementation: `scale-resume-validation` and `scale-resume-submission`. Both require a frozen model, preflight data fingerprint, persisted state, and evaluator identity. The output route remains feature-only and does not score the test split.
+
+### Measured
+
+R025 deliberately interrupted a real 27K output run after a persisted checkpoint, leaving an uncheckpointed tail. Resumption started from row `16,000,000`, truncated and digest-verified the partial prefix, wrote all `114,832,239` rows, and atomically published a `4,957,087,059`-byte CSV. Its full SHA-256 exactly equals R020’s uninterrupted output: `c4e95a9702ffc61dbbf5e2a369d3902df7945d40efb033a4c9ad2caaac37fcc5`. No `.partial` artifact remained.
+
+### Validation and status
+
+CLI help was exercised and the full suite passes: 65 tests. T2-006 now meets its implementation definition of done and is in review pending integration; it makes no hidden-test or official bonus-score claim.
+
+### Related
+
+Task: T2-006. Decisions: D028, D029. Experiment: EXP-017. Results: R024, R025. Requirements: REQ-006, REQ-008, REQ-012, REQ-014, REQ-018.
+
 ## 2026-08-28 - Resumable, identity-gated 27K scale processing
 
 ### Changed
