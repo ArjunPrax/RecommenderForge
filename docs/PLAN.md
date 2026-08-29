@@ -110,7 +110,7 @@ Validation: Deterministic fixture, injected failure, resource/intervention recor
 ### T2-005 - Autonomous ranking-objective research
 
 Owner: Claude
-Status: IN_PROGRESS
+Status: DONE
 Priority: High
 Depends on: T2-003, T2-004
 
@@ -120,10 +120,12 @@ Relevant requirements: REQ-004, REQ-005, REQ-009
 
 Definition of done: Measured multi-seed results, mechanism-aware reflections, and an explicit campaign-level convergence/resource report are recorded.
 
+Notes: R003–R023 and R026 executed the registered loss, history, auxiliary, temporal, backbone, sampling, and frozen-ensemble directions with preserved regressions. R023 converged the declared five-seed campaign; R027 binds its leader to the team-interpreted checkpoint-backed output.
+
 ### T2-006 - KuaiRand-1K and 27K adaptation
 
 Owner: Codex + Claude
-Status: REVIEW
+Status: DONE
 Priority: High
 Depends on: organizer artifact contract, T2-004, T2-005
 
@@ -133,4 +135,23 @@ Relevant requirements: REQ-004, REQ-008, REQ-012, REQ-013
 
 Definition of done: Official artifacts available; baseline, scalable training, recovery, and output validation complete.
 
-Notes: KuaiRand-1K and KuaiRand-27K official archives are checksum-verified. R012 records the 1K baseline; R016–R021 record 27K preflight, bounded baseline, item×tab improvement, frozen rescore, and checkpoint-backed feature-only output. R024–R025 demonstrate full 27K validation and output interruption/resume equivalence, including real torn-write truncation and matching full-output SHA-256. D029 permits continued execution under the Starter-Kit-pinned contract. T2-006's implementation definition of done is met and awaits branch review/integration.
+Notes: KuaiRand-1K and KuaiRand-27K official archives are checksum-verified. R012 records the 1K baseline; R016–R021 record 27K preflight, bounded baseline, item×tab improvement, frozen rescore, and checkpoint-backed feature-only output. R024–R025 demonstrate full 27K validation and output interruption/resume equivalence, including real torn-write truncation and matching full-output SHA-256. D029 permits continued execution under the Starter-Kit-pinned contract. The implementation is integrated; it makes no hidden-test or organizer 27K-score claim.
+
+### T2-009 - Isolated child-process timeout recovery
+
+Owner: Codex
+Status: DONE
+Priority: High
+Depends on: T2-002
+
+Goal: Prove that the controller's wall-clock budget terminates a real trusted child process and always removes its disposable Git worktree.
+
+Relevant requirements: REQ-006, REQ-009, REQ-019
+
+Definition of done: A POSIX integration test runs a real sleeping subprocess through the isolated worktree executor, records controlled timeout recovery, and proves no worktree remains.
+
+Validation: `tests.test_controller.ControllerTests.test_wall_clock_timeout_kills_isolated_child_and_cleans_worktree`.
+
+Files/components: `tests/test_controller.py`, `src/tiktok_ml_agent/controller.py`, `src/tiktok_ml_agent/worktree_executor.py`.
+
+Notes: R028 exercises the real POSIX subprocess and Git-worktree boundaries in a disposable temporary repository. It is not a benchmark run and does not access competition data.

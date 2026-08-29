@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import tempfile
 import signal
+import os
+import subprocess
+import sys
 import time
 import unittest
 from pathlib import Path
@@ -9,6 +12,7 @@ from pathlib import Path
 from tiktok_ml_agent.contracts import BenchmarkSpec, ExperimentSpec, OperatorFamily, RunClass
 from tiktok_ml_agent.controller import CandidateBatch, ExecutionResult, ResearchController
 from tiktok_ml_agent.ledger import ExperimentLedger
+from tiktok_ml_agent.worktree_executor import WorktreeCommandExecutor
 
 
 class ControllerTests(unittest.TestCase):
@@ -101,4 +105,64 @@ class ControllerTests(unittest.TestCase):
             self.assertEqual(record.status.value, "recovered")
             self.assertIn("TimeoutError", record.error or "")
             self.assertEqual(record.recovery, "terminate_stalled_candidate_and_return_to_parent")
+            ledger.close()
+
+    @unittest.skipUnless(hasattr(signal, "setitimer"), "requires POSIX interval timers")
+    def test_wall_clock_timeout_kills_isolated_child_and_cleans_worktree(self) -> None:
+        """A real host child cannot outlive its budget or leave an experiment tree behind."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            repository_root = root / "repository"
+            repository_root.mkdir()
+            for command in (
+                ["git", "init", "-q"],
+                ["git", "config", "user.email", "test@example.invalid"],
+                ["git", "config", "user.name", "Test Runner"],
+            ):
+                subprocess.run(command, cwd=repository_root, check=True, capture_output=True, text=True)
+            (repository_root / "fixture.txt").write_text("fixture\n", encoding="utf-8")
+            for command in (
+                ["git", "add", "fixture.txt"],
+                ["git", "commit", "-qm", "fixture"],
+            ):
+                subprocess.run(command, cwd=repository_root, check=True, capture_output=True, text=True)
+            ledger = ExperimentLedger(root / "ledger.sqlite")
+            controller = ResearchController(BenchmarkSpec("fixture", "v1", "label", ("primary",)), ledger)
+            candidate = ExperimentSpec(
+                "EXP-003", RunClass.QUALIFICATION, OperatorFamily.HYPERPARAMETER,
+                "timeout cleans a real candidate process", "subprocess is terminated and its worktree removed",
+                compute_budget_seconds=1,
+            )
+            child_pid_path = root / "child.pid"
+            child_script = (
+                "import os, time; from pathlib import Path; "
+                f"Path({str(child_pid_path)!r}).write_text(str(os.getpid()), encoding='utf-8'); time.sleep(10)"
+            )
+            executor = WorktreeCommandExecutor(
+                repository_root,
+                root / "artifacts",
+                lambda _worktree, _candidate, _result: [sys.executable, "-c", child_script],
+            )
+
+            started = time.monotonic()
+            record = controller.execute_batch(CandidateBatch("batch", None, None, (candidate,)), executor)[0]
+            elapsed = time.monotonic() - started
+
+            self.assertLess(elapsed, 3.0)
+            self.assertEqual(record.status.value, "recovered")
+            self.assertIn("TimeoutError", record.error or "")
+            self.assertEqual(record.recovery, "terminate_stalled_candidate_and_return_to_parent")
+            self.assertTrue(child_pid_path.is_file())
+            child_pid = int(child_pid_path.read_text(encoding="utf-8"))
+            with self.assertRaises(ProcessLookupError):
+                os.kill(child_pid, 0)
+            self.assertFalse((root / "artifacts" / "worktrees" / record.run_id).exists())
+            listed = subprocess.run(
+                ["git", "worktree", "list", "--porcelain"],
+                cwd=repository_root,
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout
+            self.assertNotIn(str(root / "artifacts" / "worktrees" / record.run_id), listed)
             ledger.close()

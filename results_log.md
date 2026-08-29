@@ -2,6 +2,28 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R028 - Isolated child-process timeout and cleanup recovery
+
+Date: 2026-08-29
+Task: T2-009
+Environment: CPython 3.13.11, macOS POSIX interval timers, temporary disposable Git repository.
+
+### Purpose
+
+Exercise the production controller → trusted subprocess → disposable Git-worktree recovery path with an actual long-running child, rather than relying only on an in-process sleep or a mock.
+
+### Procedure and result
+
+`tests.test_controller.ControllerTests.test_wall_clock_timeout_kills_isolated_child_and_cleans_worktree` initialized a throwaway Git repository, then ran `WorktreeCommandExecutor` through `ResearchController` with a one-second candidate budget. Its trusted Python child wrote its PID and slept for ten seconds. The controller returned in `1.110` seconds, recorded the candidate as `recovered` with `TimeoutError` and recovery action `terminate_stalled_candidate_and_return_to_parent`, and the test proved the recorded PID no longer existed. It also confirmed that the candidate worktree path had been removed and did not appear in `git worktree list --porcelain`.
+
+### Integrity and limitation
+
+This is controlled resilience evidence only: it uses no competition data, no evaluator, no model, and no test labels. It proves that the production host-command boundary kills a direct child process and runs the manager's cleanup `finally` path under a deadline. It does not simulate real machine-wide memory pressure or a hostile child that daemonizes itself.
+
+### Reproduction
+
+`.venv/bin/python -m unittest tests.test_controller.ControllerTests.test_wall_clock_timeout_kills_isolated_child_and_cleans_worktree -v`
+
 ## R027 - Team-interpreted designated final and checkpoint-backed output
 
 Date: 2026-08-29

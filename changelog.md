@@ -2,6 +2,20 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-29 - Real isolated child-process recovery proof
+
+### Changed
+
+Added T2-009's integration test for the controller's existing wall-clock recovery path. It creates a temporary Git repository, runs a trusted child through the real disposable-worktree executor, and gives it a one-second budget. The child writes its PID before sleeping so cleanup can be observed directly.
+
+### Validation
+
+The child requested ten seconds of sleep but the controller returned in `1.110` seconds with a ledgered `TimeoutError` recovery. The test proves that the child PID no longer exists and that the disposable worktree has been removed from both the filesystem and Git's worktree list. The complete suite passes 69 tests. It does not access competition data or labels. R028 retains the measured resilience evidence.
+
+### Related
+
+Task: T2-009. Result: R028. Requirements: REQ-006, REQ-009, REQ-019.
+
 ## 2026-08-29 - Public-deliverable setup and provider-boundary verification
 
 ### Changed
