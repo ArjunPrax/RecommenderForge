@@ -9,7 +9,7 @@ Status: Human-gated external actions are intentionally unchecked. This checklist
 - [x] `designate-final` created the immutable team-interpreted final record from that campaign.
 - [x] `submission` generated the aligned Starter Kit schema output from the designated record.
 - [x] KuaiRand-1K and KuaiRand-27K artifact status/results are recorded honestly.
-- [x] Full test suite and `git diff --check` pass at the current release-candidate commit.
+- [x] Full test suite (68 tests) and `git diff --check` pass at the current release-candidate commit.
 - [x] Team-interpreted campaign report states LLM input/output tokens and GPU-hours to convergence.
 
 ## Documentation

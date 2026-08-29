@@ -2,6 +2,20 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-29 - Public-deliverable setup and provider-boundary verification
+
+### Changed
+
+Added concrete `uv` setup and dataset-placement instructions plus an explicit limitations section to the README. Corrected the problem-source note so it describes D029/D031's team interpretation without incorrectly claiming organizer confirmation.
+
+### Validation
+
+Added a mocked Responses-API planner test that verifies the bounded JSON proposal is schema-validated, response token usage and response ID are retained, and an API key is not embedded in the request body. It makes no network request or token-consuming provider call. The full suite now passes 68 tests.
+
+### Related
+
+Requirements: REQ-001, REQ-005, REQ-011, REQ-013, REQ-019. This does not change the measured campaign's honest zero-token record.
+
 ## 2026-08-29 - Team-interpreted final designation and output chain
 
 ### Changed

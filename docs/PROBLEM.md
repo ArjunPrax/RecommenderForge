@@ -51,4 +51,4 @@ The technical score uses the converged result, not the peak. Per metric, hidden-
 
 ## Open Questions / Ambiguities
 
-**Organizer-source conflict - requires clarification.** The starter kit pins `long_view`, GAUC, and nDCG@5. PDF pages 4, 6, 7, and 8 instead describe `click`, nDCG@10, and Recall@50. The PDF says the Starter Kit pins the exact label/metrics, but its narrative contradicts that claim. The team will reproduce the starter kit as a provisional executable profile while blocking a final technical selection until organizers confirm whether `evaluate.py` is final.
+**Organizer-source conflict - requires clarification.** The starter kit pins `long_view`, GAUC, and nDCG@5. PDF pages 4, 6, 7, and 8 instead describe `click`, nDCG@10, and Recall@50. The PDF says the Starter Kit pins the exact label/metrics, but its narrative contradicts that claim. **Interpretation - not explicit organizer wording:** D029/D031 permit a team-interpreted technical designation under the versioned Starter Kit profile; an organizer response remains required for organizer-confirmed reporting.

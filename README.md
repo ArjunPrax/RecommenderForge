@@ -25,7 +25,19 @@ The agent reproduces the organizer KuaiRand-Pure baseline, proposes bounded rese
 
 The official PDF conflicts over the target/metrics. **Interpretation - not explicit organizer wording:** D029 uses the detailed Starter Kit as the pinned execution contract (`long_view`, GAUC, nDCG@5); D031 distinguishes this team interpretation from organizer confirmation. Any corrected evaluator is a new incompatible profile that must be rerun. See [docs/PROBLEM.md](docs/PROBLEM.md) and [docs/DECISIONS.md](docs/DECISIONS.md).
 
-The revalidated provisional campaign leader has validation primary `0.604017` against reproduced baseline `0.601572` (+`0.002445`). This is not a hidden-test or official leaderboard claim; complete evidence is in [results_log.md](results_log.md#r023---revalidated-converged-provisional-pure-campaign).
+The team-interpreted designated final has validation primary `0.604017` against reproduced baseline `0.601572` (+`0.002445`). This is not a hidden-test or official leaderboard claim; complete evidence is in [results_log.md](results_log.md#r027---team-interpreted-designated-final-and-checkpoint-backed-output).
+
+## Setup
+
+Requirements: Python 3.11+ and [uv](https://docs.astral.sh/uv/). The organizer Starter Kit and all KuaiRand data remain local and untracked.
+
+```bash
+uv sync
+source .venv/bin/activate
+python scripts/download_kuairand.py pure
+```
+
+Place the downloaded organizer artifact under `kuairand-starter-kit/KuaiRand-Pure/` as described by the Starter Kit. For bonus artifacts, use `python scripts/download_kuairand.py 1k` or `27k`. Never commit data, generated checkpoints, ledgers, or outputs.
 
 ## Safe reproduction commands
 
@@ -44,6 +56,10 @@ All development commands are validation-only. `submission` reconstructs a measur
 ## Contributions
 
 The team designed the benchmark contract and delivery direction. Codex implemented and verified the safety controls, autonomous research workflow, model experiments, large-scale recovery, immutable artifact chain, and documentation. The repository history preserves the contribution-level evidence for review.
+
+## Limitations
+
+The PDF and Starter Kit conflict; current metrics are team-interpreted against a versioned evaluator, not organizer-confirmed. The recorded campaign uses the deterministic offline planner and therefore reports zero LLM tokens; the optional Responses-API planner is bounded and schema-validated but was not used in the measured campaign. Official publication, organizer scoring, and submission require human authorization.
 
 ## Start here
 
