@@ -19,7 +19,7 @@ import torch
 from torch.nn import functional as functional
 
 from .baseline_runner import StarterFMConfig, _encode_train_validation
-from .history import prior_long_view_buckets, prior_video_tab_buckets
+from .history import prior_long_view_buckets, prior_user_author_buckets, prior_video_tab_buckets
 from .kuairand import KuaiRandPureAdapter
 from .torch_fm import TorchFM
 from .temporal import temporal_primary_windows
@@ -33,6 +33,7 @@ class RankingFMConfig(StarterFMConfig):
     history_cross: bool = False
     temporal_day_cross: bool = False
     item_tab_history_cross: bool = False
+    user_author_history_cross: bool = False
     negatives_per_positive: int = 1
     lambda_mix: float = 0.5
 
@@ -149,8 +150,8 @@ def run_ranking_fm(
     adapter = KuaiRandPureAdapter(starter_kit_dir, data_dir)
     train = adapter.development_rows("train")
     valid = adapter.development_rows("valid")
-    if sum((config.history_cross, config.temporal_day_cross, config.item_tab_history_cross)) > 1:
-        raise ValueError("history, temporal-day, and video-tab feature candidates must be evaluated independently")
+    if sum((config.history_cross, config.temporal_day_cross, config.item_tab_history_cross, config.user_author_history_cross)) > 1:
+        raise ValueError("history, temporal-day, video-tab, and user-author candidates must be evaluated independently")
     if config.history_cross:
         train_history, valid_history = prior_long_view_buckets(train, valid)
         x_train, y_train, x_valid, _, users_valid, dimension = _encode_train_validation(
@@ -158,6 +159,11 @@ def run_ranking_fm(
         )
     elif config.item_tab_history_cross:
         train_history, valid_history = prior_video_tab_buckets(train, valid)
+        x_train, y_train, x_valid, _, users_valid, dimension = _encode_train_validation(
+            train, valid, extra_train=train_history, extra_valid=valid_history
+        )
+    elif config.user_author_history_cross:
+        train_history, valid_history = prior_user_author_buckets(train, valid)
         x_train, y_train, x_valid, _, users_valid, dimension = _encode_train_validation(
             train, valid, extra_train=train_history, extra_valid=valid_history
         )
@@ -258,6 +264,7 @@ def run_ranking_fm(
                 "history_cross": config.history_cross,
                 "temporal_day_cross": config.temporal_day_cross,
                 "item_tab_history_cross": config.item_tab_history_cross,
+                "user_author_history_cross": config.user_author_history_cross,
                 "negatives_per_positive": config.negatives_per_positive,
                 "lambda_mix": config.lambda_mix,
                 "configuration": {

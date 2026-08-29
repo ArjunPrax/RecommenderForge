@@ -70,3 +70,30 @@ def prior_video_tab_buckets(
         state[key][1] += 1
     valid_buckets = [_bucket(*state[(row.video_id, row.tab)], config) for row in valid]
     return train_buckets, valid_buckets
+
+
+def prior_user_author_buckets(
+    train: list[KuaiRandRow], valid: list[KuaiRandRow], config: HistoryFeatureConfig | None = None
+) -> tuple[list[str], list[str]]:
+    """Return strict-prior user×author buckets and frozen evaluation buckets.
+
+    This is a personalised candidate feature: within one user's impression
+    list, videos from different authors can receive different fields.  As with
+    every history feature, a training row is encoded before its own label
+    updates the `(user_id, author_id)` state; validation and submission rows
+    use the completed training state and never require their labels.
+    """
+    config = config or HistoryFeatureConfig()
+    if any(row.label is None for row in train):
+        raise ValueError("history construction requires permitted train labels")
+    state: dict[tuple[str, str], list[int]] = defaultdict(lambda: [0, 0])
+    train_buckets = [""] * len(train)
+    for index in sorted(range(len(train)), key=lambda item: (train[item].timestamp_ms, item)):
+        row = train[index]
+        key = (row.user_id, row.author_id)
+        positive, total = state[key]
+        train_buckets[index] = _bucket(positive, total, config)
+        state[key][0] += int(row.label or 0)
+        state[key][1] += 1
+    valid_buckets = [_bucket(*state[(row.user_id, row.author_id)], config) for row in valid]
+    return train_buckets, valid_buckets

@@ -499,6 +499,33 @@ It preserves the required frozen-checkpoint provenance while making failed long 
 - Requirements: REQ-006, REQ-012, REQ-015, REQ-018
 - Tasks: T2-004, T2-006
 
+## D030 - Strict-prior user-author affinity candidate lane
+
+Date: 2026-08-29
+Status: Accepted
+
+### Context
+
+The base BPR FM has user, video, author, tab, and duration fields, but its tested history feature has only represented global user engagement. A user-author history can vary across candidate videos within a user’s ranking list, making it a valid personalised ranking feature if it does not consume validation or test labels.
+
+### Decision
+
+Evaluate EXP-018 as one independent five-seed BPR candidate. Each training row receives the `(user_id, author_id)` long-view bucket from strictly earlier training events before its own label updates state. Validation and feature-only submission rows use only the completed training state. The feature is evaluated independently from all other optional history/temporal fields, and a runtime ordering audit must show that it changes within-user validation relations before its metric can be considered.
+
+### Why
+
+This tests a candidate-specific personal-affinity mechanism that the existing user-global and video-tab features do not represent, while preserving a mechanical, testable temporal anti-leakage boundary.
+
+### Consequences
+
+The result will be retained whether it improves or regresses. It cannot be promoted on a single seed; its five-seed mean is compared against R003 BPR and may become an ensemble component only after immutable checkpoint/prediction provenance is recorded.
+
+### Related
+
+- Requirements: REQ-003, REQ-004, REQ-009, REQ-018
+- Tasks: T2-005
+- Experiments: EXP-018, EXP-004A
+
 ## D004 - Retain experimental evidence
 
 Date: 2026-08-26
