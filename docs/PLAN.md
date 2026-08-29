@@ -174,3 +174,20 @@ Validation: `tests.test_repository_safety.RepositorySafetyTests.test_organizer_s
 Files/components: `.gitignore`, `README.md`, `docs/PROVENANCE.md`, `tests/test_repository_safety.py`.
 
 Notes: R029 confirms that a source file within the local Starter Kit is ignored by the repository, not merely its dataset subdirectories. Organizer authorization remains necessary before deliberately redistributing any kit content.
+
+### T2-011 - Release-integrity audit
+
+Owner: Codex
+Status: DONE
+Priority: High
+Depends on: T2-010
+
+Goal: Verify the reviewable branch contains no accidental competition assets or credential signatures and that its Git object graph has no integrity errors.
+
+Relevant requirements: REQ-007, REQ-011
+
+Definition of done: Tracked-file audit finds no data, generated artifacts, or credential/private-key signatures; `git fsck` completes with no corrupted objects; results are recorded without deleting any user data.
+
+Validation: R030's commands and output.
+
+Files/components: `results_log.md`, `changelog.md`, `docs/RELEASE_CHECKLIST.md`.

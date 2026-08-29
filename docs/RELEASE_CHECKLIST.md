@@ -22,7 +22,7 @@ Status: Human-gated external actions are intentionally unchecked. This checklist
 ## Human-authorized external actions
 
 - [ ] Verify organizer Starter Kit redistribution terms before publishing it (the whole local kit is ignored until then).
-- [x] Scan tracked files for credential signatures/private-key markers; none were found. Competition data remains ignored.
+- [x] R030 scanned tracked files for credential signatures/private-key markers; none were found. Competition data and the entire Starter Kit remain ignored.
 - [ ] Make the GitHub repository public only after human review.
 - [ ] Push the reviewed release branch and merge through a PR.
 - [ ] Submit the output/checkpoint through the official competition flow.

@@ -2,6 +2,27 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R030 - Tracked-content security and Git-integrity audit
+
+Date: 2026-08-29
+Task: T2-011
+
+### Purpose
+
+Check the exact reviewable branch for accidental competition assets, generated outputs, common credential/private-key signatures, and Git object corruption before a human considers publication.
+
+### Result
+
+`git fsck --no-reflogs --full` completed without an integrity error. It reported only unreachable dangling tree objects, which are ordinary local garbage-collection candidates and were deliberately left untouched. A tracked-content scan found only `.env.example` and `artifacts/.gitkeep` among data/artifact-like paths; no Starter Kit, KuaiRand data, submissions, checkpoints, ledgers, or generated CSV files are tracked. The credential/private-key signature scan produced no matches.
+
+### Limitation
+
+This is a local static audit, not a substitute for human review, repository-visibility confirmation, organizer licensing terms, or an external secret-scanning service. It makes no claim about ignored local files.
+
+### Reproduction
+
+`git fsck --no-reflogs --full && (git grep -n -I -E '(AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{35}|sk-[A-Za-z0-9_-]{20,}|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|password[[:space:]]*=[[:space:]]*[^[:space:]]+)' HEAD -- ':!docs/ORGANIZER_CLARIFICATION_EMAIL.md' ':!README.md' || test $? -eq 1) && (git ls-files | rg '(^|/)(kuairand-starter-kit|KuaiRand-(Pure|1K|27K)|artifacts|\\.env($|\\.)|.*\\.(sqlite|pt|pth|ckpt|csv)$)' || test $? -eq 1)`
+
 ## R029 - Starter Kit publication-isolation audit
 
 Date: 2026-08-29
