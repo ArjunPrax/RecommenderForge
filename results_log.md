@@ -2,6 +2,51 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R026 - Strict-prior user×author affinity BPR result
+
+Date: 2026-08-29
+Experiment: EXP-018
+Implementation / commit: `97caf25`
+Environment: CPython 3.13.11, NumPy 2.5.2, PyTorch 2.13.0, CPU.
+
+### Question
+
+Can a user's training-only long-view history with each candidate's author provide a personalised, candidate-varying signal that improves BPR ranking without reading validation or test outcomes?
+
+### Baseline
+
+R003 / EXP-004A five-seed BPR mean primary `0.603082`. The current frozen BPR/history/temporal ensemble leader is R010/R023 at `0.604017`.
+
+### Change tested
+
+Added one categorical `(user_id, author_id)` bucket to BPR FM. Each training impression receives the bucket from strictly earlier training events before its own long-view label updates state. Validation and feature-only submission rows receive the completed training state only. The candidate was run as one autonomous five-seed batch from the immutable EXP-004A parent.
+
+### Metrics
+
+| Metric | EXP-018 mean | Population std | Delta vs BPR |
+|---|---:|---:|---:|
+| GAUC | 0.669929 | 0.000374 | +0.000394 |
+| nDCG@5 | 0.537001 | 0.000146 | +0.000372 |
+| primary | 0.603465 | 0.000226 | +0.000383 |
+
+The run took `115.54` CPU seconds, used zero GPU seconds and zero LLM tokens, and recorded zero manual interventions. Best seed 2 reached primary `0.603696` and is the frozen checkpoint artifact only; selection remains based on the five-seed mean.
+
+### Correctness validation
+
+The strict-prior/frozen-evaluation unit test passed. The runtime ordering audit found `31,951` changed within-user pairwise relations across `8,030` of `18,460` eligible validation users, proving that the feature is not user-constant or inert. The frozen best checkpoint generated `170,588` feature-only test rows plus header at `artifacts/submissions/exp-018-user-author-provisional.csv` (SHA-256 `1f2205d127a4e56c045275cb36c88e9aa79a3bc5e0b5b5526dab4e86009edfde`) without test scoring or test-label access.
+
+### Interpretation
+
+The personalised author-affinity mechanism is valid and improves BPR on both metric components, but its mean does not beat the current frozen three-component leader. Keep it as a provenance-complete component candidate; do not promote it over R023 or run an undisclosed ensemble search. Any ensemble evaluation must declare its vectors in advance and begin a new campaign rather than extending the converged R023 campaign.
+
+### Limitations
+
+This is validation-only evidence under the Starter-Kit-pinned execution contract. It is not a hidden-test score or an official organizer result. Author sparsity may send many candidates to the zero-history bucket; this candidate does not establish an improvement for every user segment.
+
+### Reproduction
+
+`.venv/bin/python -m tiktok_ml_agent autonomous-user-author-history --repository-root . --starter-kit kuairand-starter-kit --data-dir kuairand-starter-kit/KuaiRand-Pure/data --parent-ledger artifacts/autonomous-ranking-verified/ledger.sqlite --output-dir artifacts/autonomous-user-author-history`
+
 ## R023 - Revalidated, converged provisional Pure campaign
 
 Date: 2026-08-28

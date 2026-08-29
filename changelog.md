@@ -2,6 +2,24 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-29 - EXP-018 strict-prior user-author affinity candidate
+
+### Changed
+
+Added a candidate-specific, personalised `(user_id, author_id)` long-view bucket to the BPR FM research lane. Training rows are sorted by time and encoded before their own label updates state. Validation and submission use only the completed training state. `autonomous-user-author-history` runs the registered EXP-018 five-seed candidate from the frozen BPR parent; the CLI also exposes the corresponding direct ranking flag.
+
+### Measured
+
+R026 completed with five-seed primary `0.603465`, +`0.000383` over BPR (`0.603082`). Both GAUC and nDCG@5 improved; the candidate remains below the `0.604017` frozen R023 leader, so it is retained as a component candidate rather than promoted. It changed 31,951 within-user pairwise relations across 8,030 users, produced a 170,588-row feature-only output from its frozen best checkpoint, and had zero mid-run interventions.
+
+### Validation
+
+The full suite passed 50 tests before the real run, including a new strict-prior/frozen-evaluation user-author test. The output has SHA-256 `1f2205d127a4e56c045275cb36c88e9aa79a3bc5e0b5b5526dab4e86009edfde`. No test labels were accessed or scored.
+
+### Related
+
+Task: T2-005. Decision: D030. Experiment: EXP-018. Result: R026. Requirements: REQ-003, REQ-004, REQ-009, REQ-018.
+
 ## 2026-08-28 - Release-facing documentation refresh and provenance declaration
 
 ### Changed
