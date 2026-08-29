@@ -155,3 +155,22 @@ Validation: `tests.test_controller.ControllerTests.test_wall_clock_timeout_kills
 Files/components: `tests/test_controller.py`, `src/tiktok_ml_agent/controller.py`, `src/tiktok_ml_agent/worktree_executor.py`.
 
 Notes: R028 exercises the real POSIX subprocess and Git-worktree boundaries in a disposable temporary repository. It is not a benchmark run and does not access competition data.
+
+### T2-010 - Starter Kit publication isolation
+
+Owner: Codex
+Status: DONE
+Priority: High
+Depends on: T2-001
+
+Goal: Prevent accidental publication of separately supplied organizer Starter Kit code before redistribution terms are verified.
+
+Relevant requirements: REQ-007, REQ-011
+
+Definition of done: The entire local Starter Kit directory is ignored, setup says how to obtain it without implying redistribution, and a test protects the ignore rule.
+
+Validation: `tests.test_repository_safety.RepositorySafetyTests.test_organizer_starter_kit_is_unconditionally_ignored` and `git check-ignore -v --no-index kuairand-starter-kit/evaluate.py`.
+
+Files/components: `.gitignore`, `README.md`, `docs/PROVENANCE.md`, `tests/test_repository_safety.py`.
+
+Notes: R029 confirms that a source file within the local Starter Kit is ignored by the repository, not merely its dataset subdirectories. Organizer authorization remains necessary before deliberately redistributing any kit content.

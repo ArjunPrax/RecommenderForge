@@ -10,7 +10,7 @@ Status: Human-gated external actions are intentionally unchecked. This checklist
 - [x] `submission` generated the aligned Starter Kit schema output from the designated record.
 - [x] KuaiRand-1K and KuaiRand-27K artifact status/results are recorded honestly.
 - [x] R028 proves a deadline kills a real trusted child and removes its disposable worktree.
-- [x] Full test suite (69 tests) and `git diff --check` pass at the current release-candidate commit.
+- [x] Full test suite (70 tests) and `git diff --check` pass at the current release-candidate commit.
 - [x] Team-interpreted campaign report states LLM input/output tokens and GPU-hours to convergence.
 
 ## Documentation
@@ -21,7 +21,7 @@ Status: Human-gated external actions are intentionally unchecked. This checklist
 
 ## Human-authorized external actions
 
-- [ ] Verify organizer Starter Kit redistribution terms before publishing it.
+- [ ] Verify organizer Starter Kit redistribution terms before publishing it (the whole local kit is ignored until then).
 - [x] Scan tracked files for credential signatures/private-key markers; none were found. Competition data remains ignored.
 - [ ] Make the GitHub repository public only after human review.
 - [ ] Push the reviewed release branch and merge through a PR.

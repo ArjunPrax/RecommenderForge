@@ -29,13 +29,12 @@ dist/
 build/
 .cache/
 
-# Competition data and generated research artifacts (never commit)
+# Organizer Starter Kit/data and generated research artifacts (never commit)
+# The kit is supplied separately and may not be redistributed without permission.
+kuairand-starter-kit/
 KuaiRand-Pure/
 KuaiRand-1K/
 KuaiRand-27K/
-kuairand-starter-kit/KuaiRand-Pure/
-kuairand-starter-kit/KuaiRand-1K/
-kuairand-starter-kit/KuaiRand-27K/
 *.tar.gz
 *.pt
 *.pth

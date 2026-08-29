@@ -29,7 +29,7 @@ The team-interpreted designated final has validation primary `0.604017` against 
 
 ## Setup
 
-Requirements: Python 3.11+ and [uv](https://docs.astral.sh/uv/). The organizer Starter Kit and all KuaiRand data remain local and untracked.
+Requirements: Python 3.11+ and [uv](https://docs.astral.sh/uv/). Obtain the organizer Starter Kit separately from the competition materials and place its unmodified source files (including `evaluate.py`) under `kuairand-starter-kit/`. That entire directory, all data, and generated artifacts are intentionally ignored: do not force-add them unless the organizers explicitly grant redistribution permission.
 
 ```bash
 uv sync
@@ -37,7 +37,7 @@ source .venv/bin/activate
 python scripts/download_kuairand.py pure
 ```
 
-Place the downloaded organizer artifact under `kuairand-starter-kit/KuaiRand-Pure/` as described by the Starter Kit. For bonus artifacts, use `python scripts/download_kuairand.py 1k` or `27k`. Never commit data, generated checkpoints, ledgers, or outputs.
+The downloader fetches only the declared dataset archive, not the Starter Kit source. It extracts `KuaiRand-Pure/` beneath the local kit directory; for bonus artifacts, use `python scripts/download_kuairand.py 1k` or `27k`. Never commit the organizer kit, data, generated checkpoints, ledgers, or outputs.
 
 ## Safe reproduction commands
 

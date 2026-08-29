@@ -15,4 +15,4 @@
 
 ## Scope
 
-This declaration reflects the implemented and logged runs. It is not an organizer approval to redistribute starter-kit code or data; that remains an explicit release-checklist item.
+This declaration reflects the implemented and logged runs. It is not an organizer approval to redistribute starter-kit code or data. The entire `kuairand-starter-kit/` directory is intentionally git-ignored and protected by a repository-safety test; redistribution remains an explicit release-checklist item.

@@ -2,6 +2,27 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R029 - Starter Kit publication-isolation audit
+
+Date: 2026-08-29
+Task: T2-010
+
+### Purpose
+
+Prevent a broad Git add from accidentally publishing the separately supplied organizer Starter Kit before its redistribution terms are known.
+
+### Result
+
+The repository now unconditionally ignores `kuairand-starter-kit/`, including source files such as `kuairand-starter-kit/evaluate.py`, not only the data subdirectories. `tests.test_repository_safety.RepositorySafetyTests.test_organizer_starter_kit_is_unconditionally_ignored` passed, and `git check-ignore -v --no-index kuairand-starter-kit/evaluate.py` resolved to `.gitignore` line 34.
+
+### Limitation
+
+This is repository safety evidence, not permission to redistribute the kit. The release checklist still requires a human to verify the organizer's terms before any intentional inclusion or publication.
+
+### Reproduction
+
+`.venv/bin/python -m unittest tests.test_repository_safety -v && git check-ignore -v --no-index kuairand-starter-kit/evaluate.py`
+
 ## R028 - Isolated child-process timeout and cleanup recovery
 
 Date: 2026-08-29

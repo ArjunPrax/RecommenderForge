@@ -2,6 +2,20 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-29 - Starter Kit publication isolation
+
+### Changed
+
+The entire separately supplied `kuairand-starter-kit/` directory is now ignored—not only its dataset folders—so a broad Git add cannot publish organizer source before its redistribution terms are verified. README setup now distinguishes obtaining the kit from downloading a dataset archive; provenance and release documentation retain the human authorization gate.
+
+### Validation
+
+Added a repository-safety test and confirmed `git check-ignore -v --no-index kuairand-starter-kit/evaluate.py` resolves to the new whole-directory rule. The complete suite passes 70 tests. R029 records this as repository-safety evidence, not redistribution permission.
+
+### Related
+
+Task: T2-010. Result: R029. Requirements: REQ-007, REQ-011.
+
 ## 2026-08-29 - Real isolated child-process recovery proof
 
 ### Changed
