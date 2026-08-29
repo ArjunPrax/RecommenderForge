@@ -95,6 +95,30 @@ class CampaignEvidenceTests(unittest.TestCase):
             with self.assertRaises(CampaignEvidenceError):
                 designate_final(campaign_report_path=report_path, final_ledger_path=root / "final.sqlite")
 
+    def test_team_interpreted_contract_is_labelled_in_designated_final(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for index, score in enumerate((0.601, 0.6015, 0.6014), start=1):
+                _ledger_with_run(root / f"run-{index}.sqlite", f"run-{index}", score)
+            config = {
+                "campaign_id": "fixture", "benchmark_id": "kuairand-pure", "contract_status": "team_interpreted",
+                "baseline_primary": 0.60, "epsilon": 0.002, "patience": 3,
+                "batches": [
+                    {"batch_id": f"b{index}", "runs": [{"ledger": f"run-{index}.sqlite", "run_id": f"run-{index}"}]}
+                    for index in range(1, 4)
+                ],
+            }
+            path = root / "campaign.json"; path.write_text(json.dumps(config), encoding="utf-8")
+            report_path = write_campaign_report(path, root / "report.json")
+            final = designate_final(campaign_report_path=report_path, final_ledger_path=root / "final.sqlite")
+            self.assertEqual(final["designation_status"], "team_interpreted")
+            ledger = ExperimentLedger(final["final_ledger"])
+            try:
+                record = ledger.get_run(final["final_run_id"])
+            finally:
+                ledger.close()
+            self.assertEqual(record["diagnosis"]["designation_status"], "team_interpreted")
+
     def test_mixed_data_fingerprints_are_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

@@ -28,6 +28,9 @@ def designate_final(*, campaign_report_path: str | Path, final_ledger_path: str 
         raise CampaignEvidenceError("cannot designate a final from an unconverged campaign")
     if campaign.get("finalization_eligible") is not True:
         raise CampaignEvidenceError("cannot designate a final while the benchmark contract remains provisional")
+    designation_status = campaign.get("designation_status", campaign.get("contract_status"))
+    if designation_status not in {"confirmed", "team_interpreted"}:
+        raise CampaignEvidenceError("campaign has no eligible designation status")
     source_ref = campaign.get("best_run")
     if not isinstance(source_ref, dict):
         raise CampaignEvidenceError("converged campaign has no eligible best run")
@@ -61,7 +64,7 @@ def designate_final(*, campaign_report_path: str | Path, final_ledger_path: str 
             status=RunStatus.RUNNING,
             benchmark_id=str(source["benchmark_id"]),
             operator_family=OperatorFamily(str(source["operator_family"])),
-            hypothesis="Designate the converged campaign's frozen validation-best checkpoint without retraining.",
+            hypothesis=f"Designate the {designation_status} campaign's frozen validation-best checkpoint without retraining.",
             parent_run_id=source_run_id,
             code_revision=source.get("code_revision"),
             diff_sha256=source.get("diff_sha256"),
@@ -73,6 +76,7 @@ def designate_final(*, campaign_report_path: str | Path, final_ledger_path: str 
             checkpoint_manifest=manifest,
             diagnosis={
                 "summary": "Designated final reuses the converged campaign's immutable source checkpoint.",
+                "designation_status": designation_status,
                 "campaign_report_path": str(campaign_path),
                 "campaign_report_sha256": campaign_hash,
                 "source_ledger": str(source_ledger_path),
@@ -85,9 +89,10 @@ def designate_final(*, campaign_report_path: str | Path, final_ledger_path: str 
         ledger.create_run(record)
         ledger.append_event(final_id, "designated_final_bound", {
             "campaign_report_sha256": campaign_hash, "source_ledger": str(source_ledger_path), "source_run_id": source_run_id,
+            "designation_status": designation_status,
         })
         record.status = RunStatus.SUCCEEDED
         ledger.finalize_run(record)
     finally:
         ledger.close()
-    return {"final_ledger": str(Path(final_ledger_path)), "final_run_id": final_id, "source_run_id": source_run_id}
+    return {"final_ledger": str(Path(final_ledger_path)), "final_run_id": final_id, "source_run_id": source_run_id, "designation_status": designation_status}

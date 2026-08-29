@@ -589,6 +589,33 @@ The result is retained whether it improves or regresses. It cannot be promoted o
 - Tasks: T2-005
 - Experiments: EXP-018, EXP-004A
 
+## D031 - Distinguish team-interpreted designation from organizer confirmation
+
+Date: 2026-08-29
+Status: Accepted
+
+### Context
+
+D029 permits continued implementation on the Starter-Kit-pinned execution contract, but the prior two-state campaign API equated any final designation with organizer confirmation. That would either leave a converged, checkpoint-backed team decision needlessly unmaterialized or tempt the report to overstate its authority.
+
+### Decision
+
+Campaigns may now be `provisional`, `team_interpreted`, or `confirmed`. `provisional` remains fail-closed. `team_interpreted` may bind a converged campaign's exact frozen checkpoint as an internal designated-final record and generate its feature-only output without retraining; the status is embedded in the report, final ledger diagnosis, finalization event, and command response. `confirmed` remains reserved for an organizer-confirmed contract.
+
+### Why
+
+This separates the technical act of selecting the measured validation-best artifact from the external claim that the organizers accept a particular metric profile. It preserves the strong no-test-access and immutable-provenance guarantees in both cases.
+
+### Consequences
+
+The team can complete the internal campaign → designation → output chain now. Public materials must call the resulting artifact “team-interpreted” and must not report a hidden-test metric or organizer-confirmed benchmark result. A future organizer correction gets a new evaluator identity and requires rerun evidence.
+
+### Related
+
+- Requirements: REQ-003, REQ-008, REQ-012, REQ-014, REQ-018
+- Tasks: T2-005, T2-008
+- Decisions: D026, D029
+
 
 ## D004 - Retain experimental evidence
 
