@@ -66,6 +66,7 @@ def execute_ranking_candidate(
         objective=str(objective), history_cross=bool(candidate.configuration.get("history_cross", False)),
         temporal_day_cross=bool(candidate.configuration.get("temporal_day_cross", False)),
         item_tab_history_cross=bool(candidate.configuration.get("item_tab_history_cross", False)),
+        user_author_history_cross=bool(candidate.configuration.get("user_author_history_cross", False)),
         negatives_per_positive=int(candidate.configuration.get("negatives_per_positive", 1)),
         lambda_mix=float(candidate.configuration.get("lambda_mix", 0.5)),
         **common_config,

@@ -12,7 +12,7 @@ from .reporting import write_report
 from .baseline_runner import run_safe_numpy_fm
 from .torch_fm import run_safe_torch_fm
 from .ranking_fm import RankingFMConfig, run_ranking_fm
-from .autonomous import run_autonomous_backbone, run_autonomous_ensemble, run_autonomous_ensemble_confirmation, run_autonomous_ensemble_revalidation, run_autonomous_history, run_autonomous_item_tab_history, run_autonomous_lambda_ranking, run_autonomous_multitask, run_autonomous_negative_sampling, run_autonomous_ranking, run_autonomous_temporal, run_autonomous_three_ensemble, run_autonomous_watchtime
+from .autonomous import run_autonomous_backbone, run_autonomous_ensemble, run_autonomous_ensemble_confirmation, run_autonomous_ensemble_revalidation, run_autonomous_history, run_autonomous_item_tab_history, run_autonomous_lambda_ranking, run_autonomous_multitask, run_autonomous_negative_sampling, run_autonomous_ranking, run_autonomous_temporal, run_autonomous_three_ensemble, run_autonomous_user_author_history, run_autonomous_watchtime
 from .submission import generate_submission
 from .scale import ScaleArtifactAdapter, write_preflight
 from .scale_baseline import generate_scale_submission, rescore_frozen_scale_model, run_streaming_popularity
@@ -49,6 +49,7 @@ def main() -> None:
     ranking.add_argument("--objective", choices=("bpr", "lambda_bpr", "listwise"), required=True)
     ranking.add_argument("--history-cross", action="store_true", help="add strictly-earlier long-view history as an FM cross field")
     ranking.add_argument("--item-tab-history-cross", action="store_true", help="add strict-prior global video×tab history as an FM cross field")
+    ranking.add_argument("--user-author-history-cross", action="store_true", help="add strict-prior user×author affinity as an FM cross field")
     autonomous_ranking = commands.add_parser(
         "autonomous-ranking", help="plan and run the initial checkpoint-backed ranking-objective batch"
     )
@@ -68,6 +69,12 @@ def main() -> None:
     autonomous_item_tab_history.add_argument("--data-dir", type=Path, default=Path("kuairand-starter-kit/KuaiRand-Pure/data"))
     autonomous_item_tab_history.add_argument("--parent-ledger", type=Path, default=Path("artifacts/autonomous-ranking-verified/ledger.sqlite"))
     autonomous_item_tab_history.add_argument("--output-dir", type=Path, default=Path("artifacts/autonomous-item-tab-history"))
+    autonomous_user_author_history = commands.add_parser("autonomous-user-author-history", help="run the strict-prior user×author candidate-affinity cross")
+    autonomous_user_author_history.add_argument("--repository-root", type=Path, default=Path("."))
+    autonomous_user_author_history.add_argument("--starter-kit", type=Path, default=Path("kuairand-starter-kit"))
+    autonomous_user_author_history.add_argument("--data-dir", type=Path, default=Path("kuairand-starter-kit/KuaiRand-Pure/data"))
+    autonomous_user_author_history.add_argument("--parent-ledger", type=Path, default=Path("artifacts/autonomous-ranking-verified/ledger.sqlite"))
+    autonomous_user_author_history.add_argument("--output-dir", type=Path, default=Path("artifacts/autonomous-user-author-history"))
     autonomous_multitask = commands.add_parser("autonomous-multitask", help="run the checkpoint-parented multi-feedback candidate")
     autonomous_multitask.add_argument("--repository-root", type=Path, default=Path("."))
     autonomous_multitask.add_argument("--starter-kit", type=Path, default=Path("kuairand-starter-kit"))
@@ -233,6 +240,8 @@ def main() -> None:
                 sort_keys=True,
             )
         )
+    elif args.command == "autonomous-user-author-history":
+        print(json.dumps(run_autonomous_user_author_history(repository_root=args.repository_root, starter_kit_dir=args.starter_kit, data_dir=args.data_dir, parent_ledger_path=args.parent_ledger, output_dir=args.output_dir), indent=2, sort_keys=True))
     elif args.command == "autonomous-multitask":
         print(json.dumps(run_autonomous_multitask(repository_root=args.repository_root, starter_kit_dir=args.starter_kit, data_dir=args.data_dir, parent_ledger_path=args.parent_ledger, output_dir=args.output_dir), indent=2, sort_keys=True))
     elif args.command == "autonomous-watchtime":
