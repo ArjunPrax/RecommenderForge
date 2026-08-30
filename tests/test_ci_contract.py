@@ -11,6 +11,7 @@ class ContinuousIntegrationContractTests(unittest.TestCase):
         self.assertIn("uv sync --locked", workflow)
         self.assertIn("python -m unittest discover -s tests -v", workflow)
         self.assertIn("git diff --check", workflow)
+        self.assertIn("public-checkout test suite", workflow)
 
 
 if __name__ == "__main__":

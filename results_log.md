@@ -2,6 +2,27 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R033 - Public-checkout CI contract repair
+
+Date: 2026-08-30
+Task: T2-014
+
+### Purpose
+
+Verify that the repository's GitHub workflow can execute from the deliberately data-free, organizer-kit-free public checkout that T2-010 requires.
+
+### Initial outcome and cause
+
+The first remote GitHub Actions runs for PR #1 failed before test execution completed because 16 parity/resume tests directly opened `kuairand-starter-kit/evaluate.py` or `kuairand-starter-kit/baseline.py`. Those local files are intentionally ignored and therefore correctly absent from GitHub's checkout. This was a CI-test contract defect, not a benchmark or model failure.
+
+### Repair and local validation
+
+The affected tests are now explicitly conditional on the local organizer file they verify. In a developer environment containing that kit, they still execute: `uv lock --check`, `python -m unittest discover -s tests -v`, and `git diff --check` passed with 71 tests and no skips. In the public checkout they are expected to skip, leaving all tests that do not require organizer material active.
+
+### Limitation
+
+The repaired GitHub Actions run is **Not yet demonstrated** until the new commit is pushed and the PR check completes.
+
 ## R032 - Final rubric, benchmark, delivery, and redistribution audit
 
 Date: 2026-08-30

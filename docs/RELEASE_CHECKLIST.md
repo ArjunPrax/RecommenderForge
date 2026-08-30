@@ -10,7 +10,7 @@ Status: Human-gated external actions are intentionally unchecked. This checklist
 - [x] `submission` generated the aligned Starter Kit schema output from the designated record.
 - [x] KuaiRand-1K and KuaiRand-27K artifact status/results are recorded honestly.
 - [x] R028 proves a deadline kills a real trusted child and removes its disposable worktree.
-- [x] Data-free PR/push CI workflow is authored and locally contract-validated; remote execution awaits a push.
+- [x] Public-checkout PR/push CI workflow is authored and locally contract-validated; R033 records the initial remote missing-kit failure and repair.
 - [x] Full test suite (71 tests) and `git diff --check` pass at the current release-candidate commit.
 - [x] Team-interpreted campaign report states LLM input/output tokens and GPU-hours to convergence.
 
@@ -26,6 +26,6 @@ Status: Human-gated external actions are intentionally unchecked. This checklist
 - [x] Keep organizer material out of the public repo: local KuaiRand data is CC BY-SA 4.0, Starter Kit source has no separate code-license notice, and neither will be redistributed.
 - [x] R030 scanned tracked files for credential signatures/private-key markers; none were found. Competition data and the entire Starter Kit remain ignored.
 - [ ] Make the GitHub repository public only after human review.
-- [ ] Push the reviewed release branch and merge through a PR.
+- [ ] Push the reviewed release branch and merge through a PR after the repaired public-checkout CI is green.
 - [ ] Record and publish the required public 3-minute YouTube end-to-end demo, then add its URL to Devpost.
 - [ ] Submit the output/checkpoint through the official competition flow.

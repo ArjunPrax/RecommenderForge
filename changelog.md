@@ -2,6 +2,20 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-30 - Public-checkout CI repair
+
+### Changed
+
+The integrity workflow now names and tests its actual contract: a public checkout without organizer materials. Tests that prove parity against the local organizer evaluator or baseline now skip only when those deliberately untracked files are absent; all data-free safety, controller, ledger, and model tests still execute.
+
+### Validation
+
+The first remote CI attempt exposed the missing-file assumption rather than a product failure. With the local organizer kit present, `uv lock --check`, the complete 71-test suite, and `git diff --check` pass. The repaired workflow is awaiting its public-checkout reproduction and GitHub rerun.
+
+### Related
+
+Task: T2-014. Result: R033. Requirements: REQ-003, REQ-006, REQ-011, REQ-017.
+
 ## 2026-08-30 - Final rubric and delivery-contract audit
 
 ### Changed

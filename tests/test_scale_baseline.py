@@ -57,6 +57,7 @@ class StreamingPopularityTests(unittest.TestCase):
             self.assertEqual(output.read_text(encoding="utf-8").splitlines()[0], "row_id,user_id,video_id,score")
             self.assertFalse((data / "submission.csv.partial").exists())
 
+    @unittest.skipUnless((Path(__file__).resolve().parents[1] / "kuairand-starter-kit/evaluate.py").is_file(), "requires local organizer evaluator")
     def test_frozen_tab_model_can_be_rescored_without_refitting(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             data = Path(directory)
@@ -69,6 +70,7 @@ class StreamingPopularityTests(unittest.TestCase):
             result = rescore_frozen_scale_model(model_path=checkpoint, variant="1k", data_dir=data, evaluator_path=root / "kuairand-starter-kit/evaluate.py", item_weight=0.25, shards=2)
             self.assertEqual(result["item_weight"], 0.25)
 
+    @unittest.skipUnless((Path(__file__).resolve().parents[1] / "kuairand-starter-kit/evaluate.py").is_file(), "requires local organizer evaluator")
     def test_sharded_evaluation_matches_unsharded_organizer_evaluator(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             data = Path(directory)
@@ -239,6 +241,7 @@ class ScaleOutputResumeTests(unittest.TestCase):
                 next(ScaleArtifactAdapter("1k", data).iter_rows("test", include_labels=True))
 
 
+@unittest.skipUnless(EVALUATOR.is_file(), "requires local organizer evaluator")
 class ScaleValidationResumeTests(unittest.TestCase):
     def _reference(self, data: Path, model: Path) -> dict[str, float | str]:
         return score_scale_validation_resumable(
@@ -348,6 +351,7 @@ class ScaleValidationResumeTests(unittest.TestCase):
             self.assertAlmostEqual(again["primary"], first["primary"], places=12)
 
 
+@unittest.skipUnless(EVALUATOR.is_file(), "requires local organizer evaluator")
 class ScaleResumeMismatchTests(unittest.TestCase):
     def _interrupted(self, data: Path, model: Path) -> None:
         with self.assertRaises(RuntimeError):

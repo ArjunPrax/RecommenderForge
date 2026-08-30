@@ -222,6 +222,23 @@ Goal: Reconcile the official Track 2 PDF, Starter Kit, Devpost requirements, rub
 
 Relevant requirements: REQ-001–REQ-020
 
+### T2-014 - Public-checkout CI contract repair
+
+Owner: Codex
+Status: IN_PROGRESS
+Priority: Critical
+Depends on: T2-010, T2-012, T2-013
+
+Goal: Make the GitHub integrity workflow genuinely runnable from the public repository scope, while retaining local organizer-parity coverage when the separately obtained kit is installed.
+
+Relevant requirements: REQ-003, REQ-006, REQ-011, REQ-017
+
+Definition of done: The public-checkout suite passes in GitHub Actions; local environments with the kit still execute the parity tests rather than silently skipping them.
+
+Validation: R033; a tracked-files-only archive checkout; the repaired PR Actions check.
+
+Files/components: `.github/workflows/integrity.yml`, `tests/test_ci_contract.py`, `tests/test_scale_baseline.py`, `tests/test_torch_fm.py`, release records.
+
 Definition of done: A written audit identifies every required external deliverable, preserves the metric-contract conflict, confirms the non-redistribution release scope, and distinguishes demonstrated evidence from pending external actions.
 
 Validation: R032 and `docs/DELIVERY_AUDIT.md`.

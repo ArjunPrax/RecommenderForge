@@ -28,7 +28,7 @@ jobs:
       - name: Install locked environment
         run: uv sync --locked
 
-      - name: Run data-free test suite
+      - name: Run public-checkout test suite
         run: uv run python -m unittest discover -s tests -v
 
       - name: Check whitespace errors

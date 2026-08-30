@@ -28,6 +28,7 @@ def organizer_fm():
         sys.path.remove(str(KIT))
 
 
+@unittest.skipUnless((KIT / "baseline.py").is_file(), "requires local organizer baseline")
 class TorchFMParityTests(unittest.TestCase):
     def test_fixed_weights_match_organizer_logits_and_loss(self) -> None:
         fm = organizer_fm()(12, k=4, lr=0.001, seed=7)
