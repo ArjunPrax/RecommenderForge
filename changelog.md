@@ -10,7 +10,7 @@ The integrity workflow now names and tests its actual contract: a public checkou
 
 ### Validation
 
-The first remote CI attempt exposed the missing-file assumption rather than a product failure. With the local organizer kit present, `uv lock --check`, the complete 71-test suite, and `git diff --check` pass. The repaired workflow is awaiting its public-checkout reproduction and GitHub rerun.
+The first remote CI attempt exposed the missing-file assumption rather than a product failure. With the local organizer kit present, `uv lock --check`, the complete 71-test suite, and `git diff --check` pass. A clean Git clone of the tracked branch (without ignored organizer material) also passes all 71 discovered tests, with the 16 local organizer-parity tests explicitly skipped. The repaired GitHub rerun remains pending.
 
 ### Related
 

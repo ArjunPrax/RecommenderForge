@@ -17,7 +17,7 @@ The first remote GitHub Actions runs for PR #1 failed before test execution comp
 
 ### Repair and local validation
 
-The affected tests are now explicitly conditional on the local organizer file they verify. In a developer environment containing that kit, they still execute: `uv lock --check`, `python -m unittest discover -s tests -v`, and `git diff --check` passed with 71 tests and no skips. In the public checkout they are expected to skip, leaving all tests that do not require organizer material active.
+The affected tests are now explicitly conditional on the local organizer file they verify. In a developer environment containing that kit, they still execute: `uv lock --check`, `python -m unittest discover -s tests -v`, and `git diff --check` passed with 71 tests and no skips. A clean local Git clone of the tracked branch, containing no ignored organizer material but retaining `.git` metadata like GitHub Actions, also passed all 71 discovered tests with 16 intentional organizer-parity skips. The remaining 55 tests executed and passed.
 
 ### Limitation
 
