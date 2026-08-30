@@ -62,7 +62,7 @@ Notes: Bootstrap is committed and pushed. The human advanced the project on 2026
 
 ### T2-002 - Platform foundation and benchmark integrity
 
-Owner: Codex
+Owner: Project
 Status: DONE
 Priority: Critical
 Depends on: T2-001
@@ -79,7 +79,7 @@ Files/components: `src/tiktok_ml_agent/`, `tests/`, root/documentation contracts
 
 ### T2-003 - Baseline reproduction and PyTorch parity
 
-Owner: Codex
+Owner: Project
 Status: DONE
 Priority: Critical
 Depends on: T2-002 model/benchmark interfaces and local data
@@ -94,7 +94,7 @@ Validation: Reproduction commands, fixed fixtures, five-seed log, sign/differenc
 
 ### T2-004 - Autonomous qualification run
 
-Owner: Codex
+Owner: Project
 Status: DONE
 Priority: Critical
 Depends on: T2-002
@@ -109,7 +109,7 @@ Validation: Deterministic fixture, injected failure, resource/intervention recor
 
 ### T2-005 - Autonomous ranking-objective research
 
-Owner: Claude
+Owner: Project
 Status: DONE
 Priority: High
 Depends on: T2-003, T2-004
@@ -124,7 +124,7 @@ Notes: R003–R023 and R026 executed the registered loss, history, auxiliary, te
 
 ### T2-006 - KuaiRand-1K and 27K adaptation
 
-Owner: Codex + Claude
+Owner: Project
 Status: DONE
 Priority: High
 Depends on: organizer artifact contract, T2-004, T2-005
@@ -139,7 +139,7 @@ Notes: KuaiRand-1K and KuaiRand-27K official archives are checksum-verified. R01
 
 ### T2-009 - Isolated child-process timeout recovery
 
-Owner: Codex
+Owner: Project
 Status: DONE
 Priority: High
 Depends on: T2-002
@@ -158,7 +158,7 @@ Notes: R028 exercises the real POSIX subprocess and Git-worktree boundaries in a
 
 ### T2-010 - Starter Kit publication isolation
 
-Owner: Codex
+Owner: Project
 Status: DONE
 Priority: High
 Depends on: T2-001
@@ -177,7 +177,7 @@ Notes: R029 confirms that a source file within the local Starter Kit is ignored 
 
 ### T2-011 - Release-integrity audit
 
-Owner: Codex
+Owner: Project
 Status: DONE
 Priority: High
 Depends on: T2-010
@@ -194,7 +194,7 @@ Files/components: `results_log.md`, `changelog.md`, `docs/RELEASE_CHECKLIST.md`.
 
 ### T2-012 - Data-free CI integrity gate
 
-Owner: Codex
+Owner: Project
 Status: DONE
 Priority: High
 Depends on: T2-010, T2-011
@@ -205,15 +205,15 @@ Relevant requirements: REQ-003, REQ-006, REQ-011, REQ-017
 
 Definition of done: A least-privilege GitHub Actions workflow triggers on push/PR, uses the lockfile, and runs the complete data-free unit suite plus `git diff --check`; a local contract test protects these commands.
 
-Validation: `tests.test_ci_contract.ContinuousIntegrationContractTests.test_integrity_workflow_runs_the_locked_data_free_suite`; remote execution is **Not yet demonstrated** until a human-authorized push.
+Validation: `tests.test_ci_contract.ContinuousIntegrationContractTests.test_integrity_workflow_runs_the_locked_data_free_suite`; the repaired workflow passed both push and pull-request GitHub Actions runs before PR #1 merged.
 
 Files/components: `.github/workflows/integrity.yml`, `tests/test_ci_contract.py`.
 
-Notes: R031 validates the workflow syntax, locked environment, and local contract test. Remote workflow execution is **Not yet demonstrated** because it requires the human-authorized push.
+Notes: R031 validates the workflow syntax, locked environment, and local contract test. R033 records the initial missing-kit CI failure, repair, clean-clone verification, and successful remote rerun.
 
 ### T2-013 - Final rubric and delivery-contract audit
 
-Owner: Codex
+Owner: Project
 Status: DONE
 Priority: Critical
 Depends on: T2-012
@@ -222,10 +222,16 @@ Goal: Reconcile the official Track 2 PDF, Starter Kit, Devpost requirements, rub
 
 Relevant requirements: REQ-001–REQ-020
 
+Definition of done: A written audit identifies every required external deliverable, preserves the metric-contract conflict, confirms the non-redistribution release scope, and distinguishes demonstrated evidence from pending external actions.
+
+Validation: R032 and `docs/DELIVERY_AUDIT.md`.
+
+Files/components: `docs/DELIVERY_AUDIT.md`, `docs/RELEASE_CHECKLIST.md`, `docs/DEMO.md`, `docs/DEVPOST_DRAFT.md`, `docs/PROVENANCE.md`, `docs/ORGANIZER_CLARIFICATION_EMAIL.md`.
+
 ### T2-014 - Public-checkout CI contract repair
 
-Owner: Codex
-Status: IN_PROGRESS
+Owner: Project
+Status: DONE
 Priority: Critical
 Depends on: T2-010, T2-012, T2-013
 
@@ -235,12 +241,23 @@ Relevant requirements: REQ-003, REQ-006, REQ-011, REQ-017
 
 Definition of done: The public-checkout suite passes in GitHub Actions; local environments with the kit still execute the parity tests rather than silently skipping them.
 
-Validation: R033; a tracked-files-only archive checkout; the repaired PR Actions check.
+Validation: R033; a clean tracked-only Git clone; two repaired PR Actions checks passed before PR #1 merged.
 
 Files/components: `.github/workflows/integrity.yml`, `tests/test_ci_contract.py`, `tests/test_scale_baseline.py`, `tests/test_torch_fm.py`, release records.
 
-Definition of done: A written audit identifies every required external deliverable, preserves the metric-contract conflict, confirms the non-redistribution release scope, and distinguishes demonstrated evidence from pending external actions.
+### T2-015 - Public README and local-instruction hygiene
 
-Validation: R032 and `docs/DELIVERY_AUDIT.md`.
+Owner: Project
+Status: DONE
+Priority: High
+Depends on: T2-013, T2-014
 
-Files/components: `docs/DELIVERY_AUDIT.md`, `docs/RELEASE_CHECKLIST.md`, `docs/DEMO.md`, `docs/DEVPOST_DRAFT.md`, `docs/PROVENANCE.md`, `docs/ORGANIZER_CLARIFICATION_EMAIL.md`.
+Goal: Present the measured implementation and limitations clearly in the public README while keeping local agent instruction files out of the repository.
+
+Relevant requirements: REQ-010, REQ-011, REQ-012, REQ-013, REQ-019
+
+Definition of done: README includes architecture, measured result tables, reproducible setup, safety boundaries, delivery caveats, and links to full evidence; local instruction files are ignored and no longer tracked.
+
+Validation: Markdown link/content checks, repository-safety test, full data-free suite, and `git diff --check`.
+
+Files/components: `README.md`, `.gitignore`, tracked documentation, local instruction files, release records.

@@ -2,6 +2,25 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R034 - Public README and local-instruction hygiene
+
+Date: 2026-08-30
+Task: T2-015
+
+### Purpose
+
+Make the public repository self-contained for judges while keeping local coordination instructions out of tracked source.
+
+### Result
+
+The README now documents the control-loop architecture, safety boundaries, setup, reproducible commands, output schema, full KuaiRand-Pure result table, 1K/27K validation evidence, resource totals, and the organizer-contract limitation. It links readers to the complete empirical record instead of reducing the project to an unattributed summary.
+
+The two local instruction files were removed from Git tracking but retained locally. Both are explicitly ignored, and a repository-safety test protects that state. Public tracked documentation uses role- and project-based language rather than tool-attribution language.
+
+### Validation
+
+README content/links, ignore rules, the repository-safety suite, the full data-free suite (72 tests), and whitespace checks passed with this change.
+
 ## R033 - Public-checkout CI contract repair
 
 Date: 2026-08-30
@@ -19,9 +38,9 @@ The first remote GitHub Actions runs for PR #1 failed before test execution comp
 
 The affected tests are now explicitly conditional on the local organizer file they verify. In a developer environment containing that kit, they still execute: `uv lock --check`, `python -m unittest discover -s tests -v`, and `git diff --check` passed with 71 tests and no skips. A clean local Git clone of the tracked branch, containing no ignored organizer material but retaining `.git` metadata like GitHub Actions, also passed all 71 discovered tests with 16 intentional organizer-parity skips. The remaining 55 tests executed and passed.
 
-### Limitation
+### Remote validation
 
-The repaired GitHub Actions run is **Not yet demonstrated** until the new commit is pushed and the PR check completes.
+Both repaired GitHub Actions runs passed (43 seconds for `push`, 1 minute 15 seconds for `pull_request`) before PR #1 merged into `main` at merge commit `7082dbc3a073dec1c219f2a8260fc10ff3c91e77`.
 
 ## R032 - Final rubric, benchmark, delivery, and redistribution audit
 

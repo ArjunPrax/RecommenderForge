@@ -47,3 +47,7 @@ submissions/
 submission*.csv
 artifacts/*
 !artifacts/.gitkeep
+
+# Local coordination instructions (intentionally not part of the public repository)
+AGENTS.md
+CLAUDE.md
