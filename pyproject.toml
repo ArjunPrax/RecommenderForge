@@ -1,0 +1,23 @@
+[project]
+name = "tiktok-ml-agent"
+version = "0.1.0"
+description = "Autonomous ML research control plane for TikTok TechJam Track 2"
+requires-python = ">=3.11"
+dependencies = ["numpy>=2.0,<3", "torch>=2.5,<3"]
+
+[project.scripts]
+tiktok-ml-agent = "tiktok_ml_agent.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

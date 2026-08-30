@@ -2,9 +2,9 @@
 
 ## Project state
 
-**Current phase: Phase 0 - Repository/bootstrap only.** This is a two-person hackathon project. Do not begin solution planning, architecture selection, experiments, implementation, or optimization until the human explicitly advances the project out of Phase 0.
+**Current phase: Phase 1 - implementation.** The human explicitly advanced the repository on 2026-08-27. This is a two-person hackathon project implementing an autonomous ML research agent for Track 2.
 
-Work on Track 2 only. The official competition PDF is authoritative.
+Work on Track 2 only. The official competition PDF is authoritative. The downloadable organizer evaluator is the provisional executable contract until the organizer resolves the documented label/metric conflict.
 
 ## Authority and conflicts
 
@@ -20,10 +20,23 @@ Before editing, understand the task/requirements, inspect affected code, identif
 
 After editing, run relevant checks, inspect failures, update docs and `changelog.md`, and record measured outcomes in `results_log.md`. State what was and was not validated. Never fabricate benchmarks/tests, hide failed experiments, weaken tests to pass, silently change architecture, or claim performance/correctness without evidence. If incomplete, say **Not yet demonstrated**.
 
+## Benchmark integrity
+
+- Never access, score, inspect, or use hidden-test labels during development. Candidate-facing code must fail closed when asked for test labels or test scoring.
+- Delegate metric calculation to the organizer evaluator and record its path/hash. Do not silently reimplement or modify it.
+- Use immutable code/configuration/data/evaluator/checkpoint identities for every accepted result. Generate final predictions from the measured checkpoint; never retrain a different final model.
+- Use inner development only for training controls such as early stopping. It is not a rejection proxy unless a documented correlation experiment proves it predictive.
+- Treat a single seed as screening evidence only. Final promotion/convergence claims require the declared multi-seed procedure.
+- Label unresolved organizer rules **Interpretation - not explicit organizer wording** in decisions and reports.
+
+## Autonomous-run records
+
+Every eligible run has a stable `EXP-XXX` identifier, `run_class` (`qualification`, `research`, or `designated_final`), an operator family, hypothesis, diff hash, evidence source, metrics, resource usage, failure/recovery information, and a mechanism-aware reflection. The append-only ledger is the source of truth; summaries may never replace it.
+
 For meaningful implementation: identify task and requirements; inspect code; define expected behaviour and measurement; implement; test; document. Architecture changes require an explanation plus updates to decisions, architecture, and changelog.
 
 ## Records and collaboration
 
 Use stable, never-recycled IDs: `REQ-XXX`, `T2-XXX`, `DXXX`, `EXP-XXX`, and `RXXX`. Cancelled work keeps its ID. `changelog.md` is newest-first handoff context; `results_log.md` preserves all empirical outcomes, including failures.
 
-`main` is integrated state; avoid direct feature development there. Use one coherent task per branch (e.g. `arjun/<task>` or `teammate/<task>`). Flow: task -> branch -> implementation -> validation -> documentation/logs -> push -> PR -> review -> merge. The branch owner remains accountable for correctness, testing, security, performance claims, and PR quality.
+`main` is integrated state; avoid direct feature development there. Use one coherent task per branch. Because the existing `Arjun` branch occupies the `arjun` namespace, use `arjun-T2-XXX-short-name` and `divija-T2-XXX-short-name`. Flow: task -> branch -> implementation -> validation -> documentation/logs -> push -> PR -> review -> merge. The branch owner remains accountable for correctness, testing, security, performance claims, and PR quality.

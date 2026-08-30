@@ -1,0 +1,31 @@
+# Release Checklist
+
+Status: Human-gated external actions are intentionally unchecked. This checklist does not grant permission to publish, submit, or change repository visibility.
+
+## Technical evidence
+
+- [x] Campaign report explicitly distinguishes `team_interpreted` from organizer-confirmed designation.
+- [x] KuaiRand-Pure team-interpreted campaign converged through `campaign-status` with a single evaluator and data identity.
+- [x] `designate-final` created the immutable team-interpreted final record from that campaign.
+- [x] `submission` generated the aligned Starter Kit schema output from the designated record.
+- [x] KuaiRand-1K and KuaiRand-27K artifact status/results are recorded honestly.
+- [x] R028 proves a deadline kills a real trusted child and removes its disposable worktree.
+- [x] Public-checkout PR/push CI workflow is authored and locally contract-validated; R033 records the initial remote missing-kit failure and repair.
+- [x] Full test suite (71 tests) and `git diff --check` pass at the current release-candidate commit.
+- [x] Team-interpreted campaign report states LLM input/output tokens and GPU-hours to convergence.
+
+## Documentation
+
+- [x] README contains overview, setup, reproduction, limitations, and contribution/provenance context.
+- [x] `results_log.md` includes successes, regressions, failures/recovery, campaign delta table, and team-interpreted designation evidence.
+- [x] Devpost draft is updated with current measured evidence; human submission remains pending.
+- [x] R032 reconciles the final rubric, benchmark, artifact, and license evidence; it preserves the team-interpreted metric limitation.
+
+## Human-authorized external actions
+
+- [x] Keep organizer material out of the public repo: local KuaiRand data is CC BY-SA 4.0, Starter Kit source has no separate code-license notice, and neither will be redistributed.
+- [x] R030 scanned tracked files for credential signatures/private-key markers; none were found. Competition data and the entire Starter Kit remain ignored.
+- [ ] Make the GitHub repository public only after human review.
+- [ ] Push the reviewed release branch and merge through a PR after the repaired public-checkout CI is green.
+- [ ] Record and publish the required public 3-minute YouTube end-to-end demo, then add its URL to Devpost.
+- [ ] Submit the output/checkpoint through the official competition flow.

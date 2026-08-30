@@ -1,49 +1,72 @@
 # Architecture
 
-Status: **NOT YET SELECTED**
-
-Architecture planning has intentionally not begun. Repository bootstrap must complete before the team evaluates solution architectures.
+Status: **Accepted for Phase 1 implementation**
 
 ## System overview
 
-Not yet selected.
+The project is an autonomous research control plane around organizer-supplied recommender benchmarks. It plans a bounded candidate batch from immutable parents, executes candidates in isolated worktrees, delegates validation to a versioned organizer evaluator, stores immutable evidence, reflects on the outcome, and selects the next parent or converges.
 
 ## Components
 
-Not yet selected.
+- **Benchmark contract and adapter:** data partitions, evaluator path/hash, submission schema, hidden-test policy.
+- **Scale adapter:** streams official 1K/27K logs, uses bounded item statistics and user-consistent validation shards, and never exposes bonus-test labels.
+- **Scale checkpoint/output:** persists fitted bounded counters and streams feature-only scale-schema outputs from those exact counters; it never refits during submission. Long scale validation and output generation checkpoint progress and resume only under an identical frozen run identity.
+- **Train-only auxiliary channel:** can expose organizer outcomes such as watch completion only to a training candidate; validation/test records cannot carry those fields.
+- **Research knowledge base:** structured evidence cards for papers, organizer guidance, and measured findings.
+- **Memory manager:** bounded planner context distilled from, but never replacing, the append-only ledger.
+- **Planner:** produces 1–3 ranked `ExperimentSpec` siblings with evidence and one primary operator family.
+- **Executor:** invokes a host-owned command factory in a disposable candidate worktree; candidate patches are path-scoped and must emit structured result JSON.
+- **Validator:** static checks, test-access policy, checkpoint checks, and organizer evaluator delegation.
+- **Ledger:** SQLite/JSON evidence with run class, hypothesis, diff/config/data/evaluator identity, metrics, reflection, failures, and resources.
+- **Controller:** deterministic candidate selection, POSIX main-thread wall-clock budget enforcement, recovery, convergence, checkpoint freezing, and report export.
+- **Campaign convergence:** evaluates epsilon/N over complete candidate batches across the campaign, rather than incorrectly treating siblings as sequential iterations.
 
 ## Data flow
 
-Not yet selected.
+```text
+BenchmarkSpec + KnowledgeBase + MemorySnapshot
+                  -> Planner -> CandidateBatch
+                  -> isolated candidate execution
+                  -> validator + organizer evaluator
+                  -> RunRecord + artifacts
+                  -> reflection + memory consolidation
+                  -> promote / recover / converge / checkpoint-backed output
+```
 
 ## Interfaces
 
-Not yet selected.
+- `BenchmarkSpec`: dataset/splits/label/evaluator hash/baseline/convergence/schema/policy.
+- `ExperimentSpec`: stable ID, run class, parent, hypothesis, source evidence, operator, config, controls, budgets.
+- `RunRecord`: append-only measured outcome and lifecycle state.
+- `CheckpointManifest`: content hashes binding the measured checkpoint to code/data/evaluator/config/predictions.
+- `EvidenceCard` and `MemorySnapshot`: retrievable research evidence and bounded planner state.
+- `campaign-status`: materializes an auditable convergence/resource report from explicit cross-ledger run references; it refuses mixed evaluators and post-convergence continuation.
+- `designate-final`: creates a new immutable final record only from a converged campaign's verified existing checkpoint; it then feeds the feature-only output generator without retraining. It records whether the campaign is organizer-`confirmed` or internally `team_interpreted`; a `provisional` contract remains ineligible.
+- `scale-resume-validation` / `scale-resume-submission`: CLI entry points for identity-gated recovery. They require the frozen model, preflight data fingerprint, persisted state path, and versioned evaluator identity; the submission command never scores or reads test labels.
 
 ## Execution environment
 
-Not yet selected.
-
-## Performance-sensitive path
-
-Not yet selected.
+Python is managed through a project-local `uv` environment after compatibility verification. The NumPy baseline remains runnable without PyTorch. PyTorch is admitted only after fixed-weight and five-seed pointwise parity.
 
 ## Trust/security boundaries
 
-Not yet selected.
+- Candidate code cannot retrieve test labels or locally score test data.
+- Candidates cannot select shell commands; only a host-owned command factory executes after static diff validation.
+- The adapter delegates to the organizer evaluator, whose hash is recorded.
+- Every accepted prediction is traceable to an immutable checkpoint manifest.
+- Data, generated artifacts, caches, submissions, and secrets are git-ignored.
 
 ## Observability
 
-Not yet selected.
+Run records include timings, CPU/MPS/CUDA use, peak memory, LLM tokens, attempt count, failure/recovery history, interventions, and event timestamps. Generated reports aggregate qualification, research, and designated-final runs separately.
 
 ## Evaluation path
 
-Not yet selected.
-
-## Architecture diagram
-
-Not yet selected.
+Use the organizer evaluator for any official validation score. Inner development is available for model-internal training controls but is not a candidate-rejection proxy unless correlation has been demonstrated. Final claims use the declared multi-seed protocol.
 
 ## Known tradeoffs
 
-Not yet selected.
+- **Interpretation - not explicit organizer wording:** the Starter Kit is the team’s pinned execution contract (D029), while any organizer correction is a new incompatible evaluator profile.
+- Bounded operator taxonomy improves safety and comparability, but `novel` preserves exploration.
+- Working-memory summaries reduce token growth; the original ledger remains retrievable.
+- Full-fidelity Pure evaluation is preferred over unvalidated small-data pruning.
