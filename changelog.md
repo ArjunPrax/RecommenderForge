@@ -2,6 +2,20 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-30 - Final rubric and delivery-contract audit
+
+### Changed
+
+Added a source-by-source final delivery audit and promoted the public three-minute YouTube demo to an explicit mandatory release gate. The audit records the durable PDF/Starter-Kit metric contradiction, result limitations, required Devpost deliverables, final checkpoint/output hashes, and the conservative redistribution scope.
+
+### Validation
+
+R032 records the review of the official Track PDF, official Devpost event page, local Starter Kit license files, R027 evidence, and current release branch. The local data carries CC BY-SA 4.0 text; Starter Kit source has no separate code-license notice. Neither is tracked or will be published. The actual public video and remote CI are **Not yet demonstrated**.
+
+### Related
+
+Task: T2-013. Result: R032. Requirements: REQ-001–REQ-020.
+
 ## 2026-08-29 - Data-free CI integrity gate
 
 ### Changed

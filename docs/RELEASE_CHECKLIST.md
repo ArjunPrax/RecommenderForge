@@ -19,11 +19,13 @@ Status: Human-gated external actions are intentionally unchecked. This checklist
 - [x] README contains overview, setup, reproduction, limitations, and contribution/provenance context.
 - [x] `results_log.md` includes successes, regressions, failures/recovery, campaign delta table, and team-interpreted designation evidence.
 - [x] Devpost draft is updated with current measured evidence; human submission remains pending.
+- [x] R032 reconciles the final rubric, benchmark, artifact, and license evidence; it preserves the team-interpreted metric limitation.
 
 ## Human-authorized external actions
 
-- [ ] Verify organizer Starter Kit redistribution terms before publishing it (the whole local kit is ignored until then).
+- [x] Keep organizer material out of the public repo: local KuaiRand data is CC BY-SA 4.0, Starter Kit source has no separate code-license notice, and neither will be redistributed.
 - [x] R030 scanned tracked files for credential signatures/private-key markers; none were found. Competition data and the entire Starter Kit remain ignored.
 - [ ] Make the GitHub repository public only after human review.
 - [ ] Push the reviewed release branch and merge through a PR.
+- [ ] Record and publish the required public 3-minute YouTube end-to-end demo, then add its URL to Devpost.
 - [ ] Submit the output/checkpoint through the official competition flow.

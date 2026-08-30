@@ -210,3 +210,20 @@ Validation: `tests.test_ci_contract.ContinuousIntegrationContractTests.test_inte
 Files/components: `.github/workflows/integrity.yml`, `tests/test_ci_contract.py`.
 
 Notes: R031 validates the workflow syntax, locked environment, and local contract test. Remote workflow execution is **Not yet demonstrated** because it requires the human-authorized push.
+
+### T2-013 - Final rubric and delivery-contract audit
+
+Owner: Codex
+Status: DONE
+Priority: Critical
+Depends on: T2-012
+
+Goal: Reconcile the official Track 2 PDF, Starter Kit, Devpost requirements, rubric evidence, final artifact provenance, and redistribution scope before the release branch is published.
+
+Relevant requirements: REQ-001–REQ-020
+
+Definition of done: A written audit identifies every required external deliverable, preserves the metric-contract conflict, confirms the non-redistribution release scope, and distinguishes demonstrated evidence from pending external actions.
+
+Validation: R032 and `docs/DELIVERY_AUDIT.md`.
+
+Files/components: `docs/DELIVERY_AUDIT.md`, `docs/RELEASE_CHECKLIST.md`, `docs/DEMO.md`, `docs/DEVPOST_DRAFT.md`, `docs/PROVENANCE.md`, `docs/ORGANIZER_CLARIFICATION_EMAIL.md`.

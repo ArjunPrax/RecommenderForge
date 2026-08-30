@@ -2,6 +2,27 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R032 - Final rubric, benchmark, delivery, and redistribution audit
+
+Date: 2026-08-30
+Task: T2-013
+
+### Purpose
+
+Re-check the organizer's final delivery rules, scoring rubric, executable benchmark artifacts, and public-repository scope before publishing the reviewed branch.
+
+### Result
+
+The official Track PDF confirms the 35/20/20/15/10 Technical Execution, Innovation, Impact, Feasibility, and Presentation weighting; the Devpost event adds a mandatory public three-minute YouTube end-to-end video and reports a 1 September 2026, 12:00 pm SGT deadline. The reviewed branch has evidence for the first four technical criteria and an explicit timed video script, but the actual public video is **Not yet demonstrated**.
+
+The audit confirms the existing material conflict: PDF pages 3, 4, 6, 7, and 8 describe click/NDCG@10/Recall@50, while page 5 and its runnable evaluator/baseline pin long_view/GAUC/nDCG@5. D029/D031's team-interpreted result therefore remains properly limited to validation primary `0.604017` versus `0.601572` (+`0.002445`) under the versioned Starter Kit, not an organizer-confirmed or hidden-test result.
+
+The local KuaiRand data directories provide CC BY-SA 4.0 license text. The separately supplied Starter Kit source has no separate code-license notice. The release scope is consequently conservative: no organizer code or data is tracked or will be published; users are directed to organizer materials.
+
+### Reproduction
+
+Review the official PDF pp. 3-9, `kuairand-starter-kit/KuaiRand-Pure/LICENSE`, `docs/DELIVERY_AUDIT.md`, and the R027 artifact record.
+
 ## R031 - Data-free CI integrity-gate validation
 
 Date: 2026-08-29

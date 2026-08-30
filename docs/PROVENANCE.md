@@ -15,4 +15,4 @@
 
 ## Scope
 
-This declaration reflects the implemented and logged runs. It is not an organizer approval to redistribute starter-kit code or data. The entire `kuairand-starter-kit/` directory is intentionally git-ignored and protected by a repository-safety test; redistribution remains an explicit release-checklist item.
+This declaration reflects the implemented and logged runs. The local KuaiRand data directories contain CC BY-SA 4.0 license text; the separately supplied Starter Kit source contains no separate code-license notice. The entire `kuairand-starter-kit/` directory is intentionally git-ignored and protected by a repository-safety test. The public repository excludes both the kit and data rather than relying on redistribution permission. This is a release-scope record, not legal advice.

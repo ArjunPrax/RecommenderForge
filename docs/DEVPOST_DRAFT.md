@@ -2,6 +2,8 @@
 
 Status: Draft for human submission. Metrics are validation-only under the team-interpreted Starter-Kit-pinned contract; do not claim organizer-hidden-test performance or organizer confirmation.
 
+The official Devpost event also requires a public 3-minute YouTube demo. The script is in `docs/DEMO.md`; record and add the public URL before submission.
+
 ## Inspiration
 
 Recommender-system iteration often requires a person to turn a hypothesis into a code change, run the benchmark, diagnose a regression, keep the useful evidence, and repeat. Track 2 asks for that research loop to become an accountable system rather than an opaque collection of experiments.

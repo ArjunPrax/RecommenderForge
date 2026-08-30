@@ -18,6 +18,8 @@ Our team has started implementing the Track 2 autonomous recommender-system rese
 
 5. Please confirm the final submission process: whether a checkpoint is required in addition to predictions, the permitted number of submissions, and the final deadline/time zone. We will retain the Starter Kit's supplied `row_id,user_id,video_id,score` schema unless you specify otherwise.
 
+6. The KuaiRand data directories include CC BY-SA 4.0 license text, but the separately supplied Starter Kit source has no separate code-license notice. May we include any unmodified Starter Kit source in our required public repository, or should teams keep the kit excluded and link users to the organizer download?
+
 These answers will help us keep our implementation and reporting aligned with the intended competition contract. Thank you for your guidance.
 
 Best regards,
