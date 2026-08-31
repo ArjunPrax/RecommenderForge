@@ -1,6 +1,6 @@
 # Track 2 Problem
 
-Source: official **Tiktok Techjam Prob Statements** PDF supplied by the user, updated 2026-08-26, pages 1-12. This describes the problem, not a solution.
+Source: official **Tiktok Techjam Prob Statements** PDF supplied by the user, updated 2026-08-26, pages 1-12; organizer clarification received 2026-08-31. This describes the problem, not a solution.
 
 ## Official Problem Statement
 
@@ -49,6 +49,8 @@ The technical score uses the converged result, not the peak. Per metric, hidden-
 - KuaiRand-1K and KuaiRand-27K are organizer bonus benchmarks; the team treats both as internal must-attempt targets once official artifacts exist.
 - AliCCP is absent from the updated 12-page PDF and is out of scope unless organizers explicitly reintroduce it.
 
-## Open Questions / Ambiguities
+## Confirmed benchmark contract
 
-**Organizer-source conflict - requires clarification.** The starter kit pins `long_view`, GAUC, and nDCG@5. PDF pages 4, 6, 7, and 8 instead describe `click`, nDCG@10, and Recall@50. The PDF says the Starter Kit pins the exact label/metrics, but its narrative contradicts that claim. **Interpretation - not explicit organizer wording:** D029/D031 permit a team-interpreted technical designation under the versioned Starter Kit profile; an organizer response remains required for organizer-confirmed reporting.
+The organizers confirmed on 2026-08-31 that the checked-in Starter Kit is the scoring authority. Predict native `long_view`; rank only within each user's logged impressions; and report GAUC, nDCG@5, and their mean as primary. `evaluate.py` is the exact scoring code. The starter-kit convergence rule is epsilon=`0.002`, N=`3`.
+
+All prior references to `click`, NDCG@10, or Recall@50 are superseded. Recall@50 is not meaningful for this split because each evaluation user has about five logged impressions. See [ORGANIZER_CONFIRMATION.md](ORGANIZER_CONFIRMATION.md).

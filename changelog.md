@@ -2,6 +2,20 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-08-31 - Organizer-confirmed Starter Kit contract
+
+### Changed
+
+Recorded the organizer's confirmation that the checked-in Starter Kit and `evaluate.py` are authoritative for native `long_view`, within-user GAUC/nDCG@5, primary mean, and epsilon/N convergence. Superseded wording is retained only as historical evidence. Created a confirmed campaign manifest and updated public-facing contract, architecture, requirements, demo, and Devpost documentation.
+
+### Measured
+
+The confirmed campaign reuses the existing four validation ledgers and frozen EXP-009E checkpoint. It converged at primary `0.604017` versus reproduced baseline `0.601572` (+`0.002445`), then created confirmed final `final-a0f6b13399be`. Its 170,588-row feature-only output is byte-identical to the pre-confirmation artifact (SHA-256 `60538bb…a672`); no training or test scoring occurred.
+
+### Related
+
+Task: T2-016. Decision: D032. Result: R035. Requirements: REQ-002, REQ-008, REQ-012–REQ-018.
+
 ## 2026-08-30 - Public README and local-instruction hygiene
 
 ### Changed

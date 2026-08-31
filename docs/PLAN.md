@@ -2,7 +2,7 @@
 
 Current Phase: **Phase 1 - Implementation**
 
-The human advanced the project from Phase 0 on 2026-08-27. This plan implements the agreed autonomous research-agent architecture. Organizer metric/label ambiguity remains a tracked blocker for final benchmark designation, not for the platform foundation.
+The human advanced the project from Phase 0 on 2026-08-27. This plan implements the agreed autonomous research-agent architecture. The organizers confirmed the Starter Kit benchmark contract on 2026-08-31; final submission and public delivery remain external actions.
 
 1. Phase 0 - Repository and collaboration bootstrap
 2. Phase 1 - Problem analysis and research
@@ -120,7 +120,7 @@ Relevant requirements: REQ-004, REQ-005, REQ-009
 
 Definition of done: Measured multi-seed results, mechanism-aware reflections, and an explicit campaign-level convergence/resource report are recorded.
 
-Notes: R003–R023 and R026 executed the registered loss, history, auxiliary, temporal, backbone, sampling, and frozen-ensemble directions with preserved regressions. R023 converged the declared five-seed campaign; R027 binds its leader to the team-interpreted checkpoint-backed output.
+Notes: R003–R023 and R026 executed the registered loss, history, auxiliary, temporal, backbone, sampling, and frozen-ensemble directions with preserved regressions. R035 confirms the same converged validation campaign and checkpoint-backed output under the organizer-confirmed contract.
 
 ### T2-006 - KuaiRand-1K and 27K adaptation
 
@@ -261,3 +261,20 @@ Definition of done: README includes architecture, measured result tables, reprod
 Validation: Markdown link/content checks, repository-safety test, full data-free suite, and `git diff --check`.
 
 Files/components: `README.md`, `.gitignore`, tracked documentation, local instruction files, release records.
+
+### T2-016 - Apply organizer-confirmed benchmark contract
+
+Owner: Project
+Status: DONE
+Priority: Critical
+Depends on: T2-005, T2-013
+
+Goal: Replace the resolved metric ambiguity with the organizers' confirmed Starter Kit definition and materialize an organizer-confirmed final record without changing the measured model.
+
+Relevant requirements: REQ-002, REQ-008, REQ-012–REQ-018
+
+Definition of done: Confirmation is recorded; current benchmark/profile documentation and future-run source notes are updated; a confirmed campaign, designated final, and feature-only output bind the same existing validation evidence and frozen checkpoint.
+
+Validation: R035; confirmed campaign report/ledger/output; output SHA-256 equality with the historical feature-only artifact; full test suite and static checks.
+
+Files/components: `docs/ORGANIZER_CONFIRMATION.md`, `experiments/kuairand-pure-confirmed-campaign.json`, benchmark profiles, release documentation, and evidence records.

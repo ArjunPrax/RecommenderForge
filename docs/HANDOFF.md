@@ -8,4 +8,4 @@ Read this file when resuming work.
 - `changelog.md`: newest-first change history.
 - `results_log.md`: permanent measured evidence.
 
-The benchmark contract remains provisional until organizer clarification. Do not use hidden-test labels during development.
+The organizer-confirmed Starter Kit contract governs KuaiRand-Pure. Do not use hidden-test labels during development.

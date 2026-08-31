@@ -2,6 +2,41 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R035 - Organizer-confirmed KuaiRand-Pure campaign and final
+
+Date: 2026-08-31
+Task: T2-016
+Campaign: `kuairand-pure-confirmed-ensemble-v1`
+Status: Organizer-confirmed benchmark contract; validation-only model evidence.
+
+### Authority
+
+The organizers confirmed that the checked-in Starter Kit is authoritative for native `long_view`, within-user ranking, GAUC/nDCG@5, primary mean, epsilon=`0.002`, N=`3`, and `evaluate.py` scoring. Earlier click/NDCG@10/Recall@50 wording is superseded. The full source record is `docs/ORGANIZER_CONFIRMATION.md`.
+
+### Confirmed campaign
+
+The new confirmed manifest references exactly the four previously measured EXP-009E–H validation records. It reports the same evaluator SHA-256 `ecfde28392eb14fec4f488083251df50624e1af2b86278b962daecfb42d195de` and data fingerprint `37d896c3e8c698f173e985917fbc714bbc8d0c93f7bf0fd2d81fbd00e7342fc4`. It converged with leader EXP-009E at primary `0.6040165329754438` against baseline `0.601572` (+`0.002445` rounded), then three non-significant confirmation batches.
+
+The carried campaign resources are `26.648172125103883` CPU seconds, `0` GPU seconds, `0` LLM input/output tokens, and `0` manual interventions. These are existing validation-record totals; confirmation did not launch a training run.
+
+### Confirmed final and output
+
+`designate-final` created immutable record `final-a0f6b13399be` in `artifacts/finals/kuairand-pure-confirmed.sqlite`, with `designation_status="confirmed"`. It reuses EXP-009E's frozen checkpoint SHA-256 `85bc25dbb1469ab043896b4f3872a295521908f85a1794db747b446399921c2f` without retraining.
+
+The confirmed record generated `artifacts/submissions/kuairand-pure-confirmed-final.csv`. It has `170,589` lines (one header plus `170,588` feature-only test rows) and SHA-256 `60538bb59c96547bfb3e8f90ff56d8c0b5b2e2002c38ba708ecf5e2dfe82a672`, exactly equal to the historical pre-confirmation output. No test labels were read or scored.
+
+### Limitation
+
+Organizer confirmation makes the benchmark definition authoritative; it does not supply this project's hidden-test score. Only submission through the official competition service can do that.
+
+### Validation
+
+The full data-free suite passed 72 tests. The campaign test now verifies that both eligible statuses, including `confirmed`, are retained in a designated-final record. The confirmed manifest parsed as JSON, README links resolved, and `git diff --check` passed.
+
+### Reproduction
+
+`.venv/bin/python -m tiktok_ml_agent campaign-status --campaign experiments/kuairand-pure-confirmed-campaign.json --output artifacts/campaigns/kuairand-pure-confirmed-v1.json && .venv/bin/python -m tiktok_ml_agent designate-final --campaign-report artifacts/campaigns/kuairand-pure-confirmed-v1.json --final-ledger artifacts/finals/kuairand-pure-confirmed.sqlite && .venv/bin/python -m tiktok_ml_agent submission --ledger artifacts/finals/kuairand-pure-confirmed.sqlite --run-id final-a0f6b13399be --output artifacts/submissions/kuairand-pure-confirmed-final.csv`
+
 ## R034 - Public README and local-instruction hygiene
 
 Date: 2026-08-30

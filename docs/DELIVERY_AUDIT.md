@@ -26,7 +26,7 @@ The PDF contains a material contradiction:
 
 **Interpretation - not explicit organizer wording:** D029/D031 use the versioned Starter Kit as the executable internal contract. Under it, the reproduced five-seed validation baseline is primary `0.601572`; the frozen BPR/history/temporal ensemble is `0.604017`, a validation delta of `+0.002445`. R027 binds that exact checkpoint to a schema-valid 170,588-row feature-only output. These are not NDCG@10 / Recall@50 results, a hidden-test score, or organizer confirmation.
 
-Do not change the Devpost wording from “team-interpreted” unless organizers provide an unambiguous contract. If they provide a changed evaluator, create a new profile and rerun affected validation/campaign evidence rather than comparing scores across profiles.
+The organizers subsequently confirmed the Starter Kit as the unambiguous contract; see `docs/ORGANIZER_CONFIRMATION.md` and R035. The confirmed campaign uses the same evaluator hash and frozen checkpoint, so it does not require retraining. A future changed evaluator would still require a new profile and rerun evidence rather than a cross-profile comparison.
 
 ## Mandatory external deliverables
 
@@ -34,7 +34,7 @@ Do not change the Devpost wording from “team-interpreted” unless organizers 
 2. Merge after review and make the repository public; it contains no organizer code or data.
 3. Record and publish a public 3-minute YouTube end-to-end demo, then add its URL to Devpost.
 4. Submit the Devpost description, public repository URL, demo URL, run logs/resources, and the exact final output/checkpoint as directed by organizers.
-5. Keep the metric clarification request open. The official Devpost deadline currently states **1 September 2026, 12:00 pm SGT**.
+5. Use the organizer-confirmed Starter Kit language consistently. The official Devpost deadline currently states **1 September 2026, 12:00 pm SGT**.
 
 ## Pre-submission checks
 

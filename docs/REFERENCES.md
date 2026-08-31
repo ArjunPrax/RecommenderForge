@@ -3,7 +3,7 @@
 ## Official Competition Material
 
 1. TikTok TechJam 2026, **Tiktok Techjam Prob Statements** (user-supplied PDF), updated 2026-08-26, pp. 1-12. Local source: `/Users/arjunprakash/Library/CloudStorage/OneDrive-NanyangTechnologicalUniversity/Tiktok Techjam Track 2.pdf`.
-2. Organizer KuaiRand Starter Kit in `kuairand-starter-kit/` (provisional runnable evaluator and baseline).
+2. Organizer KuaiRand Starter Kit in `kuairand-starter-kit/` (organizer-confirmed runnable evaluator and baseline; confirmation received 2026-08-31).
 
 ## Technical References
 

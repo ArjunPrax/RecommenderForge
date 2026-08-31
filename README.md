@@ -2,7 +2,7 @@
 
 An autonomous ML research agent for recommender systems. It turns a benchmark contract into a controlled research loop: reproduce a baseline, propose bounded candidates, train and validate them safely, recover from failures, preserve evidence, and generate predictions from the exact frozen checkpoint that was measured.
 
-The current KuaiRand-Pure campaign is complete under a versioned **team-interpreted** Starter Kit contract. It has a converged validation result, immutable final-record provenance, and a schema-valid feature-only output. It does **not** claim an organizer-confirmed or hidden-test score.
+The current KuaiRand-Pure campaign is complete under the organizer-confirmed Starter Kit contract. It has a converged validation result, immutable final-record provenance, and a schema-valid feature-only output. It does **not** claim a hidden-test score.
 
 ## What the system does
 
@@ -47,7 +47,9 @@ All figures below are validation-only and use the Starter Kit profile described 
 
 The final blend improves the reproduced baseline by **+0.002445 primary**. Its declared weights are 0.375 BPR, 0.375 history, and 0.250 temporal. The campaign revalidated that leader, then recorded three declared non-significant confirmation batches under one data fingerprint and evaluator hash (epsilon = 0.002, N = 3). It used 26.65 CPU seconds, 0 GPU seconds, 0 LLM tokens, and 0 manual interventions across those four campaign records.
 
-The designated record `final-07eadac3e123` is bound to the frozen checkpoint SHA-256 `85bc25db…921c2f`. It generated a 170,588-row feature-only CSV with SHA-256 `60538bb…a672`; no test labels were read or scored.
+Confirmed designated record `final-a0f6b13399be` is bound to the frozen checkpoint SHA-256 `85bc25db…921c2f`. It generated a 170,588-row feature-only CSV with SHA-256 `60538bb…a672`; no test labels were read or scored.
+
+Scores should be read against the organizers' oracle primary ceiling of **0.8645**, not 1.0: 27.1% of hidden-test users have no positive label and 9.2% are all-positive, so their ranking contribution is fixed. The organizer's hidden-test FM reference is 0.5946 (mean of five seeds); this project intentionally does not reproduce or locally score that split.
 
 ### KuaiRand bonus-scale evidence
 
@@ -64,9 +66,9 @@ See [results_log.md](results_log.md) for every measured result, including regres
 
 ## Benchmark contract and integrity
 
-The official PDF is internally inconsistent: its narrative pages describe `click`, NDCG@10, and Recall@50, while the detailed Starter Kit section provides runnable code for `long_view`, GAUC, nDCG@5, epsilon = 0.002, N = 3, and the output schema below.
+The organizers have confirmed that the checked-in Starter Kit is authoritative: predict native `long_view`, rank **within each user's logged impressions**, and report GAUC and nDCG@5 with primary equal to their mean. `evaluate.py` is the exact scoring implementation; epsilon = 0.002 and N = 3. Earlier `click`/NDCG@10/Recall@50 wording is superseded.
 
-**Interpretation — not explicit organizer wording:** this project uses the versioned Starter Kit as the executable internal contract. If organizers issue a corrected evaluator, it receives a new identity and affected results must be rerun. The project therefore labels its final record `team_interpreted`, rather than organizer-confirmed. Full rationale: [docs/PROBLEM.md](docs/PROBLEM.md), [docs/DECISIONS.md](docs/DECISIONS.md), and [docs/DELIVERY_AUDIT.md](docs/DELIVERY_AUDIT.md).
+The confirmed campaign reuses the same versioned evaluator, validation records, and frozen checkpoint already measured under that contract. It is an organizer-confirmed **benchmark definition**, not an organizer-scored hidden-test result. Full rationale: [docs/ORGANIZER_CONFIRMATION.md](docs/ORGANIZER_CONFIRMATION.md), [docs/DECISIONS.md](docs/DECISIONS.md), and [docs/DELIVERY_AUDIT.md](docs/DELIVERY_AUDIT.md).
 
 Development safeguards include:
 
@@ -120,18 +122,18 @@ With the separately obtained Starter Kit and KuaiRand-Pure data installed, repro
 .venv/bin/python -m tiktok_ml_agent baseline-valid
 .venv/bin/python -m tiktok_ml_agent autonomous-ranking
 .venv/bin/python -m tiktok_ml_agent campaign-status \
-  --campaign experiments/kuairand-pure-team-interpreted-campaign.json \
-  --output artifacts/campaigns/kuairand-pure-team-interpreted-v1.json
+  --campaign experiments/kuairand-pure-confirmed-campaign.json \
+  --output artifacts/campaigns/kuairand-pure-confirmed-v1.json
 .venv/bin/python -m tiktok_ml_agent designate-final \
-  --campaign-report artifacts/campaigns/kuairand-pure-team-interpreted-v1.json \
-  --final-ledger artifacts/finals/kuairand-pure-team-interpreted.sqlite
+  --campaign-report artifacts/campaigns/kuairand-pure-confirmed-v1.json \
+  --final-ledger artifacts/finals/kuairand-pure-confirmed.sqlite
 .venv/bin/python -m tiktok_ml_agent submission \
-  --ledger artifacts/finals/kuairand-pure-team-interpreted.sqlite \
-  --run-id final-07eadac3e123 \
-  --output artifacts/submissions/kuairand-pure-team-interpreted-final.csv
+  --ledger artifacts/finals/kuairand-pure-confirmed.sqlite \
+  --run-id final-a0f6b13399be \
+  --output artifacts/submissions/kuairand-pure-confirmed-final.csv
 ```
 
-`submission` validates the required provisional schema:
+`submission` validates the required confirmed schema:
 
 ```text
 row_id,user_id,video_id,score
@@ -141,7 +143,7 @@ It generates aligned finite scores from the frozen checkpoint and does not score
 
 ## Limitations and delivery status
 
-- The organizer must resolve the PDF/Starter Kit metric conflict before any organizer-confirmed claim.
+- The organizers confirmed the metric contract, but only their competition service can produce a hidden-test result.
 - The reported campaign used the deterministic offline planner. The optional Responses-API planner is schema-bounded and tested, but was not used in the measured campaign; reported LLM usage is therefore genuinely zero.
 - The repository excludes organizer source/data because the data is CC BY-SA 4.0 and the separately supplied Starter Kit source has no separate license notice.
 - The public code repository and CI are ready. Remaining external delivery actions are a public three-minute YouTube demo and official Devpost/submission steps.

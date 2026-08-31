@@ -536,7 +536,7 @@ Atomic publication is unchanged: the final path is still replaced only after eve
 ## D029 - Starter-Kit-pinned execution contract while organizer response is absent
 
 Date: 2026-08-29
-Status: Accepted
+Status: Superseded by D032
 
 ### Context
 
@@ -592,7 +592,7 @@ The result is retained whether it improves or regresses. It cannot be promoted o
 ## D031 - Distinguish team-interpreted designation from organizer confirmation
 
 Date: 2026-08-29
-Status: Accepted
+Status: Superseded by D032 for the current KuaiRand-Pure contract; retained as a generic safety mechanism
 
 ### Context
 
@@ -615,6 +615,35 @@ The team can complete the internal campaign → designation → output chain now
 - Requirements: REQ-003, REQ-008, REQ-012, REQ-014, REQ-018
 - Tasks: T2-005, T2-008
 - Decisions: D026, D029
+
+## D032 - Apply organizer-confirmed Starter Kit contract
+
+Date: 2026-08-31
+Status: Accepted
+
+### Context
+
+The organizers confirmed that the checked-in Starter Kit is the scoring authority and that all earlier click/NDCG@10/Recall@50 wording is superseded. They explicitly confirmed native `long_view`, ranking within each user's logged impressions, GAUC/nDCG@5 with primary equal to their mean, and `evaluate.py` as the exact scorer. They also supplied the official FM references and the oracle primary ceiling of `0.8645`.
+
+### Decision
+
+Treat the existing versioned Starter Kit profile as organizer-confirmed for KuaiRand-Pure and the bonus artifacts. Materialize a new `confirmed` campaign report and designated-final record from the same converged validation ledgers and frozen EXP-009E checkpoint. Do not retrain, rescore test data, or relabel historic provisional/team-interpreted records.
+
+### Why
+
+The confirmation validates the contract already used by the implementation. A new confirmed evidence layer accurately reflects the new authority while preserving the history and immutable identities that demonstrate no benchmark shopping or test access occurred.
+
+### Consequences
+
+REQ-014 is resolved. Public materials may call the Starter Kit metric definition organizer-confirmed, but every model number remains validation-only until the official competition service scores the submitted output. The exact frozen output is byte-identical to the prior feature-only artifact; that equality is evidence of no retraining, not a hidden-test result.
+
+### Related
+
+- Requirements: REQ-002, REQ-008, REQ-012–REQ-018
+- Tasks: T2-016
+- Experiments: EXP-009E–H
+- Results: R035
+- Supersedes: D029 and D031 for current KuaiRand-Pure reporting
 
 
 ## D004 - Retain experimental evidence

@@ -52,8 +52,8 @@ def starter_kuairand_pure_spec(starter_kit_dir: str | Path) -> BenchmarkSpec:
         epsilon=0.002,
         patience=3,
         source_note=(
-            "Interpretation - not explicit organizer wording: provisional runnable starter profile "
-            "while PDF label/metric ambiguity is unresolved."
+            "Organizer-confirmed Starter Kit profile: long_view, within-user GAUC and nDCG@5, "
+            "and primary mean; confirmation recorded 2026-08-31."
         ),
     )
 

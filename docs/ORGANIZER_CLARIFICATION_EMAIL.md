@@ -1,5 +1,7 @@
 # Organizer clarification email draft
 
+> Historical draft. The organizers answered the metric, baseline, convergence, and evaluation questions on 2026-08-31; see [ORGANIZER_CONFIRMATION.md](ORGANIZER_CONFIRMATION.md). Keep this record for provenance only.
+
 **To:** [TechJam organizer email]
 
 **Subject:** Clarification on Track 2 benchmark, metrics, and submission contract
