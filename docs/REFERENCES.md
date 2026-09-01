@@ -3,7 +3,7 @@
 ## Official Competition Material
 
 1. TikTok TechJam 2026, **Tiktok Techjam Prob Statements** (user-supplied PDF), updated 2026-08-26, pp. 1-12. Local source: `/Users/arjunprakash/Library/CloudStorage/OneDrive-NanyangTechnologicalUniversity/Tiktok Techjam Track 2.pdf`.
-2. Organizer KuaiRand Starter Kit in `kuairand-starter-kit/` (provisional runnable evaluator and baseline).
+2. Organizer KuaiRand Starter Kit in `kuairand-starter-kit/` (organizer-confirmed runnable evaluator and baseline; confirmation received 2026-08-31).
 
 ## Technical References
 
@@ -27,4 +27,4 @@ Python, NumPy, PyTorch (after parity), SQLite, and standard-library process cont
 
 ## Benchmark/Dataset Sources
 
-KuaiRand-Pure is required in the updated PDF; KuaiRand-1K and KuaiRand-27K are bonus. The metric/label contract remains unresolved (REQ-014).
+KuaiRand-Pure is required and its Starter Kit contract is organizer-confirmed. KuaiRand-1K and KuaiRand-27K are bonus artifacts; their official baseline, scoring threshold, and submission route have not been supplied.

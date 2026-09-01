@@ -17,6 +17,19 @@ class RepositorySafetyTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stderr)
 
+    def test_local_instruction_files_are_unconditionally_ignored(self) -> None:
+        """Local coordination instructions must not re-enter a public checkout."""
+        root = Path(__file__).resolve().parents[1]
+        for path in ("AGENTS.md", "CLAUDE.md"):
+            with self.subTest(path=path):
+                result = subprocess.run(
+                    ["git", "check-ignore", "-q", "--no-index", path],
+                    cwd=root,
+                    capture_output=True,
+                    text=True,
+                )
+                self.assertEqual(result.returncode, 0, result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

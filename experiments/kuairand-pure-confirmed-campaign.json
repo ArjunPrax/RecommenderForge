@@ -1,0 +1,47 @@
+{
+  "campaign_id": "kuairand-pure-confirmed-ensemble-v1",
+  "benchmark_id": "kuairand-pure",
+  "contract_status": "confirmed",
+  "baseline_primary": 0.601572,
+  "epsilon": 0.002,
+  "patience": 3,
+  "source_note": "Organizer confirmation received 2026-08-31: the checked-in Starter Kit is authoritative for long_view, within-user GAUC and nDCG@5, primary mean, epsilon=0.002, N=3, and evaluate.py scoring.",
+  "batches": [
+    {
+      "batch_id": "leader-revalidation-exp-009e",
+      "runs": [
+        {
+          "ledger": "../artifacts/autonomous-ensemble-revalidation/ledger.sqlite",
+          "run_id": "exp-009e-367544f3516d"
+        }
+      ]
+    },
+    {
+      "batch_id": "confirmation-exp-009f",
+      "runs": [
+        {
+          "ledger": "../artifacts/autonomous-ensemble-confirmation-current/ledger.sqlite",
+          "run_id": "exp-009f-390b08efbec7"
+        }
+      ]
+    },
+    {
+      "batch_id": "confirmation-exp-009g",
+      "runs": [
+        {
+          "ledger": "../artifacts/autonomous-ensemble-confirmation-current/ledger.sqlite",
+          "run_id": "exp-009g-27a4202772e1"
+        }
+      ]
+    },
+    {
+      "batch_id": "confirmation-exp-009h",
+      "runs": [
+        {
+          "ledger": "../artifacts/autonomous-ensemble-confirmation-current/ledger.sqlite",
+          "run_id": "exp-009h-a6256984770f"
+        }
+      ]
+    }
+  ]
+}

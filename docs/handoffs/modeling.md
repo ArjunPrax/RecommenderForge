@@ -1,6 +1,6 @@
-# Claude Handoff
+# Modeling Handoff
 
-## Ready work
+## Historical readiness
 
 T2-003 is ready after T2-002 publishes model/plugin and benchmark interfaces.
 
@@ -12,4 +12,4 @@ T2-003 is ready after T2-002 publishes model/plugin and benchmark interfaces.
 
 ## Guardrails
 
-Do not use test labels or the starter kit test-scoring command. Record all actual measurements in `results_log.md`; published organizer values are not reproduced results.
+Do not use test labels or the Starter Kit test-scoring command. Record all actual measurements in `results_log.md`; published organizer values are not reproduced results.

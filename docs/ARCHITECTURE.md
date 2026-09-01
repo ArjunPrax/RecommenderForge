@@ -41,7 +41,7 @@ BenchmarkSpec + KnowledgeBase + MemorySnapshot
 - `CheckpointManifest`: content hashes binding the measured checkpoint to code/data/evaluator/config/predictions.
 - `EvidenceCard` and `MemorySnapshot`: retrievable research evidence and bounded planner state.
 - `campaign-status`: materializes an auditable convergence/resource report from explicit cross-ledger run references; it refuses mixed evaluators and post-convergence continuation.
-- `designate-final`: creates a new immutable final record only from a converged campaign's verified existing checkpoint; it then feeds the feature-only output generator without retraining. It records whether the campaign is organizer-`confirmed` or internally `team_interpreted`; a `provisional` contract remains ineligible.
+- `designate-final`: creates a new immutable final record only from a converged campaign's verified existing checkpoint; it then feeds the feature-only output generator without retraining. The current KuaiRand-Pure campaign is organizer-`confirmed`; a `provisional` contract remains ineligible for future benchmark profiles.
 - `scale-resume-validation` / `scale-resume-submission`: CLI entry points for identity-gated recovery. They require the frozen model, preflight data fingerprint, persisted state path, and versioned evaluator identity; the submission command never scores or reads test labels.
 
 ## Execution environment
@@ -66,7 +66,7 @@ Use the organizer evaluator for any official validation score. Inner development
 
 ## Known tradeoffs
 
-- **Interpretation - not explicit organizer wording:** the Starter Kit is the team’s pinned execution contract (D029), while any organizer correction is a new incompatible evaluator profile.
+- The organizers confirmed the Starter Kit as the authoritative KuaiRand contract on 2026-08-31. Any future evaluator change still creates a new incompatible profile.
 - Bounded operator taxonomy improves safety and comparability, but `novel` preserves exploration.
 - Working-memory summaries reduce token growth; the original ledger remains retrievable.
 - Full-fidelity Pure evaluation is preferred over unvalidated small-data pruning.

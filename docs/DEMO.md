@@ -21,7 +21,7 @@ Show a complete autonomous qualification/research run: benchmark contract, runti
 4. **1:25-1:55** Show a recovery record, isolated worktree, and zero mid-run intervention count.
 5. **1:55-2:25** Show the campaign convergence report and frozen checkpoint/output provenance.
 6. **2:25-2:50** Show the 27K resumability/scale evidence and resource accounting.
-7. **2:50-3:00** State the team-interpreted metric limitation and the organizer-clarification commitment.
+7. **2:50-3:00** State the confirmed Starter Kit contract and the hidden-test limitation.
 
 ## Normal case
 
@@ -51,7 +51,7 @@ The checkpoint-parented history-cross continuation is:
 
 ## Demonstrated output
 
-The qualification workflow records a controlled failure and enforced deadline recovery. The Pure campaign records a revalidated leader, three post-leader confirmations, data/evaluator identities, resource totals, a team-interpreted designated-final record, and a feature-only output from the frozen leader. The demo must not call this an organizer-confirmed or hidden-test submission. It must display the public repository and final Devpost/YouTube links once published.
+The qualification workflow records a controlled failure and enforced deadline recovery. The Pure campaign records a revalidated leader, three post-leader confirmations, data/evaluator identities, resource totals, an organizer-confirmed designated-final record, and a feature-only output from the frozen leader. The demo must not call this a hidden-test submission or score. It must display the public repository and final Devpost/YouTube links once published.
 
 ## Recovery plan
 

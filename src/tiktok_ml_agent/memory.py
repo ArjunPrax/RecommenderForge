@@ -77,9 +77,7 @@ class MemoryManager:
                 for run in rejected[-10:]
             ],
             "source_run_ids": [run["run_id"] for run in runs],
-            "unresolved_questions": [
-                "Organizer metric/label contract remains provisional until clarification."
-            ],
+            "unresolved_questions": [],
         }
         snapshot_hash = sha256(repr(payload).encode()).hexdigest()
         self.ledger.save_memory_snapshot(snapshot_hash, len(runs), payload)

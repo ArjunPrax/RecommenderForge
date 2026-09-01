@@ -1,14 +1,14 @@
 # Deferred Forks and Late Refinements
 
-Purpose: retain reviewed refinements and their evidence. The agreed implementation is Codex execution plan **v4**; apply-now items are incorporated through D006-D011 and T2-002.
+Purpose: retain reviewed refinements and their evidence. The agreed implementation is plan **v4**; apply-now items are incorporated through D006-D011 and T2-002.
 
-Source: Claude review of plan v3 (2026-08-26). Every number below was verified against the
+Source: independent review of plan v3 (2026-08-26). Every number below was verified against the
 Starter Kit source, `baseline_scores.json`, or the updated official PDF
 (SHA-256 `a940266486f5b3b320f932b4261470c986f47d8d5d9d3f484b645225b9ee82ff`).
 
 **ID scope.** `FORK-XX` identifiers are local to this document. They are **not** `EXP-XXX`,
-`T2-XXX`, `DXXX`, or `RXXX` identifiers. If a fork is promoted into real work, Codex assigns the
-stable ID at that point per `AGENTS.md`. Do not cite `FORK-XX` in commits, PRs, or `results_log.md`.
+`T2-XXX`, `DXXX`, or `RXXX` identifiers. If a fork is promoted into real work, assign a stable ID at
+that point. Do not cite `FORK-XX` in commits, PRs, or `results_log.md`.
 
 ---
 
@@ -76,10 +76,10 @@ share after download.
 
 **Disposition: apply now. Wave 2 cannot pass as written.**
 
-- Wave 1 gives Codex a "minimal controller".
+- Wave 1 gives the implementation a "minimal controller".
 - Wave 2 exit requires an injected failure recovering automatically, an `epsilon`/`N` convergence
   rehearsal, and automatic judge-facing report generation.
-- Wave 3 lists Codex deliverables as "automated promotion, rejection, **recovery, and convergence**".
+- Wave 3 lists deliverables as "automated promotion, rejection, **recovery, and convergence**".
 
 Recovery, convergence evaluation, and report generation are therefore scheduled *after* the wave
 whose exit criteria require them.
@@ -163,7 +163,7 @@ distinguishes it from the designated final run.
 | EXP-007 | ensembles | exposure and temporal robustness |
 | EXP-008 / 009 | 1K / 27K scaling | ensembles / scaling |
 
-`AGENTS.md` requires stable, never-recycled IDs and states that cancelled work keeps its ID. No harm
+Stable, never-recycled IDs ensure that cancelled work retains its ID. No harm
 has occurred yet: neither plan was committed, and the repository is still at the two bootstrap
 commits. But once these numbers reach `docs/EXPERIMENTS.md` both agents will cite them across
 branches, PRs, and `results_log.md`, and renumbering becomes a real violation.

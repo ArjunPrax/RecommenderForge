@@ -2,6 +2,87 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R036 - KuaiRand-1K frozen item×tab output
+
+Date: 2026-09-01
+Task: T2-017
+Experiment: EXP-015
+Status: Validation-only bonus-scale output evidence.
+
+### Purpose
+
+Materialize the previously measured 1K item×tab candidate as a frozen, feature-only output without changing its declared configuration or using test labels.
+
+### Revalidation and frozen model
+
+The bounded 24-bit item/item×tab rate blend was rebuilt from 1K training labels only with the declared `0.5/0.5` weight. Its validation result exactly reproduced R019 to displayed precision: GAUC `0.5429234352196763`, nDCG@5 `0.5487635006186582`, and primary `0.5458434679191673` over `2,524,980` validation rows and `978` users. The frozen model is `artifacts/scale/kuairand-1k-item-tab-model.npz` with SHA-256 `9933a17e2d0b03f3d7cceee5360c044c6e26c55b41652b3c69621443e80c36f1`.
+
+### Feature-only output
+
+`scale-submission` loaded that model without fitting and streamed `4,132,081` test feature rows to `artifacts/submissions/kuairand-1k-item-tab-final.csv`. The CSV has one header plus `4,132,081` rows, schema `row_id,user_id,video_id,score`, sequential row IDs from `0` through `4,132,080`, and finite scores. Its SHA-256 is `43f61ce713dea730e3e5a96e7339da439007b653cb6d0c23a385536b29272b6a`.
+
+### Scope and limitation
+
+The organizer confirmation makes the KuaiRand-Pure Starter Kit contract authoritative. It does not supply an official 1K baseline, bonus threshold, or upload route. This result is therefore an honest scale/output artifact, not a hidden-test result or a claim that the bonus benchmark has been beaten. Test rows were exposed only as identifiers and inference-known features; no test labels were read or scored.
+
+### Reproduction
+
+`.venv/bin/python -m tiktok_ml_agent scale-popularity --variant 1k --data-dir kuairand-starter-kit/KuaiRand-1K/data --evaluator kuairand-starter-kit/evaluate.py --feature-mode item_tab --item-weight 0.5 --hash-bits 24 --model-output artifacts/scale/kuairand-1k-item-tab-model.npz --output artifacts/scale/kuairand-1k-item-tab-final.json && .venv/bin/python -m tiktok_ml_agent scale-submission --variant 1k --data-dir kuairand-starter-kit/KuaiRand-1K/data --model artifacts/scale/kuairand-1k-item-tab-model.npz --output artifacts/submissions/kuairand-1k-item-tab-final.csv`
+
+## R035 - Organizer-confirmed KuaiRand-Pure campaign and final
+
+Date: 2026-08-31
+Task: T2-016
+Campaign: `kuairand-pure-confirmed-ensemble-v1`
+Status: Organizer-confirmed benchmark contract; validation-only model evidence.
+
+### Authority
+
+The organizers confirmed that the checked-in Starter Kit is authoritative for native `long_view`, within-user ranking, GAUC/nDCG@5, primary mean, epsilon=`0.002`, N=`3`, and `evaluate.py` scoring. Earlier click/NDCG@10/Recall@50 wording is superseded. The full source record is `docs/ORGANIZER_CONFIRMATION.md`.
+
+### Confirmed campaign
+
+The new confirmed manifest references exactly the four previously measured EXP-009E–H validation records. It reports the same evaluator SHA-256 `ecfde28392eb14fec4f488083251df50624e1af2b86278b962daecfb42d195de` and data fingerprint `37d896c3e8c698f173e985917fbc714bbc8d0c93f7bf0fd2d81fbd00e7342fc4`. It converged with leader EXP-009E at primary `0.6040165329754438` against baseline `0.601572` (+`0.002445` rounded), then three non-significant confirmation batches.
+
+The carried campaign resources are `26.648172125103883` CPU seconds, `0` GPU seconds, `0` LLM input/output tokens, and `0` manual interventions. These are existing validation-record totals; confirmation did not launch a training run.
+
+### Confirmed final and output
+
+`designate-final` created immutable record `final-a0f6b13399be` in `artifacts/finals/kuairand-pure-confirmed.sqlite`, with `designation_status="confirmed"`. It reuses EXP-009E's frozen checkpoint SHA-256 `85bc25dbb1469ab043896b4f3872a295521908f85a1794db747b446399921c2f` without retraining.
+
+The confirmed record generated `artifacts/submissions/kuairand-pure-confirmed-final.csv`. It has `170,589` lines (one header plus `170,588` feature-only test rows) and SHA-256 `60538bb59c96547bfb3e8f90ff56d8c0b5b2e2002c38ba708ecf5e2dfe82a672`, exactly equal to the historical pre-confirmation output. No test labels were read or scored.
+
+### Limitation
+
+Organizer confirmation makes the benchmark definition authoritative; it does not supply this project's hidden-test score. Only submission through the official competition service can do that.
+
+### Validation
+
+The full data-free suite passed 72 tests. The campaign test now verifies that both eligible statuses, including `confirmed`, are retained in a designated-final record. The confirmed manifest parsed as JSON, README links resolved, and `git diff --check` passed.
+
+### Reproduction
+
+`.venv/bin/python -m tiktok_ml_agent campaign-status --campaign experiments/kuairand-pure-confirmed-campaign.json --output artifacts/campaigns/kuairand-pure-confirmed-v1.json && .venv/bin/python -m tiktok_ml_agent designate-final --campaign-report artifacts/campaigns/kuairand-pure-confirmed-v1.json --final-ledger artifacts/finals/kuairand-pure-confirmed.sqlite && .venv/bin/python -m tiktok_ml_agent submission --ledger artifacts/finals/kuairand-pure-confirmed.sqlite --run-id final-a0f6b13399be --output artifacts/submissions/kuairand-pure-confirmed-final.csv`
+
+## R034 - Public README and local-instruction hygiene
+
+Date: 2026-08-30
+Task: T2-015
+
+### Purpose
+
+Make the public repository self-contained for judges while keeping local coordination instructions out of tracked source.
+
+### Result
+
+The README now documents the control-loop architecture, safety boundaries, setup, reproducible commands, output schema, full KuaiRand-Pure result table, 1K/27K validation evidence, resource totals, and the organizer-contract limitation. It links readers to the complete empirical record instead of reducing the project to an unattributed summary.
+
+The two local instruction files were removed from Git tracking but retained locally. Both are explicitly ignored, and a repository-safety test protects that state. Public tracked documentation uses role- and project-based language rather than tool-attribution language.
+
+### Validation
+
+README content/links, ignore rules, the repository-safety suite, the full data-free suite (72 tests), and whitespace checks passed with this change.
+
 ## R033 - Public-checkout CI contract repair
 
 Date: 2026-08-30
@@ -19,9 +100,9 @@ The first remote GitHub Actions runs for PR #1 failed before test execution comp
 
 The affected tests are now explicitly conditional on the local organizer file they verify. In a developer environment containing that kit, they still execute: `uv lock --check`, `python -m unittest discover -s tests -v`, and `git diff --check` passed with 71 tests and no skips. A clean local Git clone of the tracked branch, containing no ignored organizer material but retaining `.git` metadata like GitHub Actions, also passed all 71 discovered tests with 16 intentional organizer-parity skips. The remaining 55 tests executed and passed.
 
-### Limitation
+### Remote validation
 
-The repaired GitHub Actions run is **Not yet demonstrated** until the new commit is pushed and the PR check completes.
+Both repaired GitHub Actions runs passed (43 seconds for `push`, 1 minute 15 seconds for `pull_request`) before PR #1 merged into `main` at merge commit `7082dbc3a073dec1c219f2a8260fc10ff3c91e77`.
 
 ## R032 - Final rubric, benchmark, delivery, and redistribution audit
 

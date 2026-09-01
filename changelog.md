@@ -2,6 +2,48 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-09-01 - Frozen 1K bonus-scale output and scope correction
+
+### Changed
+
+Rebuilt the measured 1K item×tab bounded model and generated its feature-only output from that frozen model. Corrected current documentation and future bonus-scale profile notes: the organizer confirmation establishes the required KuaiRand-Pure contract, while 1K/27K have no supplied official baseline, threshold, or upload route.
+
+### Measured
+
+The 1K validation result reproduced primary `0.5458434679191673`. The frozen model SHA-256 is `9933a17e…c36f1`; its output has `4,132,081` feature-only rows, sequential IDs, finite scores, and SHA-256 `43f61ce7…72b6a`. No test labels were read or scored.
+
+### Related
+
+Task: T2-017. Experiment: EXP-015. Result: R036.
+
+## 2026-08-31 - Organizer-confirmed Starter Kit contract
+
+### Changed
+
+Recorded the organizer's confirmation that the checked-in Starter Kit and `evaluate.py` are authoritative for native `long_view`, within-user GAUC/nDCG@5, primary mean, and epsilon/N convergence. Superseded wording is retained only as historical evidence. Created a confirmed campaign manifest and updated public-facing contract, architecture, requirements, demo, and Devpost documentation.
+
+### Measured
+
+The confirmed campaign reuses the existing four validation ledgers and frozen EXP-009E checkpoint. It converged at primary `0.604017` versus reproduced baseline `0.601572` (+`0.002445`), then created confirmed final `final-a0f6b13399be`. Its 170,588-row feature-only output is byte-identical to the pre-confirmation artifact (SHA-256 `60538bb…a672`); no training or test scoring occurred.
+
+### Related
+
+Task: T2-016. Decision: D032. Result: R035. Requirements: REQ-002, REQ-008, REQ-012–REQ-018.
+
+## 2026-08-30 - Public README and local-instruction hygiene
+
+### Changed
+
+Expanded the README with the architecture, measured KuaiRand-Pure and bonus-scale results, reproduction path, safety guarantees, output details, and delivery caveats. Removed tool-attribution language from tracked documentation. Local instruction files are now ignored and removed from Git tracking while remaining available in the working tree.
+
+### Validation
+
+T2-015 adds a repository-safety test for the ignored local instruction files. `uv lock --check`, the 72-test suite, `git diff --check`, and the explicit ignored/untracked checks pass. R034 records the documentation scope and validation evidence.
+
+### Related
+
+Task: T2-015. Result: R034. Requirements: REQ-010–REQ-013, REQ-019.
+
 ## 2026-08-30 - Public-checkout CI repair
 
 ### Changed
@@ -10,7 +52,7 @@ The integrity workflow now names and tests its actual contract: a public checkou
 
 ### Validation
 
-The first remote CI attempt exposed the missing-file assumption rather than a product failure. With the local organizer kit present, `uv lock --check`, the complete 71-test suite, and `git diff --check` pass. A clean Git clone of the tracked branch (without ignored organizer material) also passes all 71 discovered tests, with the 16 local organizer-parity tests explicitly skipped. The repaired GitHub rerun remains pending.
+The first remote CI attempt exposed the missing-file assumption rather than a product failure. With the local organizer kit present, `uv lock --check`, the complete 71-test suite, and `git diff --check` pass. A clean Git clone of the tracked branch (without ignored organizer material) also passes all 71 discovered tests, with the 16 local organizer-parity tests explicitly skipped. The repaired GitHub push and pull-request runs both passed before PR #1 merged.
 
 ### Related
 
@@ -24,7 +66,7 @@ Added a source-by-source final delivery audit and promoted the public three-minu
 
 ### Validation
 
-R032 records the review of the official Track PDF, official Devpost event page, local Starter Kit license files, R027 evidence, and current release branch. The local data carries CC BY-SA 4.0 text; Starter Kit source has no separate code-license notice. Neither is tracked or will be published. The actual public video and remote CI are **Not yet demonstrated**.
+R032 records the review of the official Track PDF, official Devpost event page, local Starter Kit license files, R027 evidence, and current release branch. The local data carries CC BY-SA 4.0 text; Starter Kit source has no separate code-license notice. Neither is tracked or will be published. The actual public video is **Not yet demonstrated**; remote CI subsequently passed and is recorded in R033.
 
 ### Related
 
@@ -137,7 +179,7 @@ Task: T2-005. Decision: D030. Experiment: EXP-018. Result: R026. Requirements: R
 
 The official PDF's Starter Kit section provides the exact executable evaluator, baseline, label, metrics, convergence rule, and submission schema, despite contradictory narrative pages. D029 therefore records the team’s **Interpretation - not explicit organizer wording**: continue on the versioned Starter-Kit-pinned `long_view` / GAUC / nDCG@5 contract rather than pause implementation. This is not an organizer confirmation; any corrected evaluator is a new incompatible profile that must be rerun.
 
-Added normal CLI routes for Claude’s existing identity-gated implementation: `scale-resume-validation` and `scale-resume-submission`. Both require a frozen model, preflight data fingerprint, persisted state, and evaluator identity. The output route remains feature-only and does not score the test split.
+Added normal CLI routes for the existing identity-gated implementation: `scale-resume-validation` and `scale-resume-submission`. Both require a frozen model, preflight data fingerprint, persisted state, and evaluator identity. The output route remains feature-only and does not score the test split.
 
 ### Measured
 
@@ -185,7 +227,7 @@ Two things for the next owner.
 
 First, a resource-accounting caveat found while measuring: `wall_seconds` in every scale result is `time.perf_counter`, which resolves to `mach_absolute_time()` on macOS and does not advance while the system sleeps. The resumed run reported `241.64` active seconds against `11,064.5` elapsed seconds because the machine slept mid-run. R018's `526.90` and R020's `523.55` carry the same definition. Since resource use is a judged deliverable, decide deliberately whether reported timings should be active-process or elapsed time, and label them accordingly. Nothing was renamed here: the same pattern lives in modules outside this task's file scope.
 
-Second, `docs/WORKBOARD.md` lists T2-006 as Codex-owned while `CLAUDE.md` assigns scale adaptations to Claude. This branch proceeded on explicit human instruction, which outranks the workboard under the `AGENTS.md` precedence order, and the workboard was left untouched because it is outside this task's file scope. The owning task should reconcile the row.
+Second, `docs/WORKBOARD.md` carried an ownership mismatch for T2-006. This branch proceeded on explicit human instruction, which outranks that historical workboard entry, and the row was left untouched because it was outside this task's file scope. The owning task should reconcile the row.
 
 Committed on `divija-T2-006-scale-resume`; not pushed and not merged.
 
@@ -546,7 +588,7 @@ REQ-014 remains blocked: the current official PDF's narrative metric/label confl
 Added `docs/DEFERRED_FORKS.md`. No code, no dependency, no dataset, and no benchmark work was
 performed. The repository remains at the Phase 0 bootstrap state.
 
-The agreed build is **Codex execution plan v3**. Claude's review of v3 raised six refinements plus one
+The agreed build is **execution plan v3**. An independent review of v3 raised six refinements plus one
 research addition. Their disposition is now recorded, split by whether deferral is safe:
 
 **Apply during the wave they touch - cheap now, expensive or impossible later:**
@@ -592,7 +634,7 @@ they are hit at the worst moment.
 
 ### Impact
 
-No behaviour changed. Codex should treat FORK-02, FORK-03, FORK-04, and FORK-05 as inputs to Wave 0
+No behaviour changed. The implementation should treat FORK-02, FORK-03, FORK-04, and FORK-05 as inputs to Wave 0
 and Wave 1 rather than as a backlog, and may treat FORK-01, FORK-06, and FORK-07 as optional.
 
 ### Validation
@@ -607,8 +649,8 @@ Verified against sources rather than asserted:
 - Baseline figures, `epsilon`/`N`, seed std, split dates, row counts, and submission schema
   cross-checked against `kuairand-starter-kit/baseline_scores.json`, `evaluate.py`, `data.py`, and
   `submit.py`.
-- Repository state confirmed at commit `1cdd40c` with no remote divergence; `CLAUDE.md` and
-  `docs/handoffs/` do not exist yet, so `changelog.md` remains the handoff mechanism per D003.
+- Repository state confirmed at commit `1cdd40c` with no remote divergence; local instruction and
+  handoff files do not exist yet, so `changelog.md` remains the handoff mechanism per D003.
 
 Not validated: no dataset was downloaded and no baseline was executed, so every organizer figure
 cited remains a **reference value**, not a reproduced measurement.
@@ -621,16 +663,16 @@ cited remains a **reference value**, not a reproduced measurement.
 
 Task: none assigned - this precedes Wave 0. Requirements: REQ-014 (benchmark conflict; AliCCP portion
 now resolved by the updated PDF, metric/label portion still open). Decisions: none recorded yet;
-Codex owns D006 onward at Wave 0.
+the project owns D006 onward at Wave 0.
 
 ### Handoff Notes
 
 `FORK-XX` identifiers are local to `docs/DEFERRED_FORKS.md` and are deliberately **not** `EXP-XXX`,
-`T2-XXX`, `DXXX`, or `RXXX`. Codex assigns stable IDs at Wave 0; do not cite `FORK-XX` in commits,
+`T2-XXX`, `DXXX`, or `RXXX`. Stable IDs are assigned at Wave 0; do not cite `FORK-XX` in commits,
 PRs, or `results_log.md`.
 
-`CLAUDE.md`, `docs/WORKBOARD.md`, and `docs/handoffs/` are Codex-owned Wave 0 deliverables and were
-deliberately not created here to avoid claiming files another agent owns.
+Local instruction files, `docs/WORKBOARD.md`, and `docs/handoffs/` are Wave 0 deliverables and were
+deliberately not created here to avoid claiming files another contributor owns.
 
 These changes are uncommitted and sit in the working tree on branch `Arjun`. Plan v3 states `Arjun`
 should not be used as a shared writable development branch, so this should move to a task branch
@@ -644,11 +686,11 @@ Created the Track 2-only scaffold, documentation conventions, collaboration temp
 
 ### Why
 
-To make the repository durable shared memory for two humans and future Codex sessions.
+To make the repository durable shared memory for collaborators and future maintainers.
 
 ### Impact
 
-Future work follows `AGENTS.md`. The PDF's conflicting required-benchmark statements are explicitly unresolved.
+Future work follows the local project instructions. The PDF's conflicting required-benchmark statements are explicitly unresolved.
 
 ### Validation
 
