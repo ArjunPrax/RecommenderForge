@@ -627,7 +627,7 @@ The organizers confirmed that the checked-in Starter Kit is the scoring authorit
 
 ### Decision
 
-Treat the existing versioned Starter Kit profile as organizer-confirmed for KuaiRand-Pure and the bonus artifacts. Materialize a new `confirmed` campaign report and designated-final record from the same converged validation ledgers and frozen EXP-009E checkpoint. Do not retrain, rescore test data, or relabel historic provisional/team-interpreted records.
+Treat the existing versioned Starter Kit profile as organizer-confirmed for **KuaiRand-Pure**. Materialize a new `confirmed` campaign report and designated-final record from the same converged validation ledgers and frozen EXP-009E checkpoint. Do not retrain, rescore test data, or relabel historic provisional/team-interpreted records. Keep 1K/27K results as internal bonus-scale validation/output evidence: the organizer response did not provide a bonus baseline, threshold, or submission procedure.
 
 ### Why
 
@@ -635,7 +635,7 @@ The confirmation validates the contract already used by the implementation. A ne
 
 ### Consequences
 
-REQ-014 is resolved. Public materials may call the Starter Kit metric definition organizer-confirmed, but every model number remains validation-only until the official competition service scores the submitted output. The exact frozen output is byte-identical to the prior feature-only artifact; that equality is evidence of no retraining, not a hidden-test result.
+REQ-014 is resolved for KuaiRand-Pure. Public materials may call that Starter Kit metric definition organizer-confirmed, but every model number remains validation-only until the official competition service scores the submitted output. The exact frozen output is byte-identical to the prior feature-only artifact; that equality is evidence of no retraining, not a hidden-test result. The 1K/27K reference/threshold and upload process remain unconfirmed.
 
 ### Related
 

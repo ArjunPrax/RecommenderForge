@@ -43,7 +43,7 @@ All figures below are validation-only and use the Starter Kit profile described 
 | Reproduced organizer NumPy FM baseline (5 seeds) | 0.667400 | 0.535744 | 0.601572 | R001 |
 | PyTorch pointwise FM control (5 seeds) | 0.667450 | 0.535794 | 0.601622 | R002 |
 | BPR ranking FM (5 seeds) | 0.669535 | 0.536629 | 0.603082 | R003 |
-| Frozen BPR/history/temporal blend (5 seeds) | 0.670845 | 0.537188 | **0.604017** | R010/R023/R027 |
+| Frozen BPR/history/temporal blend (5 seeds) | 0.670845 | 0.537188 | **0.604017** | R010/R023/R035 |
 
 The final blend improves the reproduced baseline by **+0.002445 primary**. Its declared weights are 0.375 BPR, 0.375 history, and 0.250 temporal. The campaign revalidated that leader, then recorded three declared non-significant confirmation batches under one data fingerprint and evaluator hash (epsilon = 0.002, N = 3). It used 26.65 CPU seconds, 0 GPU seconds, 0 LLM tokens, and 0 manual interventions across those four campaign records.
 
@@ -56,11 +56,11 @@ Scores should be read against the organizers' oracle primary ceiling of **0.8645
 | Dataset / model | GAUC | nDCG@5 | Primary | Scope |
 |---|---:|---:|---:|---|
 | 1K item-only streaming baseline | 0.542570 | 0.545226 | 0.543898 | validation |
-| 1K item × tab blend | 0.542923 | 0.548764 | 0.545843 | validation |
+| 1K item × tab blend | 0.542923 | 0.548764 | 0.545843 | validation; frozen output in R036 |
 | 27K bounded item-only baseline | 0.570914 | 0.544153 | 0.557534 | validation |
 | 27K item × tab blend | 0.574100 | 0.599412 | **0.586756** | validation |
 
-The 27K output path streamed all 114,832,239 test feature rows from its frozen model and proved that an interrupted run resumes to the byte-identical output (SHA-256 `c4e95a…fcc5`). These scale figures demonstrate robustness and bounded processing, not an official bonus-benchmark threshold: no organizer reference threshold has been supplied.
+The 1K blend generated a 4,132,081-row feature-only CSV from its frozen bounded model (SHA-256 `43f61c…72b6a`). The 27K path streamed all 114,832,239 test feature rows from its frozen model and proved that an interrupted run resumes to the byte-identical output (SHA-256 `c4e95a…fcc5`). These scale figures demonstrate robustness and bounded processing, not an official bonus-benchmark threshold: the organizers have not supplied a 1K/27K reference, threshold, or upload route.
 
 See [results_log.md](results_log.md) for every measured result, including regressions, recovery events, hashes, commands, and limitations.
 
@@ -146,6 +146,6 @@ It generates aligned finite scores from the frozen checkpoint and does not score
 - The organizers confirmed the metric contract, but only their competition service can produce a hidden-test result.
 - The reported campaign used the deterministic offline planner. The optional Responses-API planner is schema-bounded and tested, but was not used in the measured campaign; reported LLM usage is therefore genuinely zero.
 - The repository excludes organizer source/data because the data is CC BY-SA 4.0 and the separately supplied Starter Kit source has no separate license notice.
-- The public code repository and CI are ready. Remaining external delivery actions are a public three-minute YouTube demo and official Devpost/submission steps.
+- The public-repository assets and CI configuration are ready; the current release branch must still be merged after fresh CI before publication. Remaining external delivery actions are a public three-minute YouTube demo and official Devpost/submission steps.
 
 For the full delivery checklist, see [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md). For contribution and review expectations, see [docs/COLLABORATION.md](docs/COLLABORATION.md).

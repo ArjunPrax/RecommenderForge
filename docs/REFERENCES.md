@@ -27,4 +27,4 @@ Python, NumPy, PyTorch (after parity), SQLite, and standard-library process cont
 
 ## Benchmark/Dataset Sources
 
-KuaiRand-Pure is required in the updated PDF; KuaiRand-1K and KuaiRand-27K are bonus. The metric/label contract remains unresolved (REQ-014).
+KuaiRand-Pure is required and its Starter Kit contract is organizer-confirmed. KuaiRand-1K and KuaiRand-27K are bonus artifacts; their official baseline, scoring threshold, and submission route have not been supplied.

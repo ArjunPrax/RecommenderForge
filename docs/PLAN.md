@@ -135,7 +135,7 @@ Relevant requirements: REQ-004, REQ-008, REQ-012, REQ-013
 
 Definition of done: Official artifacts available; baseline, scalable training, recovery, and output validation complete.
 
-Notes: KuaiRand-1K and KuaiRand-27K official archives are checksum-verified. R012 records the 1K baseline; R016–R021 record 27K preflight, bounded baseline, item×tab improvement, frozen rescore, and checkpoint-backed feature-only output. R024–R025 demonstrate full 27K validation and output interruption/resume equivalence, including real torn-write truncation and matching full-output SHA-256. D029 permits continued execution under the Starter-Kit-pinned contract. The implementation is integrated; it makes no hidden-test or organizer 27K-score claim.
+Notes: KuaiRand-1K and KuaiRand-27K official archives are checksum-verified. R012/R019/R036 record the 1K baseline, item×tab validation result, frozen model, and checkpoint-backed feature-only output. R016–R021 record 27K preflight, bounded baseline, item×tab improvement, frozen rescore, and checkpoint-backed feature-only output. R024–R025 demonstrate full 27K validation and output interruption/resume equivalence, including real torn-write truncation and matching full-output SHA-256. Pure's Starter Kit contract is organizer-confirmed; bonus-scale results remain validation/output evidence because no official bonus reference, threshold, or upload route has been supplied.
 
 ### T2-009 - Isolated child-process timeout recovery
 
@@ -278,3 +278,20 @@ Definition of done: Confirmation is recorded; current benchmark/profile document
 Validation: R035; confirmed campaign report/ledger/output; output SHA-256 equality with the historical feature-only artifact; full test suite and static checks.
 
 Files/components: `docs/ORGANIZER_CONFIRMATION.md`, `experiments/kuairand-pure-confirmed-campaign.json`, benchmark profiles, release documentation, and evidence records.
+
+### T2-017 - Materialize KuaiRand-1K frozen output
+
+Owner: Project
+Status: DONE
+Priority: High
+Depends on: T2-006, organizer bonus submission route
+
+Goal: Bind the previously measured 1K item×tab scale candidate to a frozen bounded model and generate an aligned feature-only output, while preserving the unconfirmed bonus-scoring scope.
+
+Relevant requirements: REQ-003, REQ-008, REQ-012, REQ-017
+
+Definition of done: The model is rebuilt from training labels only; its validation result matches R019; the feature-only CSV is sequential, finite, and checksum-recorded; public materials do not claim an organizer 1K/27K threshold or submission process.
+
+Validation: R036; 72-test suite; output header/row-ID/finiteness audit; `uv lock --check`; Markdown link check; `git diff --check`.
+
+Files/components: scale output artifacts (ignored), `results_log.md`, scale profile wording, release/Devpost/README documentation.

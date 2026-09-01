@@ -2,6 +2,33 @@
 
 This is the permanent empirical record. Preserve negative results and never record hypotheses as measured outcomes.
 
+## R036 - KuaiRand-1K frozen item×tab output
+
+Date: 2026-09-01
+Task: T2-017
+Experiment: EXP-015
+Status: Validation-only bonus-scale output evidence.
+
+### Purpose
+
+Materialize the previously measured 1K item×tab candidate as a frozen, feature-only output without changing its declared configuration or using test labels.
+
+### Revalidation and frozen model
+
+The bounded 24-bit item/item×tab rate blend was rebuilt from 1K training labels only with the declared `0.5/0.5` weight. Its validation result exactly reproduced R019 to displayed precision: GAUC `0.5429234352196763`, nDCG@5 `0.5487635006186582`, and primary `0.5458434679191673` over `2,524,980` validation rows and `978` users. The frozen model is `artifacts/scale/kuairand-1k-item-tab-model.npz` with SHA-256 `9933a17e2d0b03f3d7cceee5360c044c6e26c55b41652b3c69621443e80c36f1`.
+
+### Feature-only output
+
+`scale-submission` loaded that model without fitting and streamed `4,132,081` test feature rows to `artifacts/submissions/kuairand-1k-item-tab-final.csv`. The CSV has one header plus `4,132,081` rows, schema `row_id,user_id,video_id,score`, sequential row IDs from `0` through `4,132,080`, and finite scores. Its SHA-256 is `43f61ce713dea730e3e5a96e7339da439007b653cb6d0c23a385536b29272b6a`.
+
+### Scope and limitation
+
+The organizer confirmation makes the KuaiRand-Pure Starter Kit contract authoritative. It does not supply an official 1K baseline, bonus threshold, or upload route. This result is therefore an honest scale/output artifact, not a hidden-test result or a claim that the bonus benchmark has been beaten. Test rows were exposed only as identifiers and inference-known features; no test labels were read or scored.
+
+### Reproduction
+
+`.venv/bin/python -m tiktok_ml_agent scale-popularity --variant 1k --data-dir kuairand-starter-kit/KuaiRand-1K/data --evaluator kuairand-starter-kit/evaluate.py --feature-mode item_tab --item-weight 0.5 --hash-bits 24 --model-output artifacts/scale/kuairand-1k-item-tab-model.npz --output artifacts/scale/kuairand-1k-item-tab-final.json && .venv/bin/python -m tiktok_ml_agent scale-submission --variant 1k --data-dir kuairand-starter-kit/KuaiRand-1K/data --model artifacts/scale/kuairand-1k-item-tab-model.npz --output artifacts/submissions/kuairand-1k-item-tab-final.csv`
+
 ## R035 - Organizer-confirmed KuaiRand-Pure campaign and final
 
 Date: 2026-08-31

@@ -18,7 +18,7 @@ Plan experiments here; measured outcomes belong in `results_log.md`. IDs are sta
 | EXP-012 | Compact DeepFM BPR backbone | Measured; R011 rejects the first configuration |
 | EXP-013 | Three-negatives-per-positive BPR sampling | Measured; R014 rejects the first configuration |
 | EXP-014 | Top-five-aware Lambda-BPR mixture | Measured; R015 rejects the fixed 50/50 mixture |
-| EXP-015 | Bounded item×tab popularity scale candidate | Checkpointed 27K validation/output chain and frozen 3-weight grid demonstrated; R018–R021 |
+| EXP-015 | Bounded item×tab popularity scale candidate | Checkpoint-backed 1K and 27K validation/output chains demonstrated; frozen 3-weight grid and 27K resume evidence in R018–R021/R036 |
 | EXP-016 | Strict-prior video×tab candidate-history cross | Measured; R022 rejects it against the BPR parent while retaining its integrity evidence. |
 | EXP-017 | Resumable, identity-gated 27K scale validation and output | Robustness capability, not a metric change; full-artifact validation and output interruption→resume equivalence, torn-write truncation, and mismatch rejection measured in R024–R025. |
 | EXP-018 | Strict-prior user×author affinity candidate cross | Measured; R026 improves BPR but does not displace the frozen R023 leader. |

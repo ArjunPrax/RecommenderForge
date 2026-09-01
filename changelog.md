@@ -2,6 +2,20 @@
 
 Newest entries appear first. Record meaningful changes, why they happened, validation, unresolved issues, and useful handoff context.
 
+## 2026-09-01 - Frozen 1K bonus-scale output and scope correction
+
+### Changed
+
+Rebuilt the measured 1K item×tab bounded model and generated its feature-only output from that frozen model. Corrected current documentation and future bonus-scale profile notes: the organizer confirmation establishes the required KuaiRand-Pure contract, while 1K/27K have no supplied official baseline, threshold, or upload route.
+
+### Measured
+
+The 1K validation result reproduced primary `0.5458434679191673`. The frozen model SHA-256 is `9933a17e…c36f1`; its output has `4,132,081` feature-only rows, sequential IDs, finite scores, and SHA-256 `43f61ce7…72b6a`. No test labels were read or scored.
+
+### Related
+
+Task: T2-017. Experiment: EXP-015. Result: R036.
+
 ## 2026-08-31 - Organizer-confirmed Starter Kit contract
 
 ### Changed

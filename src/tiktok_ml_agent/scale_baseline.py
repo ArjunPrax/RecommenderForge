@@ -402,7 +402,7 @@ def rescore_frozen_scale_model(
             raise ValueError("item_weight must be in [0, 1]")
         model = replace(model, item_weight=item_weight)
     scale = ScaleArtifactAdapter(variant, Path(data_dir))
-    spec = BenchmarkSpec(benchmark_id=f"kuairand-{variant}", profile_id="confirmed-long-view-gauc-ndcg5-v1", label="long_view", metrics=("GAUC", "nDCG@5", "primary"), evaluator_path=str(evaluator_path), evaluator_sha256=hash_file(evaluator_path), source_note="Organizer-confirmed Starter Kit evaluator profile applied to bonus artifact.")
+    spec = BenchmarkSpec(benchmark_id=f"kuairand-{variant}", profile_id="bonus-reference-unconfirmed-long-view-gauc-ndcg5-v1", label="long_view", metrics=("GAUC", "nDCG@5", "primary"), evaluator_path=str(evaluator_path), evaluator_sha256=hash_file(evaluator_path), source_note="Interpretation - not explicit organizer wording: the Starter Kit evaluator is used for internal bonus-scale validation; no organizer bonus baseline, threshold, or submission procedure has been supplied.")
     metrics = _score_validation_sharded(adapter=scale, evaluator=BenchmarkAdapter.from_organizer_file(spec), model=model, shards=shards, scratch_dir=scratch_dir)
     metrics.update({"model_sha256": hash_file(model_path), "item_weight": float(model.item_weight) if isinstance(model, TabConditionedHashedPopularity) else -1.0, "wall_seconds": perf_counter() - started})
     return metrics
@@ -602,7 +602,7 @@ def run_streaming_popularity(
 ) -> dict[str, float | str]:
     """Train on a stream and score only the official validation date range."""
     started = perf_counter(); scale = ScaleArtifactAdapter(variant, Path(data_dir))
-    spec = BenchmarkSpec(benchmark_id=f"kuairand-{variant}", profile_id="confirmed-long-view-gauc-ndcg5-v1", label="long_view", metrics=("GAUC", "nDCG@5", "primary"), evaluator_path=str(evaluator_path), evaluator_sha256=hash_file(evaluator_path), source_note="Organizer-confirmed Starter Kit evaluator profile applied to bonus artifact.")
+    spec = BenchmarkSpec(benchmark_id=f"kuairand-{variant}", profile_id="bonus-reference-unconfirmed-long-view-gauc-ndcg5-v1", label="long_view", metrics=("GAUC", "nDCG@5", "primary"), evaluator_path=str(evaluator_path), evaluator_sha256=hash_file(evaluator_path), source_note="Interpretation - not explicit organizer wording: the Starter Kit evaluator is used for internal bonus-scale validation; no organizer bonus baseline, threshold, or submission procedure has been supplied.")
     evaluator = BenchmarkAdapter.from_organizer_file(spec)
     effective_bits = 24 if variant == "27k" and hash_bits is None else hash_bits
     if feature_mode not in {"item", "item_tab"}:
@@ -696,12 +696,16 @@ def score_scale_validation_resumable(
     )
     spec = BenchmarkSpec(
         benchmark_id=f"kuairand-{variant}",
-        profile_id="confirmed-long-view-gauc-ndcg5-v1",
+        profile_id="bonus-reference-unconfirmed-long-view-gauc-ndcg5-v1",
         label="long_view",
         metrics=("GAUC", "nDCG@5", "primary"),
         evaluator_path=str(evaluator_path),
         evaluator_sha256=identity["evaluator_sha256"],
-        source_note="Organizer-confirmed Starter Kit evaluator profile applied to bonus artifact.",
+        source_note=(
+            "Interpretation - not explicit organizer wording: the Starter Kit evaluator is used "
+            "for internal bonus-scale validation; no organizer bonus baseline, threshold, or "
+            "submission procedure has been supplied."
+        ),
     )
     # Guard the split name against the frozen contract as well as the adapter.
     spec.assert_development_split("valid")
